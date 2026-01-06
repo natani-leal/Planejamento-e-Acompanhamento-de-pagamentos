@@ -14,3 +14,4 @@ Projeto em Google Apps Script com HTML customizado.
 - Projeto funcional
 - Não reescrever do zero
 - Objetivo: melhorias de performance e organização
+- Código e index são o projeto principal. Quero que incorpore a tabelacontrole nele
