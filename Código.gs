@@ -8,10 +8,9 @@ var ABA_CONSOLIDADO = 'Consolidado';
 // NOVO LINK ATUALIZADO:
 var LINK_DIVISAO_EXECUTORES = 'https://script.google.com/macros/s/AKfycbzAXBIR5r5C-8FmgQws4YzL1jzEbNKNBFxLQQ6WjndJL5TeEO-vh3fjp2Dle_Efo3WOzA/exec';
 
-// Colunas (0-indexed)
-// Confirmed mapping: L is 11 (A=0, ..., L=11)
 var COL = {
   AGENCIA: 0,      // A
+  DATA_CONSOLIDADO: 1, // B
   CAMPANHA: 2,     // C
   NF: 5,           // F
   VEICULO: 9,      // J
@@ -140,14 +139,17 @@ function getAtestadas() {
     var status = String(row[COL.STATUS_PAG] || '').toLowerCase().trim();
     var isAtestada = status.indexOf('atestada') !== -1;
     var isInconformidade = status.indexOf('inconformidade') !== -1;
+    var isEmAnalise = !status || status.indexOf('analise') !== -1;
     
-    if (isAtestada || isInconformidade) {
+    if (isAtestada || isInconformidade || isEmAnalise) {
       var groupKey = row[COL.AGENCIA] + '|' + row[COL.CAMPANHA];
       if (!grupos[groupKey]) {
         var saved = stored[groupKey] || {};
         grupos[groupKey] = {
           agencia: row[COL.AGENCIA],
           campanha: row[COL.CAMPANHA],
+          qtdEmAnalise: 0,
+          valorEmAnalise: 0,
           qtdAtestada: 0,
           valorAtestado: 0,
           qtdPendente: 0,
@@ -157,10 +159,15 @@ function getAtestadas() {
         };
       }
       var valor = parseFloat(row[COL.VALOR]) || 0;
-      if (isAtestada && !isInconformidade) {
+      
+      if (isEmAnalise) {
+        grupos[groupKey].qtdEmAnalise++;
+        grupos[groupKey].valorEmAnalise += valor;
+      } else if (isAtestada && !isInconformidade) {
         grupos[groupKey].qtdAtestada++;
         grupos[groupKey].valorAtestado += valor;
       }
+      
       if (isInconformidade) {
         grupos[groupKey].qtdPendente++;
         grupos[groupKey].valorPendente += valor;
@@ -231,14 +238,14 @@ function getDadosExecutores(dataStr) {
   
   // Coletar datas disponíveis
   data.forEach(function(row) {
-    var dataNota = row[COL.ATESTO]; // Usando data de atesto
+    var dataNota = row[COL.DATA_CONSOLIDADO]; // Usando coluna B conforme solicitado
     if (dataNota && dataNota instanceof Date) {
       var key = Utilities.formatDate(dataNota, Session.getScriptTimeZone(), 'yyyy-MM-dd');
       if (key) datas[key] = true;
     }
   });
   
-  var datasOrdenadas = Object.keys(datas).sort().reverse().slice(0, 60);
+  var datasOrdenadas = Object.keys(datas).sort().reverse(); // Todas as datas, ordenadas da mais recente
   
   // Se não passou filtro, usar data mais recente
   var dataSelecionada = dataStr;
@@ -299,4 +306,136 @@ function getDadosExecutores(dataStr) {
     executores: result,
     dataSelecionada: dataSelecionada
   };
+}
+
+// ======================================================================
+// INTEGRAÇÃO: GERADOR DE TABELA DE CONTROLE DE PAGAMENTO
+// ======================================================================
+
+const SHEET_NAME_EMPENHOS = 'SaldoEmpenhos'; 
+const SHEET_NAME_CERTIDOES = 'Certidões';
+
+function filtrarControleDePagamento(valorBusca) {
+  try {
+    const data = getAllData_();
+    const out = [];
+    const buscaStr = String(valorBusca || "").trim();
+
+    for (let i = 0; i < data.length; i++) {
+      const r = data[i];
+      const valorT_raw = r[COL.CONTROLE];
+      let valorT = typeof valorT_raw === 'number' ? valorT_raw.toFixed(0) : String(valorT_raw || "");
+      valorT = valorT.trim();
+      
+      if (!r[0] && !r[2] && !r[5]) continue;
+
+      if (buscaStr === "" || valorT.includes(buscaStr)) {
+        out.push({
+          agencia_principal: String(r[COL.AGENCIA] || ""), 
+          valor_nf_agencia: (r[6] === "" || r[6] == null) ? 0 : Number(r[6]), // Mantendo índices fixos se não mapeados
+          veiculo_forn: String(r[COL.VEICULO] || ""), 
+          cnpj: String(r[10] || ""), 
+          tipo_midia: String(r[COL.TIPO_MIDIA] || ""), 
+          valor_nf: (r[COL.VALOR] === "" || r[COL.VALOR] == null) ? 0 : Number(r[COL.VALOR]), 
+          nf: String(r[COL.NF] || ""), 
+          glosa: (r[14] === "" || r[14] == null) ? 0 : Number(r[14]),
+        });
+      }
+    }
+    return out;
+  } catch (e) {
+    throw new Error("Erro ao filtrar controle: " + e.message);
+  }
+}
+
+function getSaldoByPI(valorBusca) {
+  const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+  const buscaStr = String(valorBusca || "").trim().toUpperCase();
+  const defaultReturn = { saldo: 0, agencia: null, campanha: null };
+  if (!buscaStr) return defaultReturn;
+
+  let agencia = null;
+  let campanha = null;
+  let saldoAtual = 0;
+
+  try {
+    const data = getAllData_();
+    for (let i = 0; i < data.length; i++) {
+      const r = data[i];
+      const valorT_raw = r[COL.CONTROLE];
+      let valorT = typeof valorT_raw === 'number' ? valorT_raw.toFixed(0) : String(valorT_raw || "");
+      valorT = valorT.trim().toUpperCase(); 
+
+      if (valorT.includes(buscaStr)) {
+        agencia = String(r[COL.AGENCIA] || "").trim();
+        campanha = String(r[COL.CAMPANHA] || "").trim();
+        break; 
+      }
+    }
+
+    if (!agencia || !campanha) return defaultReturn;
+
+    const shEmpenhos = ss.getSheetByName(SHEET_NAME_EMPENHOS);
+    if (!shEmpenhos) return { ...defaultReturn, agencia, campanha };
+    
+    const rowsEmpenhos = shEmpenhos.getDataRange().getValues();
+    const buscaAgenciaUpper = agencia.toUpperCase();
+    const buscaCampanhaUpper = campanha.toUpperCase();
+    
+    for (let i = 1; i < rowsEmpenhos.length; i++) {
+      const r = rowsEmpenhos[i];
+      const valorAgenciaEmpenho = String(r[5] || "").trim().toUpperCase();
+      const valorCampanhaEmpenho = String(r[4] || "").trim().toUpperCase();
+
+      if (valorAgenciaEmpenho.includes(buscaAgenciaUpper) && valorCampanhaEmpenho.includes(buscaCampanhaUpper)) {
+        saldoAtual = (r[7] === "" || r[7] == null) ? 0 : Number(r[7]);
+        break; 
+      }
+    }
+
+    return { saldo: saldoAtual, agencia: agencia, campanha: campanha };
+  } catch (e) {
+    return defaultReturn; 
+  }
+}
+
+function getCertidoesByAgencia(agenciaBusca) {
+    const defaultReturn = { rfb: null, sefaz_df: null, fgts: null, tst: null, link: null, agencia_cert: null };
+    const buscaAgencia = String(agenciaBusca || "").trim().toUpperCase(); 
+    if (!buscaAgencia) return defaultReturn;
+    
+    try {
+        const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+        const sh = ss.getSheetByName(SHEET_NAME_CERTIDOES);
+        if (!sh) return defaultReturn;
+        
+        const rows = sh.getDataRange().getValues();
+        for (let i = 1; i < rows.length; i++) {
+            const r = rows[i];
+            const agenciaCertidao = String(r[0] || "").trim().toUpperCase();
+            if (agenciaCertidao.includes(buscaAgencia) || buscaAgencia.includes(agenciaCertidao)) {
+                return {
+                    agencia_cert: String(r[0] || ""),
+                    rfb: formatSheetDate_(r[3]),
+                    sefaz_df: formatSheetDate_(r[4]),
+                    fgts: formatSheetDate_(r[5]),
+                    tst: formatSheetDate_(r[6]),
+                    link: String(r[7] || ""),
+                };
+            }
+        }
+        return defaultReturn; 
+    } catch (e) {
+        return defaultReturn;
+    }
+}
+
+function formatSheetDate_(dateValue) {
+  if (dateValue instanceof Date && !isNaN(dateValue)) {
+    const d = dateValue.getDate().toString().padStart(2, '0');
+    const m = (dateValue.getMonth() + 1).toString().padStart(2, '0');
+    const y = dateValue.getFullYear().toString().slice(-2);
+    return `${d}/${m}/${y}`;
+  }
+  return String(dateValue || 'N/A');
 }
