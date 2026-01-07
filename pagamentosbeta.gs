@@ -1,5 +1,5 @@
 // ==========================================
-// ARQUIVO: Código.gs (Backend) - VERSÃO COMPLETA CORRIGIDA
+// ARQUIVO: Código.gs (Backend) - VERSÃO CORRIGIDA
 // ==========================================
 
 // Configuração
@@ -12,12 +12,9 @@ var COL = {
   CAMPANHA: 2,          // C
   NF: 5,                // F
   VEICULO: 9,           // J
-  CNPJ: 10,             // K
   TIPO_MIDIA: 11,       // L
   STATUS_PAG: 12,       // M
   EXECUTOR: 13,         // N
-  GLOSA: 14,            // O
-  MOTIVO: 15,           // P - Motivo/Observação para tooltip
   ATESTO: 18,           // S
   CONTROLE: 19,         // T
   DATA_PAGO: 20,        // U
@@ -50,6 +47,7 @@ function getKey_(row) {
 }
 
 // --- PUBLIC FUNCTIONS ---
+
 function doGet() {
   return HtmlService.createHtmlOutputFromFile('Index')
     .setTitle('Controle de Pagamentos')
@@ -99,9 +97,6 @@ function saveField(section, key, field, value) {
   return true;
 }
 
-// ==========================================
-// EM PROCESSO DE PAGAMENTO
-// ==========================================
 function getEmProcesso() {
   var data = getAllData_();
   var stored = getStoredData_();
@@ -142,9 +137,7 @@ function getEmProcesso() {
   return result;
 }
 
-// ==========================================
-// ATESTADAS - Com diligência interna e motivo (coluna P)
-// ==========================================
+// CORRIGIDO: getAtestadas - só conta "em análise" explícito
 function getAtestadas() {
   var data = getAllData_();
   var stored = getStoredData_();
@@ -154,12 +147,11 @@ function getAtestadas() {
     var status = String(row[COL.STATUS_PAG] || '').toLowerCase().trim();
     var isAtestada = status.indexOf('atestada') !== -1;
     var isInconformidade = status.indexOf('inconformidade') !== -1;
+    // CORRIGIDO: Só conta "em análise" se tiver explicitamente no texto
     var isEmAnalise = status.indexOf('analise') !== -1 || status.indexOf('análise') !== -1;
-    var isDiligencia = status.indexOf('diligência') !== -1 || status.indexOf('diligencia') !== -1;
 
-    if (isAtestada || isInconformidade || isEmAnalise || isDiligencia) {
+    if (isAtestada || isInconformidade || isEmAnalise) {
       var groupKey = row[COL.AGENCIA] + '|' + row[COL.CAMPANHA];
-
       if (!grupos[groupKey]) {
         var saved = stored[groupKey] || {};
         grupos[groupKey] = {
@@ -171,29 +163,21 @@ function getAtestadas() {
           valorAtestado: 0,
           qtdPendente: 0,
           valorPendente: 0,
-          qtdDiligencia: 0,
-          valorDiligencia: 0,
           pendentes: [],
-          diligencias: [],
           obs: saved.obs || ''
         };
       }
-
       var valor = parseFloat(row[COL.VALOR]) || 0;
-      var motivo = String(row[COL.MOTIVO] || '').trim();
 
-      if (isDiligencia) {
-        grupos[groupKey].qtdDiligencia++;
-        grupos[groupKey].valorDiligencia += valor;
-        grupos[groupKey].diligencias.push({
-          nf: row[COL.NF],
-          veiculo: row[COL.VEICULO],
-          executor: row[COL.EXECUTOR],
-          tipoMidia: row[COL.TIPO_MIDIA],
-          motivo: motivo,
-          valor: valor
-        });
-      } else if (isInconformidade) {
+      if (isEmAnalise && !isAtestada && !isInconformidade) {
+        grupos[groupKey].qtdEmAnalise++;
+        grupos[groupKey].valorEmAnalise += valor;
+      } else if (isAtestada && !isInconformidade) {
+        grupos[groupKey].qtdAtestada++;
+        grupos[groupKey].valorAtestado += valor;
+      }
+
+      if (isInconformidade) {
         grupos[groupKey].qtdPendente++;
         grupos[groupKey].valorPendente += valor;
         grupos[groupKey].pendentes.push({
@@ -201,25 +185,15 @@ function getAtestadas() {
           veiculo: row[COL.VEICULO],
           executor: row[COL.EXECUTOR],
           tipoMidia: row[COL.TIPO_MIDIA],
-          motivo: motivo,
+          tipo: 'Inconformidade',
           valor: valor
         });
-      } else if (isEmAnalise && !isAtestada) {
-        grupos[groupKey].qtdEmAnalise++;
-        grupos[groupKey].valorEmAnalise += valor;
-      } else if (isAtestada) {
-        grupos[groupKey].qtdAtestada++;
-        grupos[groupKey].valorAtestado += valor;
       }
     }
   });
-
   return Object.values(grupos);
 }
 
-// ==========================================
-// PAGAS (ÚLTIMO MÊS)
-// ==========================================
 function getUltimasPagas() {
   var data = getAllData_();
   var grupos = {};
@@ -229,7 +203,6 @@ function getUltimasPagas() {
   data.forEach(function(row) {
     var status = String(row[COL.STATUS_PAG] || '').toLowerCase().trim();
     var dataPago = row[COL.DATA_PAGO];
-
     if (status === STATUS.PAGA && dataPago && dataPago >= limite) {
       var key = getKey_(row);
       if (!grupos[key]) {
@@ -249,7 +222,6 @@ function getUltimasPagas() {
       }
     }
   });
-
   var result = Object.values(grupos);
   result.sort(function(a, b) {
     return new Date(b.dataPago) - new Date(a.dataPago);
@@ -257,9 +229,6 @@ function getUltimasPagas() {
   return result;
 }
 
-// ==========================================
-// GET DADOS (PRINCIPAL)
-// ==========================================
 function getDados() {
   return {
     emProcesso: getEmProcesso(),
@@ -268,9 +237,7 @@ function getDados() {
   };
 }
 
-// ==========================================
-// EXECUTORES - Com valor (coluna AB)
-// ==========================================
+// CORRIGIDO: getDadosExecutores - com analisadas calculado
 function getDadosExecutores(dataStr) {
   var data = getAllData_();
   var datas = {};
@@ -286,7 +253,11 @@ function getDadosExecutores(dataStr) {
   });
 
   var datasOrdenadas = Object.keys(datas).sort().reverse();
-  var dataSelecionada = dataStr || datasOrdenadas[0];
+
+  var dataSelecionada = dataStr;
+  if (!dataSelecionada && datasOrdenadas.length > 0) {
+    dataSelecionada = datasOrdenadas[0];
+  }
 
   if (!dataSelecionada) {
     return { datasDisponiveis: datasOrdenadas, executores: [], dataSelecionada: null };
@@ -295,31 +266,29 @@ function getDadosExecutores(dataStr) {
   data.forEach(function(row) {
     var dataNota = row[COL.DATA_CONSOLIDADO];
     if (!dataNota || !(dataNota instanceof Date)) return;
+
     var dataNotaStr = Utilities.formatDate(dataNota, Session.getScriptTimeZone(), 'yyyy-MM-dd');
     if (dataNotaStr !== dataSelecionada) return;
 
-    var executor = String(row[COL.EXECUTOR] || '').trim() || 'SEM EXECUTOR';
+    var executor = String(row[COL.EXECUTOR] || '').trim();
+    if (!executor) executor = 'SEM EXECUTOR';
+
     var agencia = String(row[COL.AGENCIA] || '').toUpperCase().trim();
     var statusRaw = String(row[COL.STATUS_PAG] || '').toLowerCase().trim();
     var nf = String(row[COL.NF] || '').trim();
-    var valor = parseFloat(row[COL.VALOR]) || 0;
 
+    // CORRIGIDO: Só conta "em análise" se tiver explicitamente no texto
     var emAnalise = statusRaw.indexOf('analise') !== -1 || statusRaw.indexOf('análise') !== -1;
+    // Analisadas = tem status preenchido e NÃO é "em análise"
     var analisada = statusRaw !== '' && !emAnalise;
 
     if (!executores[executor]) {
       executores[executor] = {
         nome: executor,
-        av: 0,
-        calia: 0,
-        ebm: 0,
-        total: 0,
+        av: 0, calia: 0, ebm: 0, total: 0,
         emAnalise: 0,
         analisadas: 0,
-        valor: 0,
-        nfsAv: [],
-        nfsCalia: [],
-        nfsEbm: []
+        nfsAv: [], nfsCalia: [], nfsEbm: []
       };
     }
 
@@ -335,7 +304,6 @@ function getDadosExecutores(dataStr) {
     }
 
     executores[executor].total++;
-    executores[executor].valor += valor;
     if (emAnalise) executores[executor].emAnalise++;
     if (analisada) executores[executor].analisadas++;
   });
@@ -353,6 +321,7 @@ function getDadosExecutores(dataStr) {
 // ======================================================================
 // GERADOR DE TABELA DE CONTROLE DE PAGAMENTO
 // ======================================================================
+
 const SHEET_NAME_EMPENHOS = 'SaldoEmpenhos';
 const SHEET_NAME_CERTIDOES = 'Certidões';
 
@@ -369,16 +338,17 @@ function filtrarControleDePagamento(valorBusca) {
       valorT = valorT.trim();
 
       if (!r[0] && !r[2] && !r[5]) continue;
+
       if (buscaStr === "" || valorT.includes(buscaStr)) {
         out.push({
           agencia_principal: String(r[COL.AGENCIA] || ""),
           valor_nf_agencia: (r[6] === "" || r[6] == null) ? 0 : Number(r[6]),
           veiculo_forn: String(r[COL.VEICULO] || ""),
-          cnpj: String(r[COL.CNPJ] || ""),
+          cnpj: String(r[10] || ""),
           tipo_midia: String(r[COL.TIPO_MIDIA] || ""),
           valor_nf: (r[COL.VALOR] === "" || r[COL.VALOR] == null) ? 0 : Number(r[COL.VALOR]),
           nf: String(r[COL.NF] || ""),
-          glosa: (r[COL.GLOSA] === "" || r[COL.GLOSA] == null) ? 0 : Number(r[COL.GLOSA]),
+          glosa: (r[14] === "" || r[14] == null) ? 0 : Number(r[14]),
         });
       }
     }
@@ -392,7 +362,6 @@ function getSaldoByPI(valorBusca) {
   const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
   const buscaStr = String(valorBusca || "").trim().toUpperCase();
   const defaultReturn = { saldo: 0, agencia: null, campanha: null };
-
   if (!buscaStr) return defaultReturn;
 
   let agencia = null;
@@ -443,7 +412,6 @@ function getSaldoByPI(valorBusca) {
 function getCertidoesByAgencia(agenciaBusca) {
   const defaultReturn = { rfb: null, sefaz_df: null, fgts: null, tst: null, link: null, agencia_cert: null };
   const buscaAgencia = String(agenciaBusca || "").trim().toUpperCase();
-
   if (!buscaAgencia) return defaultReturn;
 
   try {
@@ -455,7 +423,6 @@ function getCertidoesByAgencia(agenciaBusca) {
     for (let i = 1; i < rows.length; i++) {
       const r = rows[i];
       const agenciaCertidao = String(r[0] || "").trim().toUpperCase();
-
       if (agenciaCertidao.includes(buscaAgencia) || buscaAgencia.includes(agenciaCertidao)) {
         return {
           agencia_cert: String(r[0] || ""),
