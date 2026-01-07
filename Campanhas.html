@@ -389,6 +389,48 @@
       max-width: 900px;
     }
 
+    /* Campaign Group Info - informações da campanha logo abaixo do título */
+    .campaign-group-info {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-top: 8px;
+      padding: 10px 14px;
+      background: #f8fafc;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .campaign-group-info-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+    }
+
+    .campaign-group-info-item svg {
+      width: 14px;
+      height: 14px;
+      color: #94a3b8;
+      flex-shrink: 0;
+    }
+
+    .campaign-group-info-item .info-label {
+      color: #94a3b8;
+      font-weight: 500;
+    }
+
+    .campaign-group-info-item .info-value {
+      color: #475569;
+      font-weight: 500;
+    }
+
+    .campaign-group-info-empty {
+      color: #94a3b8;
+      font-style: italic;
+      padding: 8px 0;
+    }
+
     .campaign-group-badge {
       padding: 4px 10px;
       background: #f1f5f9;
@@ -418,20 +460,16 @@
 
     .card-av { border-top: 4px solid #8b5cf6; }
     .card-calia { border-top: 4px solid #f97316; }
-    .card-ebm { border-top: 4px solid #64748b; }
-    .card-total { border-top: 4px solid #6366f1; }
+    .card-ebm { border-top: 4px solid #cbd5e1; }
+    .card-total { border-top: 4px solid #475569; }
 
     .card-header {
       padding: 20px;
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
+      background: transparent;
     }
-
-    .card-av .card-header { background: linear-gradient(to bottom, rgba(139, 92, 246, 0.08), transparent); }
-    .card-calia .card-header { background: linear-gradient(to bottom, rgba(249, 115, 22, 0.08), transparent); }
-    .card-ebm .card-header { background: linear-gradient(to bottom, rgba(100, 116, 139, 0.08), transparent); }
-    .card-total .card-header { background: linear-gradient(to bottom, rgba(99, 102, 241, 0.08), transparent); }
 
     .card-title {
       font-size: 20px;
@@ -717,11 +755,15 @@
       opacity: 1;
     }
 
-    /* Status and Payments Container */
+    /* Status and Payments Container - full width of card */
     .collapsible-buttons-container {
       margin-top: 8px;
+      margin-left: -20px;
+      margin-right: -20px;
+      margin-bottom: -20px;
       display: flex;
       flex-direction: column;
+      width: calc(100% + 40px);
     }
 
     /* Status Collapsible - styled like payments-table-container */
@@ -730,13 +772,14 @@
       border: 1px solid #e2e8f0;
       border-radius: 12px 12px 0 0;
       overflow: hidden;
+      width: 100%;
     }
 
     .status-collapsible .collapsible-header {
-      padding: 10px 16px;
-      font-size: 13px;
-      font-weight: 400;
-      color: #64748b;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #475569;
       background: #f8fafc;
       cursor: pointer;
       display: flex;
@@ -819,13 +862,14 @@
       border-top: none;
       border-radius: 0 0 12px 12px;
       overflow: hidden;
+      width: 100%;
     }
 
     .payments-table-title {
-      padding: 10px 16px;
-      font-size: 13px;
-      font-weight: 400;
-      color: #64748b;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #475569;
       background: #f8fafc;
       border-top: 1px solid #e2e8f0;
       cursor: pointer;
@@ -866,18 +910,18 @@
     .payments-table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 13px;
+      font-size: 11px;
     }
 
     .payments-table th {
-      padding: 10px 12px;
+      padding: 6px 8px;
       text-align: center;
       font-weight: 500;
-      color: #94a3b8;
+      color: #64748b;
       background: #f8fafc;
       border-bottom: 1px solid #e2e8f0;
       text-transform: uppercase;
-      font-size: 11px;
+      font-size: 9px;
       letter-spacing: 0.5px;
     }
 
@@ -886,7 +930,7 @@
     }
 
     .payments-table td {
-      padding: 10px 12px;
+      padding: 6px 8px;
       border-bottom: 1px solid #f1f5f9;
       color: #64748b;
       text-align: center;
@@ -901,12 +945,23 @@
     }
 
     .payments-table .pag-data {
-      font-size: 13px;
+      font-size: 11px;
       color: #64748b;
     }
 
-    .payments-table .pag-controle {
+    .payments-table .pag-data-sub {
       font-size: 11px;
+      color: #64748b;
+      margin-top: 1px;
+    }
+
+    .payments-table .pag-controle {
+      font-size: 10px;
+      color: #64748b;
+    }
+
+    .payments-table .pag-qt-sub {
+      font-size: 9px;
       color: #94a3b8;
       margin-top: 2px;
     }
@@ -959,8 +1014,6 @@
     .payments-table .saldo-row td.negative {
       color: #dc2626;
     }
-
-    /* Warning styles removed - moved to Saldo de Empenho */
 
     .payments-table .saldo-row.saldo-zero {
       background: #f8fafc;
@@ -1254,6 +1307,7 @@
     var allCampanhas = [];
     var allTermos = [];
     var campanhasPorTermo = {};
+    var campanhaInfoCache = {};
 
     // Initialize
     document.addEventListener('DOMContentLoaded', function() {
@@ -1665,12 +1719,30 @@
         .getEmpenhosPorCampanha(campanha);
     }
 
+    // Carregar informações de campanha para exibir abaixo do título no modo agrupado
+    function loadCampanhaInfoForGroup(campanhaNome, callback) {
+      if (campanhaInfoCache[campanhaNome]) {
+        callback(campanhaInfoCache[campanhaNome]);
+        return;
+      }
+      google.script.run
+        .withSuccessHandler(function(info) {
+          campanhaInfoCache[campanhaNome] = info;
+          callback(info);
+        })
+        .withFailureHandler(function(e) {
+          console.error('Erro ao carregar info da campanha:', e);
+          callback(null);
+        })
+        .getCampanhaInfo(campanhaNome);
+    }
+
     function toggleCollapsible(header, type) {
       var isExpanded = header.classList.contains('expanded');
       // Toggle all collapsibles of same type
       var allHeaders = document.querySelectorAll('.payments-table-title[data-type="' + type + '"], .collapsible-header[data-type="' + type + '"]');
       var allContents = document.querySelectorAll('.payments-table-content[data-type="' + type + '"], .collapsible-content[data-type="' + type + '"]');
-      
+
       allHeaders.forEach(function(h) {
         if (isExpanded) {
           h.classList.remove('expanded');
@@ -1678,7 +1750,7 @@
           h.classList.add('expanded');
         }
       });
-      
+
       allContents.forEach(function(c) {
         if (isExpanded) {
           c.classList.remove('visible');
@@ -1714,23 +1786,29 @@
           '<div class="payments-table-title" data-type="pagamentos" onclick="toggleCollapsible(this, \'pagamentos\')">Pagamentos</div>' +
           '<div class="payments-table-content" data-type="pagamentos">' +
           '<table class="payments-table">' +
-          '<thead><tr><th>Data/Controle</th><th>Qt</th><th>Valor</th></tr></thead>' +
+          '<thead><tr><th>Data</th><th>Controle</th><th>Valor</th></tr></thead>' +
           '<tbody>';
 
         var totalPagamentos = 0;
         agData.pagamentos.forEach(function(pag) {
           var pgBadge = pag.paga ? '<span class="pg-badge">PG</span>' : '';
-          var dataControle = '<div class="pag-data">' + (pag.data || '-') + '</div>' +
-            '<div class="pag-controle">' + (pag.controle || '-') + '</div>';
+          // Data início (atesto) e conclusão (pago) com tooltips
+          var dataAtestoVal = pag.dataAtesto || '-';
+          var dataPagoVal = pag.dataPago || '-';
+          var dataHtml = '<div class="pag-data" title="início">' + dataAtestoVal + '</div>' +
+            '<div class="pag-data" title="conclusão">' + dataPagoVal + '</div>';
+          // Valor em cima, quantidade menor embaixo
+          var valorQt = '<div>' + formatCurrency(pag.valor || 0) + pgBadge + '</div>' +
+            '<div class="pag-qt-sub">' + (pag.qtd || 0) + ' NFs</div>';
           html += '<tr>' +
-            '<td>' + dataControle + '</td>' +
-            '<td>' + (pag.qtd || 0) + '</td>' +
-            '<td>' + formatCurrency(pag.valor || 0) + pgBadge + '</td>' +
+            '<td>' + dataHtml + '</td>' +
+            '<td class="pag-controle">' + (pag.controle || '-') + '</td>' +
+            '<td>' + valorQt + '</td>' +
           '</tr>';
           totalPagamentos += pag.valor || 0;
         });
 
-        // Total row - aligned with Valor column
+        // Total row - 3 columns
         html += '<tr class="total-row">' +
           '<td colspan="2" style="text-align: left;">Total</td>' +
           '<td style="text-align: center;">' + formatCurrency(totalPagamentos) + '</td>' +
@@ -1738,16 +1816,16 @@
 
         // Saldo row with conditional styling (only zero)
         var saldo = (agData.empenho || 0) - totalPagamentos;
-        
+
         var saldoRowClass = 'saldo-row';
         var saldoTdClass = '';
-        
+
         if (saldo <= 0) {
           saldoRowClass += ' saldo-zero';
         } else if (saldo < 0) {
           saldoTdClass = ' negative';
         }
-        
+
         html += '<tr class="' + saldoRowClass + '">' +
           '<td colspan="2" style="text-align: left;" class="saldo-label-cell" title="Considera apenas as pagas. Pode haver faturadas e não pagas ainda.">Saldo</td>' +
           '<td class="' + saldoTdClass + '" style="text-align: center;">' + formatCurrency(saldo) + '</td>' +
@@ -1761,7 +1839,7 @@
     function calcularTotalPagamentos(pagamentosData) {
       var allPagamentos = [];
       var totalEmpenho = 0;
-      
+
       ['AV', 'Calia', 'EBM'].forEach(function(ag) {
         if (pagamentosData[ag]) {
           totalEmpenho += pagamentosData[ag].empenho || 0;
@@ -1829,9 +1907,75 @@
           '<div style="flex:1; min-width:0;">' +
             '<div class="campaign-group-title">' + campanha.nome + '</div>' +
             descHtml +
+            '<div class="campaign-group-info" id="campaign-info-' + campanha.nome.toLowerCase().replace(/[^a-z0-9]/g, '') + '"></div>' +
           '</div>';
 
         group.appendChild(header);
+
+        // Carregar informações da campanha (colunas AD-AI, exceto AE)
+        loadCampanhaInfoForGroup(campanha.nome, function(info) {
+          var infoContainer = document.getElementById('campaign-info-' + campanha.nome.toLowerCase().replace(/[^a-z0-9]/g, ''));
+          if (!infoContainer) return;
+          
+          if (!info) {
+            infoContainer.innerHTML = '<div class="campaign-group-info-empty">Sem informações cadastradas</div>';
+            return;
+          }
+
+          var hasInfo = info.processoMae || info.autorizacao || info.inicio || info.fim || info.observacoes;
+          if (!hasInfo) {
+            infoContainer.innerHTML = '<div class="campaign-group-info-empty">Sem informações cadastradas</div>';
+            return;
+          }
+
+          var infoHtml = '';
+          
+          // Processo Mãe (AD)
+          if (info.processoMae) {
+            infoHtml += '<div class="campaign-group-info-item">' +
+              getIcon('folder') +
+              '<span class="info-label">Processo Mãe:</span>' +
+              '<span class="info-value">' + info.processoMae + '</span>' +
+            '</div>';
+          }
+          
+          // Autorização (AF)
+          if (info.autorizacao) {
+            infoHtml += '<div class="campaign-group-info-item">' +
+              getIcon('check') +
+              '<span class="info-label">Autorização:</span>' +
+              '<span class="info-value">' + info.autorizacao + '</span>' +
+            '</div>';
+          }
+          
+          // Início (AG)
+          if (info.inicio) {
+            infoHtml += '<div class="campaign-group-info-item">' +
+              getIcon('calendar') +
+              '<span class="info-label">Início:</span>' +
+              '<span class="info-value">' + formatDate(info.inicio) + '</span>' +
+            '</div>';
+          }
+          
+          // Fim (AH)
+          if (info.fim) {
+            infoHtml += '<div class="campaign-group-info-item">' +
+              getIcon('calendar') +
+              '<span class="info-label">Fim:</span>' +
+              '<span class="info-value">' + formatDate(info.fim) + '</span>' +
+            '</div>';
+          }
+          
+          // Observações (AI) - mostrar em linha separada se for longa
+          if (info.observacoes) {
+            infoHtml += '<div class="campaign-group-info-item" style="width: 100%;">' +
+              '<span class="info-label">Obs:</span>' +
+              '<span class="info-value" style="white-space: pre-wrap;">' + info.observacoes + '</span>' +
+            '</div>';
+          }
+
+          infoContainer.innerHTML = infoHtml;
+        });
 
         // Cards grid - horizontal
         var cardsDiv = document.createElement('div');
@@ -1929,7 +2073,7 @@
       card.className = 'card card-' + cardClass;
 
       var contratoHtml = CONTRATOS[title] ? '<div class="card-contrato">' + CONTRATOS[title] + '</div>' : '';
-      var processoHtml = showProcesso && data.processo ? 
+      var processoHtml = showProcesso && data.processo ?
         '<div class="card-processo">' + data.processo + '</div>' : '';
 
       // Calcular A Atestar (soma dos subitens)
@@ -1938,11 +2082,11 @@
 
       // Só adiciona wrappers de empenhos e pagamentos para agências (não para Total)
       var campaignSuffix = campaignId ? '-' + campaignId.toLowerCase().replace(/[^a-z0-9]/g, '') : '';
-      var empenhosWrapperHtml = (title !== 'Total') 
-        ? '<div class="empenhos-table-wrapper" id="empenhos-' + cardClass + campaignSuffix + '"></div>' 
+      var empenhosWrapperHtml = (title !== 'Total')
+        ? '<div class="empenhos-table-wrapper" id="empenhos-' + cardClass + campaignSuffix + '"></div>'
         : '';
-      var paymentsWrapperHtml = (title !== 'Total') 
-        ? '<div class="payments-table-wrapper" id="payments-' + cardClass + campaignSuffix + '"></div>' 
+      var paymentsWrapperHtml = (title !== 'Total')
+        ? '<div class="payments-table-wrapper" id="payments-' + cardClass + campaignSuffix + '"></div>'
         : '';
 
       // Check if saldo warning should be shown
@@ -1950,7 +2094,7 @@
       var showWarningIcon = percentUsed >= 90 && data.saldoAtual > 0;
       var warningIconHtml = showWarningIcon ? '<span class="material-icons donut-warning-icon" title="Resta apenas 10% do valor empenhado">warning</span>' : '';
 
-      card.innerHTML = 
+      card.innerHTML =
         '<div class="card-header">' +
           '<div>' +
             '<div class="card-title">' + title + '</div>' +
@@ -2018,10 +2162,10 @@
           var isNegative = valor < 0;
           var valueClass = isNegative ? ' class="negative-value"' : '';
           var seiNumber = emp.sei || '-';
-          var seiBtn = seiNumber !== '-' 
-            ? '<span class="copy-sei-btn" data-tooltip="Nº SEI: ' + seiNumber + '" onclick="copySei(\'' + seiNumber + '\', this, event)"><span class="material-icons">content_copy</span></span>' 
+          var seiBtn = seiNumber !== '-'
+            ? '<span class="copy-sei-btn" data-tooltip="Nº SEI: ' + seiNumber + '" onclick="copySei(\'' + seiNumber + '\', this, event)"><span class="material-icons">content_copy</span></span>'
             : '';
-          var empenhoHtml = '<div class="emp-empenho">' + 
+          var empenhoHtml = '<div class="emp-empenho">' +
             (emp.empenho || '-') + seiBtn +
           '</div>';
           html += '<tr>' +
@@ -2089,7 +2233,7 @@
           var originalText = btn.innerHTML;
           btn.innerHTML = '✓';
           btn.classList.add('copied');
-          
+
           // Highlight the row
           var row = btn.closest('tr');
           if (row) {
@@ -2098,7 +2242,7 @@
               row.classList.remove('highlight-copied');
             }, 1000);
           }
-          
+
           setTimeout(function() {
             btn.innerHTML = originalText;
             btn.classList.remove('copied');
@@ -2132,7 +2276,7 @@
     function createSaldoEmpenhoRow(label, value, empenhoTotal, tooltip) {
       var tooltipAttr = tooltip ? ' data-row-tooltip="' + tooltip + '"' : '';
       var tooltipClass = tooltip ? ' has-tooltip' : '';
-      
+
       return '<div class="data-row saldo-empenho-row' + tooltipClass + '"' + tooltipAttr + '>' +
         '<span class="data-label">' + label + '</span>' +
         '<div class="data-value">' +
@@ -2164,7 +2308,7 @@
       header.classList.toggle('expanded');
       var content = header.nextElementSibling;
       content.classList.toggle('visible');
-      
+
       // Sync all status collapsibles
       var isExpanded = header.classList.contains('expanded');
       document.querySelectorAll('.status-collapsible').forEach(function(sc) {
@@ -2337,18 +2481,28 @@
     }
 
     function formatCurrency(value) {
-      return 'R$ ' + (value || 0).toLocaleString('pt-BR', { 
-        minimumFractionDigits: 2, 
-        maximumFractionDigits: 2 
+      return 'R$ ' + (value || 0).toLocaleString('pt-BR', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
       });
     }
 
     function formatDate(value) {
       if (!value) return '';
-      if (typeof value === 'string') return value;
+      if (typeof value === 'string') {
+        // Se já está em formato dd/mm/yyyy, converter para dd/mm/yy
+        var parts = value.split('/');
+        if (parts.length === 3 && parts[2].length === 4) {
+          return parts[0] + '/' + parts[1] + '/' + parts[2].slice(-2);
+        }
+        return value;
+      }
       try {
         var d = new Date(value);
-        return d.toLocaleDateString('pt-BR');
+        var day = ('0' + d.getDate()).slice(-2);
+        var month = ('0' + (d.getMonth() + 1)).slice(-2);
+        var year = String(d.getFullYear()).slice(-2);
+        return day + '/' + month + '/' + year;
       } catch (e) {
         return String(value);
       }
