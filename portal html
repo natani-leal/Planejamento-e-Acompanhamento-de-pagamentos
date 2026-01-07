@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://script.google.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: hsl(220, 20%, 97%);
+      --bg-card: hsl(0, 0%, 100%);
+      --text-primary: hsl(220, 25%, 25%);
+      --text-secondary: hsl(220, 15%, 50%);
+      --border-color: hsl(220, 15%, 90%);
+      --accent: hsl(252, 85%, 60%);
+      --accent-light: hsl(252, 85%, 95%);
+      --success: hsl(142, 70%, 45%);
+      --success-light: hsl(142, 70%, 92%);
+      --warning: hsl(38, 95%, 55%);
+      --warning-light: hsl(38, 95%, 92%);
+      --info: hsl(217, 90%, 60%);
+      --info-light: hsl(217, 90%, 92%);
+      --error: hsl(0, 75%, 55%);
+      --error-light: hsl(0, 75%, 92%);
+    }
+
+    [data-theme="dark"] {
+      --bg-primary: hsl(220, 20%, 10%);
+      --bg-card: hsl(220, 20%, 15%);
+      --text-primary: hsl(220, 15%, 90%);
+      --text-secondary: hsl(220, 15%, 65%);
+      --border-color: hsl(220, 15%, 25%);
+      --accent-light: hsl(252, 85%, 25%);
+      --success-light: hsl(142, 70%, 20%);
+      --warning-light: hsl(38, 95%, 20%);
+      --info-light: hsl(217, 90%, 20%);
+      --error-light: hsl(0, 75%, 20%);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Smooth view transitions */
+    .portal-view {
+      display: block;
+      opacity: 1;
+      transform: translateX(0);
+      transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+
+    .portal-view.fade-out {
+      opacity: 0;
+      transform: translateX(-30px);
+    }
+
+    .portal-view.hidden {
+      display: none;
+    }
+
+    .header {
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border-color);
+      padding: 2rem 1.5rem;
+    }
+
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      text-align: center;
+      position: relative;
+    }
+
+    .header h1 {
+      font-size: 1.75rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .header p {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+    }
+
+    .theme-toggle {
+      padding: 0.5rem 1rem;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      color: var(--text-primary);
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: inherit;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .theme-toggle.header-theme {
+      position: absolute;
+      top: 0;
+      right: 0;
+    }
+
+    .theme-toggle:hover {
+      background: var(--accent-light);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .theme-toggle svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .theme-toggle-small {
+      padding: 0.4rem 0.75rem;
+      font-size: 0.75rem;
+    }
+
+    .theme-toggle-small svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    .main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(1, 1fr);
+      gap: 1.25rem;
+    }
+
+    @media (min-width: 640px) {
+      .grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (min-width: 1024px) {
+      .grid { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    @media (min-width: 1280px) {
+      .grid { grid-template-columns: repeat(4, 1fr); }
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-decoration: none;
+      color: inherit;
+      display: block;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .card:hover {
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+
+    .card.disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .card.disabled:hover {
+      box-shadow: none;
+      border-color: var(--border-color);
+      transform: none;
+    }
+
+    .card.loaded::after {
+      content: '✓';
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      font-size: 0.7rem;
+      color: var(--success);
+      background: var(--success-light);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1rem;
+    }
+
+    .card-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card-icon svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    .card-icon.accent { background: var(--accent-light); color: var(--accent); }
+    .card-icon.info { background: var(--info-light); color: var(--info); }
+    .card-icon.success { background: var(--success-light); color: var(--success); }
+    .card-icon.warning { background: var(--warning-light); color: var(--warning); }
+    .card-icon.error { background: var(--error-light); color: var(--error); }
+
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+      text-align: center;
+    }
+
+    .card-description {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      text-align: center;
+    }
+
+    .badge {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 500;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      background: var(--border-color);
+      color: var(--text-secondary);
+      margin-top: 0.75rem;
+    }
+
+    /* Iframe View with smooth transitions */
+    .iframe-view {
+      display: none;
+      height: 100vh;
+      flex-direction: column;
+      opacity: 0;
+      transform: translateX(30px);
+      transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+
+    .iframe-view.active {
+      display: flex;
+    }
+
+    .iframe-view.fade-in {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .iframe-header {
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border-color);
+      padding: 0.75rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .back-button {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      color: var(--text-primary);
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+
+    .back-button:hover {
+      background: var(--accent-light);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .back-button svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    .iframe-title {
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-left: auto;
+    }
+
+    .quick-links {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .quick-link {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.4rem 0.75rem;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      color: var(--text-secondary);
+      font-size: 0.75rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: inherit;
+      white-space: nowrap;
+    }
+
+    .quick-link:hover {
+      background: var(--accent-light);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .quick-link.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: white;
+    }
+
+    .quick-link svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    @media (max-width: 768px) {
+      .quick-links {
+        display: none;
+      }
+    }
+
+    .iframe-container {
+      flex: 1;
+      position: relative;
+    }
+
+    .cached-iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: none;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    .cached-iframe.active {
+      display: block;
+      opacity: 1;
+    }
+
+    /* Dark mode for embedded tools (works even across different web-apps) */
+    [data-theme="dark"] .cached-iframe {
+      filter: invert(1) hue-rotate(180deg);
+    }
+
+    .loading-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--bg-primary);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      z-index: 10;
+      opacity: 1;
+      transition: opacity 0.3s ease;
+    }
+
+    .loading-overlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid var(--border-color);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    .loading-text {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .preload-status {
+      display: inline-block;
+      margin-top: 0.75rem;
+      font-size: 0.8rem;
+      color: var(--accent);
+      background: var(--accent-light);
+      padding: 0.35rem 0.75rem;
+      border-radius: 6px;
+      transition: opacity 0.3s ease;
+    }
+
+    .preload-status.hidden {
+      opacity: 0;
+    }
+  </style>
+</head>
+<body>
+  <!-- Portal View -->
+  <div id="portalView" class="portal-view">
+    <header class="header">
+      <div class="header-content">
+        <button class="theme-toggle header-theme" onclick="toggleTheme()" title="Alternar tema">
+          <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+          </svg>
+          <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="display: none;">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+          </svg>
+        </button>
+        <h1>Contratos de Publicidade</h1>
+        <p>Ferramentas de gestão</p>
+        <span id="preloadStatus" class="preload-status"></span>
+      </div>
+    </header>
+
+    <main class="main">
+      <div class="grid">
+        <div class="card" data-tool="status-pi" onclick="openTool('status-pi', 'Status PI', 'https://script.google.com/macros/s/AKfycbwq6TX3v48zi4HX9WVXZuim6f71JhaXPCpOvx3cngS7D4PLf5PlGT4NfmmeDaPPLZDoeQ/exec')">
+          <div class="card-header">
+            <div class="card-icon accent">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
+          </div>
+          <h2 class="card-title">Status PI</h2>
+          <p class="card-description">Acompanhamento do status dos Pedidos de Inserção</p>
+        </div>
+
+        <div class="card" data-tool="status-campanhas" onclick="openTool('status-campanhas', 'Campanhas', 'https://script.google.com/macros/s/AKfycbz3v4pJLS_0uqzWrfFvZYnDghQdjpSbJsUCiT2aQT-ocItNpxPUe1huV8exc2TEvBfS/exec')">
+          <div class="card-header">
+            <div class="card-icon info">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+            </div>
+          </div>
+          <h2 class="card-title">Campanhas</h2>
+          <p class="card-description">andamento e outras informações úteis</p>
+        </div>
+
+
+        <div class="card" data-tool="cadastro-veiculos" onclick="openTool('cadastro-veiculos', 'Veículos Comunitários', 'https://script.google.com/macros/s/AKfycbzLFmMNsrYCUR4B-X133Tq5oeFnII-wZKDKGujEVKA-y_nwWEf3KzwmlCMqmaQ5Sg/exec')">
+          <div class="card-header">
+            <div class="card-icon warning">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" />
+              </svg>
+            </div>
+          </div>
+          <h2 class="card-title">Veículos Comunitários</h2>
+          <p class="card-description">Consulta ao cadastro</p>
+        </div>
+
+
+        <div class="card" data-tool="monitoramento-pagamentos" onclick="openTool('monitoramento-pagamentos', 'Pagamentos', 'https://script.google.com/macros/s/AKfycbzbaCJZI0wbntzhf8Q6NDl_ajnM32G0sAf-DmvwH3MLC31ZDb5_VhqTt0tznf_jYVEmcg/exec')">
+          <div class="card-header">
+            <div class="card-icon error">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+          </div>
+          <h2 class="card-title">Pagamentos</h2>
+          <p class="card-description">Planejamento e acompanhamento</p>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- Iframe View -->
+  <div id="iframeView" class="iframe-view">
+    <div class="iframe-header">
+      <button class="back-button" onclick="goBack()" title="Voltar" aria-label="Voltar">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+      </button>
+      <span id="iframeTitle" class="iframe-title"></span>
+      <div class="header-actions">
+        <div id="quickLinks" class="quick-links"></div>
+        <button class="theme-toggle theme-toggle-small" onclick="toggleTheme()" title="Alternar tema">
+          <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+          </svg>
+          <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="display: none;">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+          </svg>
+        </button>
+      </div>
+    </div>
+    <div id="iframeContainer" class="iframe-container">
+      <div id="loadingOverlay" class="loading-overlay">
+        <div class="spinner"></div>
+        <span class="loading-text">Carregando...</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const cachedIframes = {};
+    let currentTool = null;
+    let preloadedCount = 0;
+    let isTransitioning = false;
+
+    const tools = [
+      { id: 'status-pi', title: 'Status PI', url: 'https://script.google.com/macros/s/AKfycbwgw6O0H2g9Z8DdhkMZD1FcnZHVsSGvZHvfOhQcZSFWqAVM9ZMvLWbCQ464p0071A-6YQ/exec' },
+      { id: 'status-campanhas', title: 'Campanhas', url: 'https://script.google.com/macros/s/AKfycbwRtGm-23HHIPooqi_dw2-2StBAoBdJiwkH3d25Lt8p6XRW60zui-a504HU5F5_hVae/exec' },
+      { id: 'cadastro-veiculos', title: 'Veículos Comunitários', url: 'https://script.google.com/macros/s/AKfycbw0GujQHLsT9vSM8IN0TcVVDKKZDH-ppnNuW9vcEnMQYWz_khRSFfC5MZ92NA-2SbHPag/exec' },
+      { id: 'monitoramento-pagamentos', title: 'Pagamentos', url: 'https://script.google.com/macros/s/AKfycbyXijsY2wobSuWwG4k8TbAaGuf5xBL65bB0kdHVGzv7_A8Epd50MAS7DiGQyj8MyzKrhQ/exec' }
+    ];
+
+    function updatePreloadStatus() {
+      const statusEl = document.getElementById('preloadStatus');
+      if (preloadedCount < tools.length) {
+        statusEl.textContent = `Carregando ferramentas... ${preloadedCount}/${tools.length}`;
+        statusEl.classList.remove('hidden');
+      } else {
+        statusEl.textContent = `Todas as ferramentas prontas ✓`;
+        setTimeout(() => statusEl.classList.add('hidden'), 2000);
+      }
+    }
+
+    function preloadIframe(tool) {
+      const iframeContainer = document.getElementById('iframeContainer');
+      
+      const iframe = document.createElement('iframe');
+      iframe.className = 'cached-iframe';
+      iframe.src = tool.url;
+      
+      iframe.onload = function() {
+        preloadedCount++;
+        updatePreloadStatus();
+        const card = document.querySelector(`[data-tool="${tool.id}"]`);
+        if (card) card.classList.add('loaded');
+      };
+      
+      iframeContainer.appendChild(iframe);
+      cachedIframes[tool.id] = iframe;
+    }
+
+    function preloadAllTools() {
+      updatePreloadStatus();
+      const loadTool = (index) => {
+        if (index >= tools.length) return;
+        
+        const callback = () => {
+          preloadIframe(tools[index]);
+          loadTool(index + 1);
+        };
+        
+        if ('requestIdleCallback' in window) {
+          requestIdleCallback(callback, { timeout: 2000 });
+        } else {
+          setTimeout(callback, index * 300);
+        }
+      };
+      
+      setTimeout(() => loadTool(0), 100);
+    }
+
+    function toggleTheme() {
+      const html = document.documentElement;
+      const isDark = html.getAttribute('data-theme') === 'dark';
+      
+      if (isDark) {
+        html.removeAttribute('data-theme');
+        localStorage.setItem('portal-theme', 'light');
+      } else {
+        html.setAttribute('data-theme', 'dark');
+        localStorage.setItem('portal-theme', 'dark');
+      }
+      
+      updateThemeIcons();
+    }
+
+    function updateThemeIcons() {
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      
+      // Update all theme toggle buttons (portal and iframe views)
+      document.querySelectorAll('.theme-toggle').forEach(button => {
+        const sunIcon = button.querySelector('.sun-icon');
+        const moonIcon = button.querySelector('.moon-icon');
+        if (sunIcon) sunIcon.style.display = isDark ? 'none' : 'block';
+        if (moonIcon) moonIcon.style.display = isDark ? 'block' : 'none';
+      });
+    }
+
+    // Load saved theme
+    (function() {
+      const savedTheme = localStorage.getItem('portal-theme');
+      if (savedTheme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+      // Run on DOMContentLoaded and also immediately after for dynamic content
+      document.addEventListener('DOMContentLoaded', updateThemeIcons);
+      setTimeout(updateThemeIcons, 100);
+    })();
+
+    function renderQuickLinks(currentId) {
+      const quickLinksContainer = document.getElementById('quickLinks');
+      quickLinksContainer.innerHTML = '';
+      
+      tools.forEach(tool => {
+        const button = document.createElement('button');
+        button.className = 'quick-link' + (tool.id === currentId ? ' active' : '');
+        button.onclick = () => {
+          if (tool.id !== currentId) {
+            switchTool(tool.id, tool.title, tool.url);
+          }
+        };
+        button.innerHTML = tool.title;
+        quickLinksContainer.appendChild(button);
+      });
+    }
+
+    function switchTool(id, title, url) {
+      if (isTransitioning) return;
+      
+      const iframeTitle = document.getElementById('iframeTitle');
+      const loadingOverlay = document.getElementById('loadingOverlay');
+      
+      currentTool = id;
+      iframeTitle.textContent = title;
+      renderQuickLinks(id);
+      
+      // Hide all cached iframes
+      Object.values(cachedIframes).forEach(iframe => {
+        iframe.classList.remove('active');
+      });
+      
+      if (cachedIframes[id]) {
+        loadingOverlay.classList.add('hidden');
+        cachedIframes[id].classList.add('active');
+      } else {
+        loadingOverlay.classList.remove('hidden');
+      }
+    }
+
+    function openTool(id, title, url) {
+      if (isTransitioning) return;
+      isTransitioning = true;
+      
+      const portalView = document.getElementById('portalView');
+      const iframeView = document.getElementById('iframeView');
+      const iframeTitle = document.getElementById('iframeTitle');
+      const loadingOverlay = document.getElementById('loadingOverlay');
+
+      currentTool = id;
+      iframeTitle.textContent = title;
+      renderQuickLinks(id);
+
+      // Hide all cached iframes
+      Object.values(cachedIframes).forEach(iframe => {
+        iframe.classList.remove('active');
+      });
+
+      // Check if iframe already exists in cache
+      if (cachedIframes[id]) {
+        loadingOverlay.classList.add('hidden');
+        cachedIframes[id].classList.add('active');
+      } else {
+        loadingOverlay.classList.remove('hidden');
+      }
+
+      // Smooth transition out
+      portalView.classList.add('fade-out');
+      
+      setTimeout(() => {
+        portalView.classList.add('hidden');
+        portalView.classList.remove('fade-out');
+        iframeView.classList.add('active');
+        
+        // Trigger reflow then fade in
+        void iframeView.offsetWidth;
+        iframeView.classList.add('fade-in');
+        
+        setTimeout(() => {
+          isTransitioning = false;
+        }, 250);
+      }, 200);
+    }
+
+    function goBack() {
+      if (isTransitioning) return;
+      isTransitioning = true;
+      
+      const portalView = document.getElementById('portalView');
+      const iframeView = document.getElementById('iframeView');
+
+      // Fade out iframe view
+      iframeView.classList.remove('fade-in');
+      
+      setTimeout(() => {
+        if (currentTool && cachedIframes[currentTool]) {
+          cachedIframes[currentTool].classList.remove('active');
+        }
+        
+        iframeView.classList.remove('active');
+        portalView.classList.remove('hidden');
+        
+        // Trigger reflow
+        void portalView.offsetWidth;
+        
+        currentTool = null;
+        
+        setTimeout(() => {
+          isTransitioning = false;
+        }, 250);
+      }, 200);
+    }
+
+    // Keyboard navigation
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && currentTool) {
+        goBack();
+      }
+    });
+
+    // Start preloading when page loads
+    window.addEventListener('load', preloadAllTools);
+  </script>
+</body>
+</html>
