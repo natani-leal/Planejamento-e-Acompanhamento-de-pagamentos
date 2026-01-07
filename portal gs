@@ -1,0 +1,5 @@
+function doGet() {
+  return HtmlService.createHtmlOutputFromFile('portal')
+    .setTitle('Portal de Ferramentas')
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+}
