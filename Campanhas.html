@@ -1,0 +1,2372 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+      min-height: 100vh;
+      color: #475569;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    /* Header - Estilo Dashboard */
+    .header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .header-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 20px;
+      background: white;
+      border-radius: 50px;
+      border: 1px solid hsl(220, 15%, 90%);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .header-icon {
+      width: 20px;
+      height: 20px;
+      color: hsl(217, 90%, 60%);
+    }
+
+    .header h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: hsl(220, 15%, 35%);
+    }
+
+    /* Filters */
+    .filters {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: flex-end;
+      padding: 16px;
+      background: rgba(255, 255, 255, 0.7);
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+      margin-bottom: 20px;
+    }
+
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .filter-group label {
+      font-size: 11px;
+      font-weight: 500;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .filter-group select {
+      min-width: 160px;
+      padding: 8px 12px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      background: white;
+      font-size: 14px;
+      color: #475569;
+      cursor: pointer;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .filter-group select:focus {
+      outline: none;
+      border-color: #6366f1;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+
+    .btn-clear {
+      padding: 8px 16px;
+      background: transparent;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 14px;
+      color: #64748b;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+      height: 38px;
+    }
+
+    .btn-clear:hover {
+      background: #f1f5f9;
+      color: #475569;
+    }
+
+    /* Campaign Info */
+    .campaign-info {
+      display: none;
+      background: white;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+      padding: 16px;
+      margin-bottom: 20px;
+    }
+
+    .campaign-info.active {
+      display: block;
+    }
+
+    .campaign-info-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 2px;
+    }
+
+    .campaign-info-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #475569;
+    }
+
+    .campaign-info-fase {
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    .campaign-info-fase.em-andamento {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .campaign-info-fase.finalizada {
+      background: #f1f5f9;
+      color: #64748b;
+    }
+
+    .campaign-info-desc {
+      font-size: 13px;
+      color: #475569;
+      margin-bottom: 10px;
+    }
+
+    .campaign-info-observacoes {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px dashed #e2e8f0;
+      font-size: 12px;
+      color: #475569;
+      line-height: 1.4;
+      white-space: pre-wrap;
+    }
+
+    .campaign-info-observacoes .label {
+      font-size: 11px;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .campaign-info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+    }
+
+    .info-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .info-item svg {
+      width: 16px;
+      height: 16px;
+      color: #64748b;
+      flex-shrink: 0;
+    }
+
+    .info-item .info-label {
+      font-size: 11px;
+      color: #64748b;
+      flex-shrink: 0;
+    }
+
+    .info-item .info-value {
+      font-size: 13px;
+      font-weight: 500;
+      color: #475569;
+    }
+
+    /* Campaigns List */
+    .campaigns-list {
+      display: none;
+      background: white;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+      padding: 16px;
+      margin-bottom: 20px;
+    }
+
+    .campaigns-list.active {
+      display: block;
+    }
+
+    .campaigns-list h3 {
+      font-size: 13px;
+      font-weight: 500;
+      color: #64748b;
+      margin-bottom: 12px;
+    }
+
+    .campaigns-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .campaign-chip {
+      padding: 6px 12px;
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+      border-radius: 20px;
+      font-size: 13px;
+      color: #475569;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .campaign-chip:hover {
+      background: #6366f1;
+      border-color: #6366f1;
+      color: white;
+    }
+
+    /* Campaigns By Termo */
+    .campaigns-by-termo {
+      margin-top: 16px;
+    }
+
+    .termo-group {
+      margin-bottom: 16px;
+    }
+
+    .termo-group:last-child {
+      margin-bottom: 0;
+    }
+
+    .termo-group-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: #475569;
+      margin-bottom: 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    /* Loading */
+    .loading {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      justify-content: center;
+      align-items: center;
+      background: rgba(248, 250, 252, 0.8);
+      z-index: 1000;
+    }
+
+    .loading.active {
+      display: flex;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid #e2e8f0;
+      border-top-color: #6366f1;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Cards Grid - default para visão sem agrupamento */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    /* Quando filtrando por fase: lista de campanhas em coluna (evita compressão/"sobreposição") */
+    .cards-grid.grouped {
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+    }
+
+    /* Campaign Group - cada campanha em uma linha com 4 cards */
+    .campaign-group {
+      margin-bottom: 32px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .campaign-group:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+    }
+
+    .campaign-group .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .campaign-group .cards-grid .card {
+      min-width: 0;
+      height: fit-content;
+    }
+
+    @media (max-width: 1100px) {
+      .campaign-group .cards-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 600px) {
+      .campaign-group .cards-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .campaign-group-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .campaign-group-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #475569;
+    }
+
+    .campaign-group-desc {
+      font-size: 12px;
+      color: #64748b;
+      margin-top: 2px;
+      max-width: 900px;
+    }
+
+    .campaign-group-badge {
+      padding: 4px 10px;
+      background: #f1f5f9;
+      border-radius: 12px;
+      font-size: 11px;
+      color: #64748b;
+    }
+
+    .campaign-group .cards-grid {
+      margin-top: 0;
+    }
+
+    /* Card */
+    .card {
+      background: white;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+      border: 1px solid #e2e8f0;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    }
+
+    .card-av { border-top: 4px solid #8b5cf6; }
+    .card-calia { border-top: 4px solid #f97316; }
+    .card-ebm { border-top: 4px solid #64748b; }
+    .card-total { border-top: 4px solid #6366f1; }
+
+    .card-header {
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .card-av .card-header { background: linear-gradient(to bottom, rgba(139, 92, 246, 0.08), transparent); }
+    .card-calia .card-header { background: linear-gradient(to bottom, rgba(249, 115, 22, 0.08), transparent); }
+    .card-ebm .card-header { background: linear-gradient(to bottom, rgba(100, 116, 139, 0.08), transparent); }
+    .card-total .card-header { background: linear-gradient(to bottom, rgba(99, 102, 241, 0.08), transparent); }
+
+    .card-title {
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .card-contrato {
+      font-size: 11px;
+      color: #94a3b8;
+      margin-top: 2px;
+    }
+
+    .card-av .card-title { color: #8b5cf6; }
+    .card-calia .card-title { color: #f97316; }
+    .card-ebm .card-title { color: #64748b; }
+    .card-total .card-title { color: #475569; }
+
+    .card-processo {
+      font-size: 11px;
+      color: #64748b;
+      margin-top: 4px;
+    }
+
+    /* Donut Chart */
+    .donut-container {
+      position: relative;
+      width: 70px;
+      height: 70px;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+
+    .donut-container:hover {
+      transform: scale(1.08);
+    }
+
+    .donut-container canvas {
+      width: 70px;
+      height: 70px;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.08));
+    }
+
+    .donut-center {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      pointer-events: none;
+    }
+
+    .donut-percent {
+      font-size: 13px;
+      font-weight: 700;
+      color: #475569;
+      line-height: 1;
+    }
+
+    .donut-label {
+      font-size: 9px;
+      color: #64748b;
+      margin-top: 1px;
+    }
+
+    /* Card Body */
+    .card-body {
+      padding: 0 20px 20px;
+    }
+
+    .data-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .data-row:last-child {
+      border-bottom: none;
+    }
+
+    .data-row.header {
+      border-bottom-color: #e2e8f0;
+    }
+
+    .data-row.header.expandable {
+      cursor: pointer;
+    }
+
+    .data-row.header.expandable:hover {
+      background: #f8fafc;
+    }
+
+    .data-row.header.expandable .data-label::after {
+      content: "▶";
+      font-size: 8px;
+      color: #94a3b8;
+      display: inline-block;
+      margin-left: 4px;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .data-row.header.expandable.expanded .data-label::after {
+      transform: rotate(90deg);
+    }
+
+    .data-row.parent {
+      padding-bottom: 6px;
+      cursor: pointer;
+    }
+
+    .data-row.parent:hover {
+      background: #f8fafc;
+      margin: 0 -8px;
+      padding-left: 8px;
+      padding-right: 8px;
+    }
+
+    .data-row.parent .data-label::after {
+      content: "▶";
+      font-size: 8px;
+      color: #94a3b8;
+      display: inline-block;
+      margin-left: 4px;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .data-row.parent.expanded .data-label::after {
+      transform: rotate(90deg);
+    }
+
+    .data-row.subitem {
+      display: flex;
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+      padding: 0 0 0 16px;
+      border-bottom: 1px solid transparent;
+      transition: max-height 0.3s ease-out, opacity 0.25s ease-out, padding 0.3s ease-out, border-color 0.3s ease-out;
+    }
+
+    .data-row.subitem.visible {
+      max-height: 50px;
+      opacity: 1;
+      padding: 6px 0 6px 16px;
+      border-bottom: 1px solid #f8fafc;
+    }
+
+    .data-row.subitem .data-label {
+      font-size: 12px;
+      color: #94a3b8;
+    }
+
+    .data-row.subitem .data-label::before {
+      content: "└ ";
+      color: #cbd5e1;
+    }
+
+    .data-row.subitem .data-value .value {
+      font-size: 12px;
+    }
+
+    /* Tooltip para data-row */
+    .data-row.has-tooltip {
+      position: relative;
+      cursor: help;
+    }
+
+    .data-row.has-tooltip::before {
+      content: attr(data-row-tooltip);
+      position: absolute;
+      left: 0;
+      bottom: calc(100% + 4px);
+      background: #1e293b;
+      color: #fff;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 10px;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+      z-index: 10;
+    }
+
+    .data-row.has-tooltip:hover::before {
+      opacity: 1;
+    }
+
+    .data-label {
+      font-size: 13px;
+      color: #64748b;
+    }
+
+    .data-value {
+      text-align: right;
+      display: flex;
+      align-items: baseline;
+      justify-content: flex-end;
+      gap: 4px;
+    }
+
+    .data-value .value {
+      font-size: 13px;
+      font-weight: 600;
+      color: #475569;
+    }
+
+    .data-label .nf-count {
+      font-size: 9px;
+      color: #9c9ea1;
+      vertical-align: sub;
+      position: relative;
+      top: 2px;
+      margin-left: 2px;
+      font-weight: 500;
+    }
+
+    .data-row.header .data-value .value {
+      font-size: 15px;
+    }
+
+    /* Status Colors */
+    .status-pago { color: #10b981 !important; }
+    .status-processo { color: #06b6d4 !important; }
+    .status-atestada { color: #3b82f6 !important; }
+    .status-aatestar { color: #6366f1 !important; }
+    .status-analise { color: #8b5cf6 !important; }
+    .status-inconformidade { color: #a855f7 !important; }
+    .status-diligencia { color: #ec4899 !important; }
+    .status-glosa { color: #f43f5e !important; }
+    .status-cancelada { color: #94a3b8 !important; }
+    .status-afaturar { color: #cbd5e1 !important; }
+
+    /* Collapsible Section (Empenhos e Pagamentos) */
+    .collapsible-section {
+      margin-top: 16px;
+      background: white;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+      overflow: hidden;
+    }
+
+    .collapsible-header {
+      padding: 12px 16px;
+      font-size: 14px;
+      font-weight: 400;
+      color: #475569;
+      background: #f8fafc;
+      border-bottom: 1px solid #e2e8f0;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: background 0.2s;
+    }
+
+    .collapsible-header:hover {
+      background: #f1f5f9;
+    }
+
+    .collapsible-header::after {
+      content: "▶";
+      font-size: 10px;
+      color: #94a3b8;
+      display: inline-block;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .collapsible-header.expanded::after {
+      transform: rotate(90deg);
+    }
+
+    .collapsible-content {
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+      transition: max-height 0.35s ease-out, opacity 0.3s ease-out;
+    }
+
+    .collapsible-content.visible {
+      max-height: 500px;
+      opacity: 1;
+    }
+
+    /* Status and Payments Container */
+    .collapsible-buttons-container {
+      margin-top: 8px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Status Collapsible - styled like payments-table-container */
+    .status-collapsible {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px 12px 0 0;
+      overflow: hidden;
+    }
+
+    .status-collapsible .collapsible-header {
+      padding: 10px 16px;
+      font-size: 13px;
+      font-weight: 400;
+      color: #64748b;
+      background: #f8fafc;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: background 0.2s;
+    }
+
+    .status-collapsible .collapsible-header:hover {
+      background: #f1f5f9;
+    }
+
+    .status-collapsible .collapsible-header::after {
+      content: "▶";
+      font-size: 10px;
+      color: #94a3b8;
+      display: inline-block;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .status-collapsible .collapsible-header.expanded::after {
+      transform: rotate(90deg);
+    }
+
+    .status-collapsible .collapsible-label {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .status-collapsible .collapsible-content {
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+      transition: max-height 0.35s ease-out, opacity 0.3s ease-out;
+      padding: 0 16px;
+    }
+
+    .status-collapsible .collapsible-content.visible {
+      max-height: 400px;
+      opacity: 1;
+      padding: 6px 16px 10px 16px;
+    }
+
+    /* Saldo de Empenho */
+    .saldo-empenho-row {
+      position: relative;
+    }
+
+    /* Donut Warning Icon */
+    .donut-container .donut-warning-icon {
+      position: absolute;
+      top: -6px;
+      left: -6px;
+      font-size: 20px;
+      color: #dc2626;
+      cursor: help;
+      z-index: 10;
+      animation: pulse-warning 1.2s ease-in-out infinite;
+      filter: drop-shadow(0 0 4px rgba(220, 38, 38, 0.5));
+    }
+
+    @keyframes pulse-warning {
+      0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+        filter: drop-shadow(0 0 4px rgba(220, 38, 38, 0.5));
+      }
+      50% {
+        opacity: 0.85;
+        transform: scale(1.25);
+        filter: drop-shadow(0 0 8px rgba(220, 38, 38, 0.8));
+      }
+    }
+
+    /* Payments Table */
+    .payments-table-container {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-top: none;
+      border-radius: 0 0 12px 12px;
+      overflow: hidden;
+    }
+
+    .payments-table-title {
+      padding: 10px 16px;
+      font-size: 13px;
+      font-weight: 400;
+      color: #64748b;
+      background: #f8fafc;
+      border-top: 1px solid #e2e8f0;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: background 0.2s;
+    }
+
+    .payments-table-title:hover {
+      background: #f1f5f9;
+    }
+
+    .payments-table-title::after {
+      content: "▶";
+      font-size: 10px;
+      color: #94a3b8;
+      display: inline-block;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .payments-table-title.expanded::after {
+      transform: rotate(90deg);
+    }
+
+    .payments-table-content {
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+      transition: max-height 0.4s ease-out, opacity 0.3s ease-out;
+    }
+
+    .payments-table-content.visible {
+      max-height: 800px;
+      opacity: 1;
+    }
+
+    .payments-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .payments-table th {
+      padding: 10px 12px;
+      text-align: center;
+      font-weight: 500;
+      color: #94a3b8;
+      background: #f8fafc;
+      border-bottom: 1px solid #e2e8f0;
+      text-transform: uppercase;
+      font-size: 11px;
+      letter-spacing: 0.5px;
+    }
+
+    .payments-table th:last-child {
+      text-align: center;
+    }
+
+    .payments-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid #f1f5f9;
+      color: #64748b;
+      text-align: center;
+    }
+
+    .payments-table td:last-child {
+      text-align: center;
+    }
+
+    .payments-table td:first-child {
+      text-align: center;
+    }
+
+    .payments-table .pag-data {
+      font-size: 13px;
+      color: #64748b;
+    }
+
+    .payments-table .pag-controle {
+      font-size: 11px;
+      color: #94a3b8;
+      margin-top: 2px;
+    }
+
+    .payments-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .payments-table tr:hover {
+      background: #fafbfc;
+    }
+
+    .payments-table .pg-badge {
+      font-size: 9px;
+      font-weight: 600;
+      color: #881337;
+      vertical-align: super;
+      margin-left: 4px;
+    }
+
+    .payments-table .total-row {
+      background: #f8fafc;
+      font-weight: 600;
+    }
+
+    .payments-table .total-row td {
+      border-top: 2px solid #e2e8f0;
+      color: #475569;
+      text-align: right;
+    }
+
+    .payments-table .total-row td:first-child {
+      text-align: left;
+    }
+
+    .payments-table .saldo-row {
+      background: #f0fdf4;
+    }
+
+    .payments-table .saldo-row td {
+      color: #16a34a;
+      font-weight: 600;
+      text-align: right;
+    }
+
+    .payments-table .saldo-row td:first-child {
+      text-align: left;
+    }
+
+    .payments-table .saldo-row td.negative {
+      color: #dc2626;
+    }
+
+    /* Warning styles removed - moved to Saldo de Empenho */
+
+    .payments-table .saldo-row.saldo-zero {
+      background: #f8fafc;
+    }
+
+    .payments-table .saldo-row.saldo-zero td {
+      color: #94a3b8;
+    }
+
+    /* Empenhos Table */
+    .empenhos-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11px;
+    }
+
+    .empenhos-table th {
+      padding: 6px 8px;
+      text-align: center;
+      font-weight: 500;
+      color: #94a3b8;
+      background: #f8fafc;
+      border-bottom: 1px solid #e2e8f0;
+      text-transform: uppercase;
+      font-size: 9px;
+      letter-spacing: 0.5px;
+    }
+
+    .empenhos-table td {
+      padding: 6px 8px;
+      border-bottom: 1px solid #f1f5f9;
+      color: #64748b;
+      text-align: center;
+    }
+
+    .empenhos-table td:last-child {
+      white-space: nowrap;
+    }
+
+    .empenhos-table .emp-empenho {
+      font-size: 11px;
+      color: #64748b;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .empenhos-table .emp-empenho .copy-sei-btn {
+      cursor: pointer;
+      padding: 2px 4px;
+      background: transparent;
+      border-radius: 4px;
+      font-size: 14px;
+      color: #94a3b8;
+      border: none;
+      transition: all 0.2s;
+      position: relative;
+      line-height: 1;
+      vertical-align: middle;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .empenhos-table .emp-empenho .copy-sei-btn .material-icons {
+      font-size: 14px;
+    }
+
+    .empenhos-table .emp-empenho .copy-sei-btn:hover {
+      color: #3b82f6;
+      background: #f1f5f9;
+    }
+
+    .empenhos-table .emp-empenho .copy-sei-btn.copied {
+      color: #16a34a;
+      background: #dcfce7;
+    }
+
+    /* Tooltip para Nº SEI */
+    .empenhos-table .emp-empenho .copy-sei-btn::before {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: calc(100% + 6px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1e293b;
+      color: #fff;
+      padding: 5px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      white-space: nowrap;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.2s, visibility 0.2s;
+      pointer-events: none;
+      z-index: 100;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .empenhos-table .emp-empenho .copy-sei-btn::after {
+      content: '';
+      position: absolute;
+      bottom: calc(100% + 2px);
+      left: 50%;
+      transform: translateX(-50%);
+      border: 5px solid transparent;
+      border-top-color: #1e293b;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.2s, visibility 0.2s;
+    }
+
+    .empenhos-table .emp-empenho .copy-sei-btn:hover::before,
+    .empenhos-table .emp-empenho .copy-sei-btn:hover::after {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    /* Highlight animation when SEI is copied */
+    @keyframes row-highlight {
+      0% { background: transparent; }
+      20% { background: #dcfce7; }
+      100% { background: transparent; }
+    }
+
+    .empenhos-table tr.highlight-copied {
+      animation: row-highlight 1s ease-out;
+    }
+
+    .saldo-separator {
+      border-top: 1px solid #e2e8f0;
+      margin: 8px 0 0 0;
+      padding-top: 8px;
+    }
+
+    .empenhos-table-wrapper {
+      margin-top: -6px;
+      margin-bottom: 12px;
+    }
+
+    .empenhos-table td.negative-value {
+      color: #dc2626;
+      font-style: italic;
+    }
+
+    .empenhos-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .empenhos-table tr:hover {
+      background: #fafbfc;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      body {
+        padding: 12px;
+      }
+
+      .header h1 {
+        font-size: 22px;
+      }
+
+      .filters {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .filter-group select {
+        width: 100%;
+      }
+
+      .btn-clear {
+        justify-content: center;
+      }
+
+      .cards-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .campaign-info-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Loading -->
+    <div class="loading" id="loading">
+      <div class="spinner"></div>
+    </div>
+
+    <!-- Header - Estilo Dashboard -->
+    <div class="header">
+      <div class="header-badge">
+        <svg class="header-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" x2="18" y1="20" y2="10"></line>
+          <line x1="12" x2="12" y1="20" y2="4"></line>
+          <line x1="6" x2="6" y1="20" y2="14"></line>
+        </svg>
+        <h1>Campanhas</h1>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters">
+      <div class="filter-group">
+        <label>Campanha</label>
+        <select id="filterCampanha">
+          <option value="">Todas</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label>Termo Contratual</label>
+        <select id="filterTermo">
+          <option value="">Todos</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label>Tipo</label>
+        <select id="filterTipo">
+          <option value="">Todos</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label>Fase</label>
+        <select id="filterFase">
+          <option value="">Todas</option>
+          <option value="Em Andamento">Em Andamento</option>
+          <option value="Finalizada">Finalizada</option>
+        </select>
+      </div>
+
+      <button class="btn-clear" id="btnClear">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 6L6 18M6 6l12 12"/>
+        </svg>
+        Limpar
+      </button>
+    </div>
+
+    <!-- Campaign Info -->
+    <div class="campaign-info" id="campaignInfo">
+      <div class="campaign-info-header">
+        <span class="campaign-info-title" id="campaignInfoTitle"></span>
+        <span class="campaign-info-fase" id="campaignInfoFase"></span>
+      </div>
+      <p class="campaign-info-desc" id="campaignInfoDesc"></p>
+      <div class="campaign-info-grid" id="campaignInfoGrid"></div>
+      <div class="campaign-info-observacoes" id="campaignInfoObs">
+        <span class="label">Observações</span>
+        <span id="campaignInfoObsText"></span>
+      </div>
+    </div>
+
+    <!-- Campaigns List -->
+    <div class="campaigns-list" id="campaignsList">
+      <h3 id="campaignsListTitle"></h3>
+      <div class="campaigns-chips" id="campaignsChips"></div>
+      <div class="campaigns-by-termo" id="campaignsByTermo"></div>
+    </div>
+
+    <!-- Cards Grid -->
+    <div class="cards-grid" id="cardsGrid"></div>
+  </div>
+
+  <script>
+    // Status colors for donut - gradient harmonioso
+    var STATUS_COLORS = [
+      '#10b981', // pago - verde esmeralda
+      '#06b6d4', // emProcesso - ciano
+      '#3b82f6', // atestada - azul
+      '#8b5cf6', // emAnalise - violeta
+      '#a855f7', // inconformidade - púrpura
+      '#ec4899', // emDiligencia - rosa
+      '#f43f5e', // glosa - vermelho rosado
+      '#94a3b8', // cancelada - cinza
+      '#e2e8f0'  // saldo - cinza claro
+    ];
+
+    var currentFilters = {
+      campanha: '',
+      termo: '',
+      tipo: '',
+      fase: 'Em Andamento'
+    };
+
+    var allCampanhas = [];
+    var allTermos = [];
+    var campanhasPorTermo = {};
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+      loadFilters();
+    });
+
+    function loadFilters() {
+      showLoading(true);
+      Promise.all([
+        new Promise(function(resolve) {
+          google.script.run.withSuccessHandler(resolve).withFailureHandler(function() { resolve([]); }).getCampanhas();
+        }),
+        new Promise(function(resolve) {
+          google.script.run.withSuccessHandler(resolve).withFailureHandler(function() { resolve([]); }).getTermos();
+        }),
+        new Promise(function(resolve) {
+          google.script.run.withSuccessHandler(resolve).withFailureHandler(function() { resolve([]); }).getTipos();
+        }),
+        new Promise(function(resolve) {
+          google.script.run.withSuccessHandler(resolve).withFailureHandler(function() { resolve([]); }).getCampanhasNaoFinalizadas();
+        }),
+        new Promise(function(resolve) {
+          google.script.run.withSuccessHandler(resolve).withFailureHandler(function() { resolve({}); }).getCampanhasPorTermo();
+        })
+      ]).then(function(results) {
+        allCampanhas = results[0] || [];
+        allTermos = results[1] || [];
+        var tipos = results[2] || [];
+        var naoFinalizadas = results[3] || [];
+        campanhasPorTermo = results[4] || {};
+
+        // Populate selects
+        var selCampanha = document.getElementById('filterCampanha');
+        allCampanhas.forEach(function(c) {
+          var opt = document.createElement('option');
+          opt.value = c;
+          opt.textContent = c;
+          selCampanha.appendChild(opt);
+        });
+
+        var selTermo = document.getElementById('filterTermo');
+        allTermos.forEach(function(t) {
+          var opt = document.createElement('option');
+          opt.value = t;
+          opt.textContent = t;
+          selTermo.appendChild(opt);
+        });
+
+        var selTipo = document.getElementById('filterTipo');
+        tipos.forEach(function(t) {
+          var opt = document.createElement('option');
+          opt.value = t;
+          opt.textContent = t;
+          selTipo.appendChild(opt);
+        });
+
+        // Event listeners
+        document.getElementById('filterCampanha').addEventListener('change', onFilterChange);
+        document.getElementById('filterTermo').addEventListener('change', onFilterChange);
+        document.getElementById('filterTipo').addEventListener('change', onFilterChange);
+        document.getElementById('filterFase').addEventListener('change', onFilterChange);
+
+        // Selecionar "Em Andamento" por padrão
+        document.getElementById('filterFase').value = 'Em Andamento';
+        // Load initial data com fase "Em Andamento"
+        showCampaignsList(naoFinalizadas, 'Campanhas em andamento');
+        loadData();
+      });
+    }
+
+    function clearFilters() {
+      document.getElementById('filterCampanha').value = '';
+      document.getElementById('filterTermo').value = '';
+      document.getElementById('filterTipo').value = '';
+      document.getElementById('filterFase').value = '';
+      currentFilters = { campanha: '', termo: '', tipo: '', fase: '' };
+      hideCampaignInfo();
+      // Mostrar todas as campanhas organizadas por termo
+      showAllCampaignsByTermo();
+      loadData();
+    }
+
+    function showAllCampaignsByTermo() {
+      var container = document.getElementById('campaignsList');
+      var titleEl = document.getElementById('campaignsListTitle');
+      var chipsEl = document.getElementById('campaignsChips');
+      var byTermoEl = document.getElementById('campaignsByTermo');
+      titleEl.textContent = 'Soma de todas as campanhas realizadas desde a assinatura dos contratos';
+      chipsEl.innerHTML = '';
+      byTermoEl.innerHTML = '';
+      // Adicionar linha de processo de contratação
+      var processoInfo = document.createElement('div');
+      processoInfo.style.cssText = 'margin-bottom: 16px; padding: 8px 12px; background: #f8fafc; border-radius: 8px; font-size: 13px; color: #475569;';
+      processoInfo.innerHTML = '<strong style="color: #64748b;">Processo de contratação:</strong> 00001-00013567/2021-51';
+      byTermoEl.appendChild(processoInfo);
+      // Ordenar termos - "Termo Inicial" primeiro
+      var termosOrdenados = allTermos.slice().sort(function(a, b) {
+        var aIsInicial = a.toLowerCase().indexOf('inicial') !== -1;
+        var bIsInicial = b.toLowerCase().indexOf('inicial') !== -1;
+        if (aIsInicial && !bIsInicial) return -1;
+        if (!aIsInicial && bIsInicial) return 1;
+        return 0;
+      });
+      // Organizar por termo
+      termosOrdenados.forEach(function(termo) {
+        var campanhas = campanhasPorTermo[termo] || [];
+        if (campanhas.length === 0) return;
+        var termoGroup = document.createElement('div');
+        termoGroup.className = 'termo-group';
+        var termoTitle = document.createElement('div');
+        termoTitle.className = 'termo-group-title';
+        termoTitle.textContent = termo;
+        termoGroup.appendChild(termoTitle);
+        var chipsDiv = document.createElement('div');
+        chipsDiv.className = 'campaigns-chips';
+        campanhas.forEach(function(c) {
+          var chip = document.createElement('span');
+          chip.className = 'campaign-chip';
+          chip.textContent = c;
+          chip.onclick = function() {
+            document.getElementById('filterCampanha').value = c;
+            onFilterChange();
+          };
+          chipsDiv.appendChild(chip);
+        });
+        termoGroup.appendChild(chipsDiv);
+        byTermoEl.appendChild(termoGroup);
+      });
+      container.classList.add('active');
+    }
+
+    function onFilterChange() {
+      currentFilters.campanha = document.getElementById('filterCampanha').value;
+      currentFilters.termo = document.getElementById('filterTermo').value;
+      currentFilters.tipo = document.getElementById('filterTipo').value;
+      currentFilters.fase = document.getElementById('filterFase').value;
+
+      // Update campaign info if specific campaign selected
+      if (currentFilters.campanha) {
+        google.script.run.withSuccessHandler(function(info) {
+          if (info) {
+            showCampaignInfo(info);
+            // Sync filters
+            if (info.termo) document.getElementById('filterTermo').value = info.termo;
+            if (info.tipo) document.getElementById('filterTipo').value = info.tipo;
+            currentFilters.termo = info.termo || '';
+            currentFilters.tipo = info.tipo || '';
+          } else {
+            // Se não retornou info, mostrar info básica
+            showCampaignInfo({ campanha: currentFilters.campanha });
+          }
+        }).withFailureHandler(function(e) {
+          console.error('Erro ao buscar info da campanha:', e);
+          // Mostrar info básica mesmo com erro
+          showCampaignInfo({ campanha: currentFilters.campanha });
+        }).getCampanhaInfo(currentFilters.campanha);
+        hideCampaignsList();
+      } else {
+        hideCampaignInfo();
+        updateCampaignsList();
+      }
+
+      loadData();
+    }
+
+    function isAllFiltersEmpty() {
+      return !currentFilters.campanha && !currentFilters.termo && !currentFilters.tipo && !currentFilters.fase;
+    }
+
+    function updateCampaignsList() {
+      // Se todos os filtros estão vazios, mostrar todas por termo
+      if (isAllFiltersEmpty()) {
+        showAllCampaignsByTermo();
+        return;
+      }
+      var titulo = '';
+      var partes = [];
+      if (currentFilters.fase) partes.push(currentFilters.fase);
+      if (currentFilters.termo) partes.push(currentFilters.termo);
+      if (currentFilters.tipo) partes.push(currentFilters.tipo);
+      if (partes.length > 0) {
+        titulo = 'Campanhas ' + partes.join(' • ').toLowerCase();
+        // Get filtered campaigns
+        if (currentFilters.fase) {
+          google.script.run.withSuccessHandler(function(campanhas) {
+            // Apply additional filters client-side
+            var filtradas = campanhas;
+            if (currentFilters.termo || currentFilters.tipo) {
+              filtradas = campanhas.filter(function(c) {
+                return allCampanhas.indexOf(c) !== -1;
+              });
+            }
+            showCampaignsList(filtradas, titulo);
+          }).getCampanhasByFase(currentFilters.fase);
+        } else if (currentFilters.termo) {
+          google.script.run.withSuccessHandler(function(campanhas) {
+            showCampaignsList(campanhas, titulo);
+          }).getCampanhasByTermo(currentFilters.termo);
+        } else if (currentFilters.tipo) {
+          google.script.run.withSuccessHandler(function(campanhas) {
+            showCampaignsList(campanhas, titulo);
+          }).getCampanhasByTipo(currentFilters.tipo);
+        }
+      } else {
+        google.script.run.withSuccessHandler(function(naoFinalizadas) {
+          showCampaignsList(naoFinalizadas, 'Campanhas em andamento');
+        }).getCampanhasNaoFinalizadas();
+      }
+    }
+
+    function loadData() {
+      // Quando filtrar por fase (sem campanha específica), usar modo agrupado para evitar compressão
+      var gridEl = document.getElementById('cardsGrid');
+      var isGrouped = !!(currentFilters.fase && !currentFilters.campanha);
+      gridEl.classList.toggle('grouped', isGrouped);
+
+      showLoading(true);
+      // Se filtrar por fase (sem campanha específica), mostrar por campanha
+      if (isGrouped) {
+        google.script.run
+          .withSuccessHandler(function(campanhas) {
+            renderCampaignGroups(campanhas);
+            showLoading(false);
+          })
+          .withFailureHandler(function(e) {
+            console.error('Erro ao carregar dados:', e);
+            showLoading(false);
+          })
+          .getDadosPorCampanha(currentFilters);
+      } else {
+        google.script.run
+          .withSuccessHandler(function(dados) {
+            renderCards(dados);
+            showLoading(false);
+          })
+          .withFailureHandler(function(e) {
+            console.error('Erro ao carregar dados:', e);
+            showLoading(false);
+          })
+          .getDados(currentFilters);
+      }
+    }
+
+    function showCampaignInfo(info) {
+      var container = document.getElementById('campaignInfo');
+      var titleEl = document.getElementById('campaignInfoTitle');
+      var faseEl = document.getElementById('campaignInfoFase');
+      var descEl = document.getElementById('campaignInfoDesc');
+      var obsWrap = document.getElementById('campaignInfoObs');
+      var obsText = document.getElementById('campaignInfoObsText');
+      var grid = document.getElementById('campaignInfoGrid');
+
+      var nome = info?.campanha || currentFilters.campanha || '';
+      titleEl.textContent = nome;
+
+      // Mostrar fase
+      var fase = info?.fase || '';
+      if (fase) {
+        faseEl.style.display = '';
+        faseEl.textContent = fase;
+        faseEl.className = 'campaign-info-fase ' + (fase === 'Finalizada' ? 'finalizada' : 'em-andamento');
+      } else {
+        faseEl.style.display = 'none';
+      }
+
+      var descricao = String(info?.descricao || '').trim();
+      if (descricao) {
+        descEl.style.display = '';
+        descEl.textContent = descricao;
+      } else {
+        descEl.style.display = 'none';
+        descEl.textContent = '';
+      }
+
+      var observacoes = String(info?.observacoes || '').trim();
+      if (observacoes) {
+        obsWrap.style.display = '';
+        obsText.textContent = observacoes;
+      } else {
+        obsWrap.style.display = 'none';
+        obsText.textContent = '';
+      }
+
+      grid.innerHTML = '';
+
+      var items = [
+        { icon: 'file', label: 'Termo Contratual', value: info.termo },
+        { icon: 'tag', label: 'Tipo', value: info.tipo },
+        { icon: 'folder', label: 'Processo Mãe', value: info.processoMae },
+        { icon: 'check', label: 'Autorização', value: info.autorizacao },
+        { icon: 'calendar', label: 'Início', value: formatDate(info.inicio) },
+        { icon: 'calendar', label: 'Fim', value: formatDate(info.fim) }
+      ];
+
+      items.forEach(function(item) {
+        if (item.value) {
+          var div = document.createElement('div');
+          div.className = 'info-item';
+          div.innerHTML = getIcon(item.icon) +
+            '<span class="info-label">' + item.label + ':</span>' +
+            '<span class="info-value">' + item.value + '</span>';
+          grid.appendChild(div);
+        }
+      });
+
+      container.classList.add('active');
+    }
+
+    function hideCampaignInfo() {
+      document.getElementById('campaignInfo').classList.remove('active');
+      document.getElementById('campaignInfoTitle').textContent = '';
+      document.getElementById('campaignInfoFase').style.display = 'none';
+      document.getElementById('campaignInfoDesc').textContent = '';
+      document.getElementById('campaignInfoDesc').style.display = 'none';
+      document.getElementById('campaignInfoObs').style.display = 'none';
+      document.getElementById('campaignInfoObsText').textContent = '';
+      document.getElementById('campaignInfoGrid').innerHTML = '';
+    }
+
+    function showCampaignsList(campanhas, titulo) {
+      var container = document.getElementById('campaignsList');
+      var titleEl = document.getElementById('campaignsListTitle');
+      var chipsEl = document.getElementById('campaignsChips');
+      var byTermoEl = document.getElementById('campaignsByTermo');
+      if (!campanhas || campanhas.length === 0) {
+        container.classList.remove('active');
+        return;
+      }
+      titleEl.textContent = titulo;
+      chipsEl.innerHTML = '';
+      byTermoEl.innerHTML = '';
+      campanhas.forEach(function(c) {
+        var chip = document.createElement('span');
+        chip.className = 'campaign-chip';
+        chip.textContent = c;
+        chip.onclick = function() {
+          document.getElementById('filterCampanha').value = c;
+          onFilterChange();
+        };
+        chipsEl.appendChild(chip);
+      });
+      container.classList.add('active');
+    }
+
+    function hideCampaignsList() {
+      document.getElementById('campaignsList').classList.remove('active');
+    }
+
+    function renderCards(dados) {
+      var grid = document.getElementById('cardsGrid');
+      grid.innerHTML = '';
+
+      var showProcesso = !!currentFilters.campanha;
+
+      // Calculate totals
+      var totais = calcularTotais(dados);
+
+      // Render agency cards
+      ['AV', 'Calia', 'EBM'].forEach(function(ag) {
+        if (!dados[ag]) return;
+
+        // Se campanha específica, sempre mostrar as 3 agências (mesmo com zero)
+        if (showProcesso) {
+          grid.appendChild(createCard(ag, dados[ag], true, currentFilters.campanha));
+          return;
+        }
+
+        // Visão agregada: só mostra se tiver empenho
+        if (dados[ag].empenhoTotal > 0) {
+          grid.appendChild(createCard(ag, dados[ag], false, null));
+        }
+      });
+
+      // Render total card
+      if (showProcesso || totais.empenhoTotal > 0) {
+        grid.appendChild(createCard('Total', totais, false, currentFilters.campanha));
+      }
+
+      // Load payments and empenhos if specific campaign selected
+      if (showProcesso && currentFilters.campanha) {
+        loadPagamentos(currentFilters.campanha, currentFilters.campanha);
+        loadEmpenhos(currentFilters.campanha, currentFilters.campanha);
+      }
+    }
+
+    function loadPagamentos(campanha, campaignId) {
+      console.log('loadPagamentos chamado para:', campanha, 'campaignId:', campaignId);
+      google.script.run
+        .withSuccessHandler(function(pagamentosData) {
+          console.log('Pagamentos recebidos:', pagamentosData);
+          renderPagamentos(pagamentosData, campaignId);
+        })
+        .withFailureHandler(function(e) {
+          console.error('Erro ao carregar pagamentos:', e);
+        })
+        .getPagamentosPorCampanha(campanha);
+    }
+
+    function loadEmpenhos(campanha, campaignId) {
+      console.log('loadEmpenhos chamado para:', campanha, 'campaignId:', campaignId);
+      google.script.run
+        .withSuccessHandler(function(empenhosData) {
+          console.log('Empenhos recebidos:', empenhosData);
+          renderEmpenhos(empenhosData, campaignId);
+        })
+        .withFailureHandler(function(e) {
+          console.error('Erro ao carregar empenhos:', e);
+        })
+        .getEmpenhosPorCampanha(campanha);
+    }
+
+    function toggleCollapsible(header, type) {
+      var isExpanded = header.classList.contains('expanded');
+      // Toggle all collapsibles of same type
+      var allHeaders = document.querySelectorAll('.payments-table-title[data-type="' + type + '"], .collapsible-header[data-type="' + type + '"]');
+      var allContents = document.querySelectorAll('.payments-table-content[data-type="' + type + '"], .collapsible-content[data-type="' + type + '"]');
+      
+      allHeaders.forEach(function(h) {
+        if (isExpanded) {
+          h.classList.remove('expanded');
+        } else {
+          h.classList.add('expanded');
+        }
+      });
+      
+      allContents.forEach(function(c) {
+        if (isExpanded) {
+          c.classList.remove('visible');
+        } else {
+          c.classList.add('visible');
+        }
+      });
+    }
+
+    function formatValueNoSymbol(value) {
+      var num = Number(value) || 0;
+      return num.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function renderPagamentos(pagamentosData, campaignId) {
+      console.log('renderPagamentos iniciado, campaignId:', campaignId);
+      var campaignSuffix = campaignId ? '-' + campaignId.toLowerCase().replace(/[^a-z0-9]/g, '') : '';
+      ['AV', 'Calia', 'EBM'].forEach(function(ag) {
+        var cardClass = ag.toLowerCase().replace(/\s/g, '');
+        var wrapperId = 'payments-' + cardClass + campaignSuffix;
+        var wrapper = document.getElementById(wrapperId);
+        console.log('Buscando wrapper:', wrapperId, 'Encontrado:', !!wrapper);
+        if (!wrapper) return;
+
+        var agData = pagamentosData[ag] || { pagamentos: [], empenho: 0 };
+
+        if (!agData.pagamentos || agData.pagamentos.length === 0) {
+          wrapper.innerHTML = '';
+          return;
+        }
+
+        var html = '<div class="payments-table-container">' +
+          '<div class="payments-table-title" data-type="pagamentos" onclick="toggleCollapsible(this, \'pagamentos\')">Pagamentos</div>' +
+          '<div class="payments-table-content" data-type="pagamentos">' +
+          '<table class="payments-table">' +
+          '<thead><tr><th>Data/Controle</th><th>Qt</th><th>Valor</th></tr></thead>' +
+          '<tbody>';
+
+        var totalPagamentos = 0;
+        agData.pagamentos.forEach(function(pag) {
+          var pgBadge = pag.paga ? '<span class="pg-badge">PG</span>' : '';
+          var dataControle = '<div class="pag-data">' + (pag.data || '-') + '</div>' +
+            '<div class="pag-controle">' + (pag.controle || '-') + '</div>';
+          html += '<tr>' +
+            '<td>' + dataControle + '</td>' +
+            '<td>' + (pag.qtd || 0) + '</td>' +
+            '<td>' + formatCurrency(pag.valor || 0) + pgBadge + '</td>' +
+          '</tr>';
+          totalPagamentos += pag.valor || 0;
+        });
+
+        // Total row - aligned with Valor column
+        html += '<tr class="total-row">' +
+          '<td colspan="2" style="text-align: left;">Total</td>' +
+          '<td style="text-align: center;">' + formatCurrency(totalPagamentos) + '</td>' +
+        '</tr>';
+
+        // Saldo row with conditional styling (only zero)
+        var saldo = (agData.empenho || 0) - totalPagamentos;
+        
+        var saldoRowClass = 'saldo-row';
+        var saldoTdClass = '';
+        
+        if (saldo <= 0) {
+          saldoRowClass += ' saldo-zero';
+        } else if (saldo < 0) {
+          saldoTdClass = ' negative';
+        }
+        
+        html += '<tr class="' + saldoRowClass + '">' +
+          '<td colspan="2" style="text-align: left;" class="saldo-label-cell" title="Considera apenas as pagas. Pode haver faturadas e não pagas ainda.">Saldo</td>' +
+          '<td class="' + saldoTdClass + '" style="text-align: center;">' + formatCurrency(saldo) + '</td>' +
+        '</tr>';
+
+        html += '</tbody></table></div></div>';
+        wrapper.innerHTML = html;
+      });
+    }
+
+    function calcularTotalPagamentos(pagamentosData) {
+      var allPagamentos = [];
+      var totalEmpenho = 0;
+      
+      ['AV', 'Calia', 'EBM'].forEach(function(ag) {
+        if (pagamentosData[ag]) {
+          totalEmpenho += pagamentosData[ag].empenho || 0;
+          (pagamentosData[ag].pagamentos || []).forEach(function(pag) {
+            // Agrupar por controle
+            var existing = allPagamentos.find(function(p) { return p.controle === pag.controle; });
+            if (existing) {
+              existing.qtd += pag.qtd || 0;
+              existing.valor += pag.valor || 0;
+            } else {
+              allPagamentos.push({
+                data: pag.data,
+                controle: pag.controle,
+                qtd: pag.qtd || 0,
+                valor: pag.valor || 0,
+                paga: pag.paga
+              });
+            }
+          });
+        }
+      });
+
+      // Ordenar por data
+      allPagamentos.sort(function(a, b) {
+        if (!a.data) return 1;
+        if (!b.data) return -1;
+        return a.data.localeCompare(b.data);
+      });
+
+      return { pagamentos: allPagamentos, empenho: totalEmpenho };
+    }
+
+    // Ordem fixa das campanhas
+    var CAMPAIGN_ORDER = ['Entregas', 'Machismo', 'D25', 'PETS'];
+
+    function renderCampaignGroups(campanhas) {
+      var grid = document.getElementById('cardsGrid');
+      grid.innerHTML = '';
+
+      if (!campanhas || campanhas.length === 0) {
+        grid.innerHTML = '<div style="text-align: center; padding: 40px; color: #64748b;">Nenhuma campanha encontrada</div>';
+        return;
+      }
+
+      // Ordenar campanhas pela ordem fixa
+      campanhas.sort(function(a, b) {
+        var indexA = CAMPAIGN_ORDER.indexOf(a.nome);
+        var indexB = CAMPAIGN_ORDER.indexOf(b.nome);
+        // Se não estiver na lista, colocar no final
+        if (indexA === -1) indexA = 999;
+        if (indexB === -1) indexB = 999;
+        return indexA - indexB;
+      });
+
+      campanhas.forEach(function(campanha) {
+        var group = document.createElement('div');
+        group.className = 'campaign-group';
+
+        // Header
+        var header = document.createElement('div');
+        header.className = 'campaign-group-header';
+
+        var descHtml = campanha.descricao ? ('<div class="campaign-group-desc">' + campanha.descricao + '</div>') : '';
+        header.innerHTML =
+          '<div style="flex:1; min-width:0;">' +
+            '<div class="campaign-group-title">' + campanha.nome + '</div>' +
+            descHtml +
+          '</div>';
+
+        group.appendChild(header);
+
+        // Cards grid - horizontal
+        var cardsDiv = document.createElement('div');
+        cardsDiv.className = 'cards-grid';
+
+        // Calculate totals for this campaign
+        var totais = calcularTotais(campanha);
+
+        // Sempre mostrar 4 quadros: AV, Calia, EBM e Total (mesmo zerados)
+        ['AV', 'Calia', 'EBM'].forEach(function(ag) {
+          var agData = campanha[ag] || createEmptyData();
+          cardsDiv.appendChild(createCard(ag, agData, true, campanha.nome));
+        });
+
+        cardsDiv.appendChild(createCard('Total', totais, false, campanha.nome));
+
+        group.appendChild(cardsDiv);
+        grid.appendChild(group);
+
+        // Carregar pagamentos e empenhos para esta campanha
+        loadPagamentos(campanha.nome, campanha.nome);
+        loadEmpenhos(campanha.nome, campanha.nome);
+      });
+    }
+
+    function createEmptyData() {
+      return {
+        processo: '',
+        empenhoTotal: 0,
+        saldoAtual: 0,
+        faturado: { qtd: 0, val: 0 },
+        pago: { qtd: 0, val: 0 },
+        emProcesso: { qtd: 0, val: 0 },
+        glosa: { qtd: 0, val: 0 },
+        atestada: { qtd: 0, val: 0 },
+        emAnalise: { qtd: 0, val: 0 },
+        inconformidade: { qtd: 0, val: 0 },
+        emDiligencia: { qtd: 0, val: 0 },
+        cancelada: { qtd: 0, val: 0 }
+      };
+    }
+
+    function calcularTotais(dados) {
+      var totais = {
+        processo: '',
+        empenhoTotal: 0,
+        saldoAtual: 0,
+        faturado: { qtd: 0, val: 0 },
+        pago: { qtd: 0, val: 0 },
+        emProcesso: { qtd: 0, val: 0 },
+        glosa: { qtd: 0, val: 0 },
+        atestada: { qtd: 0, val: 0 },
+        emAnalise: { qtd: 0, val: 0 },
+        inconformidade: { qtd: 0, val: 0 },
+        emDiligencia: { qtd: 0, val: 0 },
+        cancelada: { qtd: 0, val: 0 }
+      };
+      ['AV', 'Calia', 'EBM'].forEach(function(ag) {
+        if (dados[ag]) {
+          totais.empenhoTotal += dados[ag].empenhoTotal || 0;
+          totais.saldoAtual += dados[ag].saldoAtual || 0;
+          totais.faturado.qtd += dados[ag].faturado?.qtd || 0;
+          totais.faturado.val += dados[ag].faturado?.val || 0;
+          totais.pago.qtd += dados[ag].pago?.qtd || 0;
+          totais.pago.val += dados[ag].pago?.val || 0;
+          totais.emProcesso.qtd += dados[ag].emProcesso?.qtd || 0;
+          totais.emProcesso.val += dados[ag].emProcesso?.val || 0;
+          totais.glosa.qtd += dados[ag].glosa?.qtd || 0;
+          totais.glosa.val += dados[ag].glosa?.val || 0;
+          totais.atestada.qtd += dados[ag].atestada?.qtd || 0;
+          totais.atestada.val += dados[ag].atestada?.val || 0;
+          totais.emAnalise.qtd += dados[ag].emAnalise?.qtd || 0;
+          totais.emAnalise.val += dados[ag].emAnalise?.val || 0;
+          totais.inconformidade.qtd += dados[ag].inconformidade?.qtd || 0;
+          totais.inconformidade.val += dados[ag].inconformidade?.val || 0;
+          totais.emDiligencia.qtd += dados[ag].emDiligencia?.qtd || 0;
+          totais.emDiligencia.val += dados[ag].emDiligencia?.val || 0;
+          totais.cancelada.qtd += dados[ag].cancelada?.qtd || 0;
+          totais.cancelada.val += dados[ag].cancelada?.val || 0;
+        }
+      });
+      return totais;
+    }
+
+    var CONTRATOS = {
+      'AV': 'Contrato Nº 38/2022',
+      'Calia': 'Contrato Nº 37/2022',
+      'EBM': 'Contrato Nº 39/2022',
+      'Total': ''
+    };
+
+    function createCard(title, data, showProcesso, campaignId) {
+      var card = document.createElement('div');
+      var cardClass = title.toLowerCase().replace(/\s/g, '');
+      card.className = 'card card-' + cardClass;
+
+      var contratoHtml = CONTRATOS[title] ? '<div class="card-contrato">' + CONTRATOS[title] + '</div>' : '';
+      var processoHtml = showProcesso && data.processo ? 
+        '<div class="card-processo">' + data.processo + '</div>' : '';
+
+      // Calcular A Atestar (soma dos subitens)
+      var aAtestarVal = (data.emAnalise?.val || 0) + (data.inconformidade?.val || 0) + (data.emDiligencia?.val || 0);
+      var aAtestarQtd = (data.emAnalise?.qtd || 0) + (data.inconformidade?.qtd || 0) + (data.emDiligencia?.qtd || 0);
+
+      // Só adiciona wrappers de empenhos e pagamentos para agências (não para Total)
+      var campaignSuffix = campaignId ? '-' + campaignId.toLowerCase().replace(/[^a-z0-9]/g, '') : '';
+      var empenhosWrapperHtml = (title !== 'Total') 
+        ? '<div class="empenhos-table-wrapper" id="empenhos-' + cardClass + campaignSuffix + '"></div>' 
+        : '';
+      var paymentsWrapperHtml = (title !== 'Total') 
+        ? '<div class="payments-table-wrapper" id="payments-' + cardClass + campaignSuffix + '"></div>' 
+        : '';
+
+      // Check if saldo warning should be shown
+      var percentUsed = data.empenhoTotal > 0 ? ((data.empenhoTotal - data.saldoAtual) / data.empenhoTotal) * 100 : 0;
+      var showWarningIcon = percentUsed >= 90 && data.saldoAtual > 0;
+      var warningIconHtml = showWarningIcon ? '<span class="material-icons donut-warning-icon" title="Resta apenas 10% do valor empenhado">warning</span>' : '';
+
+      card.innerHTML = 
+        '<div class="card-header">' +
+          '<div>' +
+            '<div class="card-title">' + title + '</div>' +
+            contratoHtml +
+            processoHtml +
+          '</div>' +
+          '<div class="donut-container" onclick="toggleDonut(this)">' +
+            warningIconHtml +
+            '<canvas width="70" height="70"></canvas>' +
+            '<div class="donut-center">' +
+              '<div class="donut-percent">0%</div>' +
+              '<div class="donut-label">Fat.</div>' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="card-body">' +
+          createEmpenhoTotalRow('Empenho Total', data.empenhoTotal, title) +
+          empenhosWrapperHtml +
+          '<div class="saldo-separator"></div>' +
+          createSaldoEmpenhoRow('Saldo de Empenho', data.saldoAtual, data.empenhoTotal, 'Considera as faturadas') +
+          createDataRow('Faturado', data.faturado?.val, data.faturado?.qtd) +
+          '<div class="collapsible-buttons-container">' +
+            createStatusCollapsible(data, aAtestarVal, aAtestarQtd) +
+            paymentsWrapperHtml +
+          '</div>' +
+        '</div>';
+
+      // Draw donut after appending
+      setTimeout(function() {
+        drawDonut(card.querySelector('canvas'), data, false);
+      }, 0);
+
+      // Store data for toggle
+      card.dataset.cardData = JSON.stringify(data);
+      card.dataset.showFaturado = 'true';
+      card.dataset.agency = title;
+
+      return card;
+    }
+
+    function renderEmpenhos(empenhosData, campaignId) {
+      console.log('renderEmpenhos iniciado, campaignId:', campaignId);
+      var campaignSuffix = campaignId ? '-' + campaignId.toLowerCase().replace(/[^a-z0-9]/g, '') : '';
+      ['AV', 'Calia', 'EBM'].forEach(function(ag) {
+        var cardClass = ag.toLowerCase().replace(/\s/g, '');
+        var wrapperId = 'empenhos-' + cardClass + campaignSuffix;
+        var wrapper = document.getElementById(wrapperId);
+        console.log('Buscando wrapper empenhos:', wrapperId, 'Encontrado:', !!wrapper);
+        if (!wrapper) return;
+
+        var empenhos = empenhosData[ag] || [];
+
+        if (!empenhos || empenhos.length === 0) {
+          wrapper.innerHTML = '';
+          return;
+        }
+
+        var html = '<div class="collapsible-content" data-type="empenhos">' +
+          '<table class="empenhos-table">' +
+          '<thead><tr><th>Data</th><th>Empenho</th><th>Valor</th></tr></thead>' +
+          '<tbody>';
+
+        empenhos.forEach(function(emp) {
+          var valor = emp.valor || 0;
+          var isNegative = valor < 0;
+          var valueClass = isNegative ? ' class="negative-value"' : '';
+          var seiNumber = emp.sei || '-';
+          var seiBtn = seiNumber !== '-' 
+            ? '<span class="copy-sei-btn" data-tooltip="Nº SEI: ' + seiNumber + '" onclick="copySei(\'' + seiNumber + '\', this, event)"><span class="material-icons">content_copy</span></span>' 
+            : '';
+          var empenhoHtml = '<div class="emp-empenho">' + 
+            (emp.empenho || '-') + seiBtn +
+          '</div>';
+          html += '<tr>' +
+            '<td>' + (emp.data || '-') + '</td>' +
+            '<td>' + empenhoHtml + '</td>' +
+            '<td' + valueClass + '>' + formatCurrency(valor) + '</td>' +
+          '</tr>';
+        });
+
+        html += '</tbody></table></div>';
+        wrapper.innerHTML = html;
+      });
+    }
+
+    function createEmpenhoTotalRow(label, value, cardTitle) {
+      // Para o card Total, não exibe seta (não tem empenhos)
+      if (cardTitle === 'Total') {
+        return '<div class="data-row header">' +
+          '<span class="data-label">' + label + '</span>' +
+          '<div class="data-value">' +
+            '<span class="value">' + formatCurrency(value || 0) + '</span>' +
+          '</div>' +
+        '</div>';
+      }
+      // Para agências, exibe seta clicável
+      return '<div class="data-row header expandable" onclick="toggleEmpenhos(this)">' +
+        '<span class="data-label">' + label + '</span>' +
+        '<div class="data-value">' +
+          '<span class="value">' + formatCurrency(value || 0) + '</span>' +
+        '</div>' +
+      '</div>';
+    }
+
+    function toggleEmpenhos(row) {
+      var isExpanded = row.classList.contains('expanded');
+      // Get all cards on the page
+      var allCards = document.querySelectorAll('.card');
+      // Toggle empenhos visibility in ALL cards
+      allCards.forEach(function(card) {
+        var wrapper = card.querySelector('.empenhos-table-wrapper');
+        if (!wrapper) return;
+        var content = wrapper.querySelector('.collapsible-content[data-type="empenhos"]');
+        if (!content) return;
+        if (isExpanded) {
+          content.classList.remove('visible');
+        } else {
+          content.classList.add('visible');
+        }
+        // Also update header row expanded state
+        var headerRow = card.querySelector('.data-row.header.expandable');
+        if (headerRow) {
+          if (isExpanded) {
+            headerRow.classList.remove('expanded');
+          } else {
+            headerRow.classList.add('expanded');
+          }
+        }
+      });
+    }
+
+    function copySei(seiNumber, btn, event) {
+      event.stopPropagation();
+      if (seiNumber && seiNumber !== '-') {
+        navigator.clipboard.writeText(seiNumber).then(function() {
+          var originalText = btn.innerHTML;
+          btn.innerHTML = '✓';
+          btn.classList.add('copied');
+          
+          // Highlight the row
+          var row = btn.closest('tr');
+          if (row) {
+            row.classList.add('highlight-copied');
+            setTimeout(function() {
+              row.classList.remove('highlight-copied');
+            }, 1000);
+          }
+          
+          setTimeout(function() {
+            btn.innerHTML = originalText;
+            btn.classList.remove('copied');
+          }, 1200);
+        });
+      }
+    }
+
+    function createDataRow(label, value, qtd, isHeader, statusClass, isParent, isSubitem, tooltip) {
+      var headerClass = isHeader ? ' header' : '';
+      var parentClass = isParent ? ' parent' : '';
+      var subitemClass = isSubitem ? ' subitem' : '';
+      var valueClass = statusClass ? ' ' + statusClass : '';
+      // Mostrar número de NFs em sobrescrito depois do nome - "1 NF" ou "x NFs"
+      var nfHtml = '';
+      if (qtd !== undefined && qtd !== null && qtd > 0) {
+        var nfText = qtd === 1 ? '1 NF' : qtd + ' NFs';
+        nfHtml = '<span class="nf-count">' + nfText + '</span>';
+      }
+      var tooltipAttr = tooltip ? ' data-row-tooltip="' + tooltip + '"' : '';
+      var tooltipClass = tooltip ? ' has-tooltip' : '';
+      var clickHandler = isParent ? ' onclick="toggleSubitems(this)"' : '';
+      return '<div class="data-row' + headerClass + parentClass + subitemClass + tooltipClass + '"' + clickHandler + tooltipAttr + '>' +
+        '<span class="data-label">' + label + nfHtml + '</span>' +
+        '<div class="data-value">' +
+          '<span class="value' + valueClass + '">' + formatCurrency(value || 0) + '</span>' +
+        '</div>' +
+      '</div>';
+    }
+
+    function createSaldoEmpenhoRow(label, value, empenhoTotal, tooltip) {
+      var tooltipAttr = tooltip ? ' data-row-tooltip="' + tooltip + '"' : '';
+      var tooltipClass = tooltip ? ' has-tooltip' : '';
+      
+      return '<div class="data-row saldo-empenho-row' + tooltipClass + '"' + tooltipAttr + '>' +
+        '<span class="data-label">' + label + '</span>' +
+        '<div class="data-value">' +
+          '<span class="value">' + formatCurrency(value || 0) + '</span>' +
+        '</div>' +
+      '</div>';
+    }
+
+    function createStatusCollapsible(data, aAtestarVal, aAtestarQtd) {
+      return '<div class="status-collapsible">' +
+        '<div class="collapsible-header" onclick="toggleStatusCollapsible(this)">' +
+          '<span class="collapsible-label">Status</span>' +
+        '</div>' +
+        '<div class="collapsible-content">' +
+          createDataRow('Pago', data.pago?.val, data.pago?.qtd, false, 'status-pago') +
+          createDataRow('Em Processo de Pgto', data.emProcesso?.val, data.emProcesso?.qtd, false, 'status-processo') +
+          createDataRow('Atestada', data.atestada?.val, data.atestada?.qtd, false, 'status-atestada') +
+          createDataRow('A Atestar', aAtestarVal, aAtestarQtd, false, 'status-aatestar', true) +
+          createDataRow('Em Análise', data.emAnalise?.val, data.emAnalise?.qtd, false, 'status-analise', false, true) +
+          createDataRow('Inconformidade', data.inconformidade?.val, data.inconformidade?.qtd, false, 'status-inconformidade', false, true) +
+          createDataRow('Em Diligência Interna', data.emDiligencia?.val, data.emDiligencia?.qtd, false, 'status-diligencia', false, true) +
+          createDataRow('Glosa Total', data.glosa?.val, data.glosa?.qtd, false, 'status-glosa') +
+          createDataRow('Cancelada', data.cancelada?.val, data.cancelada?.qtd, false, 'status-cancelada') +
+        '</div>' +
+      '</div>';
+    }
+
+    function toggleStatusCollapsible(header) {
+      header.classList.toggle('expanded');
+      var content = header.nextElementSibling;
+      content.classList.toggle('visible');
+      
+      // Sync all status collapsibles
+      var isExpanded = header.classList.contains('expanded');
+      document.querySelectorAll('.status-collapsible').forEach(function(sc) {
+        var h = sc.querySelector('.collapsible-header');
+        var c = sc.querySelector('.collapsible-content');
+        if (isExpanded) {
+          h.classList.add('expanded');
+          c.classList.add('visible');
+        } else {
+          h.classList.remove('expanded');
+          c.classList.remove('visible');
+        }
+      });
+    }
+
+    function toggleSubitems(parentRow) {
+      // Toggle expanded class on parent
+      parentRow.classList.toggle('expanded');
+      // Get all cards on the page
+      var allCards = document.querySelectorAll('.card');
+      var isExpanded = parentRow.classList.contains('expanded');
+      // Toggle subitems visibility in ALL cards
+      allCards.forEach(function(card) {
+        var subitems = card.querySelectorAll('.data-row.subitem');
+        subitems.forEach(function(subitem) {
+          if (isExpanded) {
+            subitem.classList.add('visible');
+          } else {
+            subitem.classList.remove('visible');
+          }
+        });
+        // Also update parent row expanded state in all cards
+        var parentRows = card.querySelectorAll('.data-row.parent');
+        parentRows.forEach(function(pr) {
+          if (isExpanded) {
+            pr.classList.add('expanded');
+          } else {
+            pr.classList.remove('expanded');
+          }
+        });
+      });
+    }
+
+    function drawDonut(canvas, data, showPago) {
+      var ctx = canvas.getContext('2d');
+      var size = 70;
+      var centerX = size / 2;
+      var centerY = size / 2;
+      var outerRadius = 32;
+      var innerRadius = 20;
+
+      ctx.clearRect(0, 0, size, size);
+
+      var empenho = data.empenhoTotal || 0;
+      var faturado = data.faturado?.val || 0;
+      var pago = data.pago?.val || 0;
+      var displayValue = showPago ? pago : faturado;
+      var percent = empenho > 0 ? (displayValue / empenho) * 100 : 0;
+
+      // Gradientes modernos
+      var MODERN_COLORS = [
+        { start: '#22c55e', end: '#16a34a' }, // pago
+        { start: '#38bdf8', end: '#0ea5e9' }, // emProcesso
+        { start: '#60a5fa', end: '#3b82f6' }, // atestada
+        { start: '#a78bfa', end: '#8b5cf6' }, // emAnalise
+        { start: '#c084fc', end: '#a855f7' }, // inconformidade
+        { start: '#f472b6', end: '#ec4899' }, // emDiligencia
+        { start: '#fb7185', end: '#f43f5e' }, // glosa
+        { start: '#94a3b8', end: '#64748b' }, // cancelada
+        { start: '#e2e8f0', end: '#cbd5e1' }  // saldo
+      ];
+
+      // Fundo cinza claro (track)
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, outerRadius, 0, Math.PI * 2);
+      ctx.arc(centerX, centerY, innerRadius, 0, Math.PI * 2, true);
+      ctx.closePath();
+      ctx.fillStyle = '#f1f5f9';
+      ctx.fill();
+
+      if (empenho > 0) {
+        var values = [
+          data.pago?.val || 0,
+          data.emProcesso?.val || 0,
+          data.atestada?.val || 0,
+          data.emAnalise?.val || 0,
+          data.inconformidade?.val || 0,
+          data.emDiligencia?.val || 0,
+          data.glosa?.val || 0,
+          data.cancelada?.val || 0,
+          data.saldoAtual || 0
+        ];
+
+        var startAngle = -Math.PI / 2;
+        var gap = 0.02;
+
+        values.forEach(function(val, i) {
+          if (val > 0) {
+            var sweepAngle = (val / empenho) * Math.PI * 2;
+            var endAngle = startAngle + sweepAngle - gap;
+
+            if (endAngle > startAngle + 0.01) {
+              // Criar gradiente angular
+              var midAngle = startAngle + sweepAngle / 2;
+              var gradX1 = centerX + Math.cos(startAngle) * outerRadius;
+              var gradY1 = centerY + Math.sin(startAngle) * outerRadius;
+              var gradX2 = centerX + Math.cos(endAngle) * outerRadius;
+              var gradY2 = centerY + Math.sin(endAngle) * outerRadius;
+
+              var grad = ctx.createLinearGradient(gradX1, gradY1, gradX2, gradY2);
+              grad.addColorStop(0, MODERN_COLORS[i].start);
+              grad.addColorStop(1, MODERN_COLORS[i].end);
+
+              // Desenhar fatia com sombra
+              ctx.save();
+              ctx.shadowColor = 'rgba(0, 0, 0, 0.15)';
+              ctx.shadowBlur = 4;
+              ctx.shadowOffsetX = 1;
+              ctx.shadowOffsetY = 2;
+
+              ctx.beginPath();
+              ctx.moveTo(centerX, centerY);
+              ctx.arc(centerX, centerY, outerRadius, startAngle, endAngle);
+              ctx.lineTo(centerX, centerY);
+              ctx.closePath();
+              ctx.fillStyle = grad;
+              ctx.fill();
+
+              ctx.restore();
+            }
+            startAngle += sweepAngle;
+          }
+        });
+
+        // Círculo interno (cria o buraco do donut)
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, innerRadius, 0, Math.PI * 2);
+        ctx.fillStyle = 'white';
+        ctx.fill();
+
+        // Borda interna sutil
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, innerRadius, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(0,0,0,0.03)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
+
+      // Update center text
+      var container = canvas.parentElement;
+      if (container) {
+        container.querySelector('.donut-percent').textContent = Math.round(percent) + '%';
+        container.querySelector('.donut-label').textContent = showPago ? 'Pago' : 'Fat.';
+      }
+    }
+
+    function toggleDonut(container) {
+      var card = container.closest('.card');
+      var data = JSON.parse(card.dataset.cardData);
+      var showFaturado = card.dataset.showFaturado === 'true';
+      showFaturado = !showFaturado;
+      card.dataset.showFaturado = showFaturado.toString();
+      drawDonut(container.querySelector('canvas'), data, !showFaturado);
+    }
+
+    function showLoading(show) {
+      document.getElementById('loading').classList.toggle('active', show);
+      // Não forçar display "grid" aqui: o modo pode ser grid (normal) ou flex (grouped)
+      document.getElementById('cardsGrid').style.display = show ? 'none' : '';
+    }
+
+    function formatCurrency(value) {
+      return 'R$ ' + (value || 0).toLocaleString('pt-BR', { 
+        minimumFractionDigits: 2, 
+        maximumFractionDigits: 2 
+      });
+    }
+
+    function formatDate(value) {
+      if (!value) return '';
+      if (typeof value === 'string') return value;
+      try {
+        var d = new Date(value);
+        return d.toLocaleDateString('pt-BR');
+      } catch (e) {
+        return String(value);
+      }
+    }
+
+    function getIcon(type) {
+      var icons = {
+        file: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>',
+        tag: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><circle cx="7" cy="7" r="1"/></svg>',
+        folder: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>',
+        check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg>',
+        calendar: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>'
+      };
+      return icons[type] || '';
+    }
+
+    // Clear button event
+    document.getElementById('btnClear').addEventListener('click', clearFilters);
+  </script>
+</body>
+</html>
