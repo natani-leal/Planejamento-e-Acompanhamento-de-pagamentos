@@ -83,7 +83,7 @@
         .section.pagas .dot { background: hsl(217, 90%, 60%); }
         .section.gerador .dot { background: hsl(252, 85%, 60%); }
 
-        /* Cores das agências na tabela: AV = Roxo, CALIA = Laranja, EBM = Cinza */
+        /* Cores das agências na tabela */
         .agencia-av {
             color: hsl(270, 70%, 55%) !important;
             font-weight: 600;
@@ -104,14 +104,14 @@
             gap: 16px;
             margin-bottom: 24px;
         }
-
-        /* Link Card - Input ANTES da expansão */
+        
+        /* Link Card - Collapsible */
         .link-card {
             background: white;
             border: 1px solid hsl(220, 15%, 90%);
             border-radius: 12px;
             padding: 1rem 1.5rem;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
         }
         .link-card:hover {
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
@@ -125,6 +125,7 @@
             align-items: center;
             flex-wrap: wrap;
             gap: 12px;
+            cursor: pointer;
         }
         .link-card-icon {
             width: 24px;
@@ -145,11 +146,20 @@
             font-weight: 600;
             color: hsl(220, 25%, 25%);
         }
-
-        /* Input inline com o título, antes da expansão */
+        .toggle-icon {
+            margin-left: 8px;
+            transition: transform 0.3s ease;
+            color: hsl(220, 10%, 50%);
+        }
+        .link-card.expanded .toggle-icon {
+            transform: rotate(180deg);
+        }
+        
+        /* Input inline com o título */
         .gerador-input-inline {
             margin-left: auto;
         }
+        /* HARMONIZADO: Input SEI - largura 320px, padding 10px 14px, font 0.875rem */
         .gerador-input {
             width: 320px;
             padding: 10px 14px;
@@ -169,7 +179,7 @@
         .gerador-input::placeholder {
             color: hsl(220, 10%, 60%);
         }
-
+        
         .link-card-content {
             display: none;
             margin-top: 1rem;
@@ -181,28 +191,54 @@
             display: block;
         }
 
-        /* Executor Date Selector - Menu Suspenso */
-        .executor-date-select {
-            margin-left: auto;
-            padding-left: 16px;
+        /* Multi-select de datas */
+        .multi-date-select {
+            position: relative;
+            display: inline-block;
         }
-        .date-select-dropdown {
-            width: 320px;
-            padding: 10px 14px;
+        .multi-date-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
             border: 1px solid hsl(220, 15%, 90%);
             border-radius: 8px;
-            font-size: 0.875rem;
+            font-size: 0.85rem;
             font-family: inherit;
             background: hsl(220, 20%, 98%);
             cursor: pointer;
             transition: all 0.2s;
         }
-        .date-select-dropdown:focus {
-            outline: none;
+        .multi-date-btn:hover {
             border-color: hsl(252, 85%, 60%);
             background: white;
-            box-shadow: 0 0 0 3px hsla(252, 85%, 60%, 0.15);
         }
+        .multi-date-dropdown {
+            position: absolute;
+            top: calc(100% + 4px);
+            right: 0;
+            min-width: 180px;
+            max-height: 280px;
+            overflow-y: auto;
+            background: white;
+            border: 1px solid hsl(220, 15%, 90%);
+            border-radius: 8px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            z-index: 100;
+            display: none;
+        }
+        .multi-date-dropdown.open { display: block; }
+        .multi-date-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: background 0.15s;
+        }
+        .multi-date-item:hover { background: hsl(220, 20%, 97%); }
+        .multi-date-item input { cursor: pointer; }
 
         /* Table */
         .table-wrapper { overflow-x: auto; }
@@ -222,15 +258,16 @@
             color: hsl(220, 10%, 50%);
             border-bottom: 2px solid hsl(220, 15%, 92%);
         }
+        th.center { text-align: center; }
         td {
             padding: 14px 16px;
             border-bottom: 1px solid hsl(220, 15%, 95%);
-            vertical-align: middle;
+            vertical-align: top;
         }
         tr:hover td { background: hsl(220, 20%, 98%); }
         tr:last-child td { border-bottom: none; }
-        .agencia { font-weight: 600; vertical-align: middle; }
-        .campanha { color: hsl(220, 25%, 35%); vertical-align: middle; }
+        .agencia { font-weight: 600; }
+        .campanha { color: hsl(220, 25%, 35%); }
         .controle {
             font-family: 'SF Mono', Consolas, monospace;
             font-size: 0.8rem;
@@ -239,12 +276,11 @@
             border-radius: 4px;
             color: hsl(220, 25%, 40%);
         }
-        .qtd { text-align: center; font-weight: 400; }
+        .qtd { text-align: center; font-weight: 600; }
         .valor {
-            font-weight: 400;
-            color: hsl(220, 15%, 35%);
+            font-weight: 700;
+            color: hsl(142, 70%, 40%);
             white-space: nowrap;
-            text-align: center;
         }
 
         /* Count Badge */
@@ -253,7 +289,7 @@
             border-radius: 20px;
             font-size: 0.75rem;
             font-weight: 600;
-            margin-left: 6px;
+            margin-left: 8px;
         }
         .count-badge.blue {
             background: hsl(217, 90%, 95%);
@@ -267,15 +303,11 @@
             background: hsl(220, 15%, 96%);
             color: hsl(220, 10%, 50%);
         }
-        .count-badge.orange {
-            background: hsl(38, 95%, 95%);
-            color: hsl(38, 60%, 35%);
-        }
 
         /* Executor Table */
         .executor-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
         .executor-table th {
-            text-align: center;
+            text-align: left;
             padding: 12px 16px;
             background: hsl(220, 20%, 97%);
             font-weight: 600;
@@ -285,59 +317,56 @@
             color: hsl(220, 10%, 50%);
             border-bottom: 2px solid hsl(220, 15%, 92%);
         }
-        .executor-table th:first-child { text-align: left; }
+        .executor-table th.center { text-align: center; }
         .executor-table td {
             padding: 14px 16px;
             border-bottom: 1px solid hsl(220, 15%, 95%);
             vertical-align: middle;
-            text-align: center;
         }
-        .executor-table td:first-child { text-align: left; }
         .executor-table tr:hover td { background: hsl(220, 20%, 98%); }
-        .executor-table .executor-name { font-weight: 600; color: hsl(220, 15%, 30%); vertical-align: middle; }
-        .executor-table .count { text-align: center; font-weight: 400; vertical-align: middle; color: hsl(220, 15%, 35%); }
-        .executor-table .count.av { color: hsl(270, 70%, 55%); font-weight: 600; }
-        .executor-table .count.calia { color: hsl(30, 90%, 50%); font-weight: 600; }
-        .executor-table .count.ebm { color: hsl(220, 10%, 50%); font-weight: 600; }
-        .executor-table .valor {
-            font-weight: 400;
-            color: hsl(220, 15%, 35%);
-            white-space: nowrap;
-            text-align: center;
+        .executor-table .executor-name { font-weight: 600; color: hsl(220, 15%, 30%); }
+        .executor-table .count { text-align: center; font-weight: 600; }
+        .executor-table .count.av { color: hsl(270, 70%, 55%); }
+        .executor-table .count.calia { color: hsl(30, 90%, 50%); }
+        .executor-table .count.ebm { color: hsl(220, 10%, 50%); }
+        .executor-table .nfs-cell {
+            font-size: 0.75rem;
+            color: hsl(220, 10%, 45%);
+            max-width: 150px;
+            word-break: break-word;
+        }
+        /* Container com scroll horizontal para executor */
+        #executorContent .table-wrapper {
+            overflow-x: auto;
+            margin-right: -8px;
+            padding-right: 8px;
         }
         .executor-table .summary-row {
             background: hsl(220, 20%, 97%) !important;
-            font-weight: 600;
+            font-weight: 700;
         }
         .executor-table .summary-row td {
             border-top: 2px solid hsl(220, 15%, 90%);
             padding-top: 16px;
         }
-        .executor-table .summary-row .count { font-weight: 600; }
 
-        /* Status Select - Cinza claro padrão, apenas OB colorido */
+        /* Status Select */
         .status-select {
             padding: 8px 12px;
             border: 1px solid hsl(220, 15%, 90%);
             border-radius: 6px;
             font-size: 0.8rem;
             font-family: inherit;
-            background: hsl(220, 20%, 98%);
+            background: white;
             cursor: pointer;
             min-width: 140px;
         }
-        .status-select.montando,
-        .status-select.aguardando,
-        .status-select.dicom,
-        .status-select.daf,
-        .status-select.enviado {
-            background: hsl(220, 20%, 98%);
-            border-color: hsl(220, 15%, 90%);
-        }
-        .status-select.ob {
-            background: hsl(142, 70%, 93%);
-            border-color: hsl(142, 70%, 65%);
-        }
+        .status-select.montando { background: hsl(38, 95%, 95%); border-color: hsl(38, 95%, 75%); }
+        .status-select.aguardando { background: hsl(270, 70%, 95%); border-color: hsl(270, 70%, 75%); }
+        .status-select.dicom { background: hsl(217, 90%, 95%); border-color: hsl(217, 90%, 75%); }
+        .status-select.daf { background: hsl(185, 85%, 93%); border-color: hsl(185, 85%, 65%); }
+        .status-select.ob { background: hsl(142, 70%, 93%); border-color: hsl(142, 70%, 65%); }
+        .status-select.enviado { background: hsl(142, 70%, 90%); border-color: hsl(142, 70%, 55%); }
 
         /* Obs Input */
         .obs-input {
@@ -384,7 +413,7 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Pendentes / Inconformidades */
+        /* Pendentes */
         .pendente-item {
             background: hsl(0, 75%, 97%);
             border: 1px solid hsl(0, 75%, 90%);
@@ -393,22 +422,14 @@
             margin-bottom: 4px;
             color: hsl(0, 75%, 40%);
             font-size: 0.75rem;
-            cursor: default;
         }
-        /* Diligência interna - estilo diferenciado */
-        .diligencia-item {
-            background: hsl(38, 95%, 95%);
-            border: 1px solid hsl(38, 95%, 80%);
-            border-radius: 6px;
-            padding: 6px 8px;
-            margin-bottom: 4px;
-            color: hsl(38, 60%, 35%);
-            font-size: 0.75rem;
-            cursor: default;
-        }
-        /* Tooltip para pendentes */
-        .pendente-item[title], .diligencia-item[title] {
-            cursor: help;
+        .pendente-tipo {
+            display: inline-block;
+            background: hsl(0, 75%, 92%);
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 4px;
+            font-weight: 600;
         }
 
         /* Empty State */
@@ -446,10 +467,112 @@
         }
         #error.show { display: block; }
 
-        /* Pagas table centered */
-        .section.pagas td { text-align: center; vertical-align: middle; }
+        /* Pagas table - Tudo cinza exceto agência */
+        .section.pagas td { text-align: center; vertical-align: middle; color: hsl(220, 10%, 45%); }
         .section.pagas th { text-align: center; }
-        .section.pagas .controle { display: inline-block; }
+        .section.pagas .agencia { color: inherit !important; }
+        .section.pagas .agencia.agencia-av { color: hsl(270, 70%, 55%) !important; }
+        .section.pagas .agencia.agencia-calia { color: hsl(30, 90%, 50%) !important; }
+        .section.pagas .agencia.agencia-ebm { color: hsl(220, 10%, 50%) !important; }
+        .section.pagas .campanha { color: hsl(220, 10%, 45%); }
+        .section.pagas .controle { display: inline-block; background: hsl(220, 15%, 94%); color: hsl(220, 10%, 45%); }
+        .section.pagas .qtd { color: hsl(220, 10%, 45%); }
+        .section.pagas .valor { color: hsl(220, 10%, 45%); font-weight: 600; }
+        .section.pagas .data-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .section.pagas .data-main {
+            font-weight: 600;
+            color: hsl(220, 10%, 45%);
+        }
+        .section.pagas .data-sub {
+            font-size: 0.7rem;
+            color: hsl(220, 10%, 55%);
+            margin-top: 2px;
+        }
+
+        /* Qtd Sub info */
+        .qtd-sub, .valor-sub {
+            font-size: 0.7rem;
+            margin-top: 4px;
+        }
+        .qtd-sub div, .valor-sub div {
+            margin-top: 2px;
+        }
+
+        /* Gerador Table - Control de Pagamento */
+        .gerador-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+            margin-top: 20px;
+            color: black;
+        }
+        .gerador-table th, .gerador-table td {
+            border: 1px solid black;
+            padding: 8px 12px;
+            text-align: center;
+            background: transparent;
+            color: black;
+        }
+        .gerador-table th {
+            background: transparent;
+            font-weight: 600;
+            color: black;
+        }
+        .gerador-table tr:last-child td {
+            border-bottom: 1px solid black;
+        }
+        .gerador-table .veiculo-cell {
+            text-align: center;
+        }
+        .gerador-table .glosa-cell {
+            color: black;
+        }
+        .gerador-table .valor-negative {
+            color: black;
+            font-weight: 700;
+        }
+        .gerador-table .summary-row {
+            font-weight: 700;
+        }
+        .gerador-table .summary-row td {
+            border: 1px solid black;
+        }
+
+        /* Atesto Box */
+        .atesto-box {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: hsl(217, 90%, 97%);
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 1px solid hsl(217, 90%, 90%);
+        }
+        .copy-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border: 1px solid hsl(217, 90%, 80%);
+            border-radius: 6px;
+            background: white;
+            color: hsl(217, 90%, 45%);
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .copy-btn:hover {
+            background: hsl(217, 90%, 95%);
+        }
+        .copy-btn svg {
+            width: 14px;
+            height: 14px;
+        }
     </style>
 </head>
 <body>
@@ -458,7 +581,7 @@
         <p>Carregando dados...</p>
     </div>
     <div id="error"></div>
-
+    
     <div class="container">
         <!-- Header -->
         <div class="header">
@@ -470,33 +593,44 @@
             </div>
         </div>
 
-        <!-- MOVIDO PARA O TOPO: Divisão de Notas por Executor com menu suspenso -->
-        <div class="section executores">
-            <div class="section-header">
-                <h2 class="section-title">
-                    <span class="dot" style="background: hsl(252, 85%, 60%);"></span>
-                    Divisão de Notas por Executor
-                </h2>
-                <div class="executor-date-select">
-                    <select id="executorDateSelect" class="date-select-dropdown" onchange="carregarExecutores(this.value)">
-                        <option value="">Carregando datas...</option>
-                    </select>
+        <!-- Divisão de Notas por Executor - Collapsible -->
+        <div class="cards-row">
+            <div class="link-card" id="executorCard">
+                <div class="link-card-header">
+                    <div style="display: flex; align-items: center; gap: 12px; cursor: pointer;" onclick="toggleExecutorSection()">
+                        <div class="link-card-icon" style="background: hsl(270, 70%, 92%); color: hsl(270, 70%, 55%);">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                            </svg>
+                        </div>
+                        <h2 class="link-card-title">Divisão de Notas por Executor</h2>
+                        <svg class="toggle-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </div>
+                    <div style="margin-left: auto;" class="multi-date-select">
+                        <button class="multi-date-btn" id="multiDateBtn" type="button" onclick="toggleDateDropdown(event)">
+                            <span id="executorDateLabel">Carregando...</span>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                        </button>
+                        <div class="multi-date-dropdown" id="multiDateDropdown"></div>
+                    </div>
                 </div>
-            </div>
-            <div id="executorTableContainer">
-                <div class="empty-state">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                        <circle cx="12" cy="12" r="10"/>
-                        <path d="M12 6v6l4 2"/>
-                    </svg>
-                    <p>Carregando dados dos executores...</p>
+                <div class="link-card-content" id="executorContent">
+                    <div class="table-wrapper">
+                        <table class="executor-table">
+                            <thead id="executor-thead"></thead>
+                            <tbody id="tbody-executor">
+                                <tr><td colspan="8" style="text-align: center; padding: 40px;">Carregando dados dos executores...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
-
-        <!-- Cards Row -->
+        
+        <!-- Gerar Tabela de Controle de Pagamento -->
         <div class="cards-row">
-            <!-- Gerar Tabela de Controle de Pagamento -->
             <div class="link-card" id="geradorCard">
                 <div class="link-card-header">
                     <div class="link-card-icon" style="background: hsl(38, 95%, 92%); color: hsl(38, 95%, 55%);">
@@ -505,20 +639,19 @@
                         </svg>
                     </div>
                     <h2 class="link-card-title">Gerar Tabela de Controle de Pagamento</h2>
-                    <!-- Input inline com o título -->
                     <div class="gerador-input-inline">
-                        <input type="text" id="valorBuscaGerador" class="gerador-input" placeholder="Digite o nº SEI do Controle" oninput="debounceSearchGerador()">
+                        <input type="text" id="valorBuscaGerador" class="gerador-input" placeholder="Digite o nº SEI do Controle de pagamento" inputmode="numeric">
                     </div>
                 </div>
                 <div class="link-card-content" id="geradorContent">
-                    <div id="statusSaldoGerador" style="margin-top: 15px; font-size: 0.9rem;"></div>
-                    <!-- REMOVIDO: certidoesAreaGerador - pasta restrita do OneDrive -->
-                    <div id="atestoInfoGerador" style="margin-top: 20px;"></div>
+                    <div id="statusSaldoGerador" style="margin-bottom: 12px; font-size: 0.9rem;"></div>
+                    <div id="certidoesAreaGerador" style="margin-bottom: 12px; font-size: 0.85rem;"></div>
+                    <div id="atestoInfoGerador" style="margin-bottom: 20px;"></div>
                     <div id="loadingGerador" style="display:none; text-align: center; padding: 20px;">
-                        <div class="spinner" style="margin: 0 auto; width: 32px; height: 32px;"></div>
-                        <p style="margin-top: 10px;">Buscando dados...</p>
+                        <div class="spinner" style="margin: 0 auto;"></div>
+                        <p style="margin-top: 12px;">Buscando dados...</p>
                     </div>
-                    <div id="tableContainerGerador"></div>
+                    <div id="resultadoGerador"></div>
                 </div>
             </div>
         </div>
@@ -526,11 +659,11 @@
         <!-- Notas em Processo de Pagamento -->
         <div class="section processo">
             <div class="section-header">
-                <h2 class="section-title">
+                <div class="section-title">
                     <span class="dot"></span>
                     Notas em Processo de Pagamento
-                </h2>
-                <span id="count-processo" class="count-badge gray">0 processo(s)</span>
+                </div>
+                <span class="count-badge blue" id="countProcesso">0 processo(s)</span>
             </div>
             <div class="table-wrapper">
                 <table>
@@ -539,7 +672,7 @@
                             <th>Agência</th>
                             <th>Campanha</th>
                             <th>Controle</th>
-                            <th style="text-align:center">Qtd NFs</th>
+                            <th class="center">Qtd NFs</th>
                             <th>Valor Total</th>
                             <th>Data Atesto</th>
                             <th>Status</th>
@@ -551,25 +684,25 @@
             </div>
         </div>
 
-        <!-- Notas em análise, atestadas ou com inconformidade -->
+        <!-- Notas em análise, Atestadas ou com inconformidade -->
         <div class="section atestadas">
             <div class="section-header">
-                <h2 class="section-title">
+                <div class="section-title">
                     <span class="dot"></span>
-                    Notas em análise, atestadas ou com inconformidade
-                </h2>
-                <div class="section-count" id="count-atestadas"></div>
+                    Notas em análise, Atestadas ou com inconformidade
+                </div>
+                <div id="countAtestadas"></div>
             </div>
             <div class="table-wrapper">
                 <table>
                     <thead>
                         <tr>
-                            <th style="text-align:center">Agência</th>
-                            <th style="text-align:center">Campanha</th>
-                            <th style="text-align:center">Qtd NFs</th>
-                            <th style="text-align:center">Valor</th>
-                            <th>Inconformidades</th>
-                            <th>Observação</th>
+                            <th style="width: 80px;">Agência</th>
+                            <th style="width: 180px;">Campanha</th>
+                            <th class="center" style="width: 90px;">Qtd NFs</th>
+                            <th style="width: 140px;">Valor</th>
+                            <th style="min-width: 220px;">Inconformidade</th>
+                            <th style="min-width: 180px;">Observação</th>
                         </tr>
                     </thead>
                     <tbody id="tbody-atestadas"></tbody>
@@ -580,11 +713,11 @@
         <!-- Pagas (último mês) -->
         <div class="section pagas">
             <div class="section-header">
-                <h2 class="section-title">
+                <div class="section-title">
                     <span class="dot"></span>
                     Pagas (último mês)
-                </h2>
-                <span id="count-pagas" class="count-badge gray">0 processo(s)</span>
+                </div>
+                <span class="count-badge gray" id="countPagas">0 processo(s)</span>
             </div>
             <div class="table-wrapper">
                 <table>
@@ -618,7 +751,29 @@
             { value: 'ob', label: 'OB' },
             { value: 'enviado', label: 'Controle Retenções Enviado' }
         ];
+        
+        // Dados de exemplo para visualização (serão substituídos pelos dados reais do Apps Script)
+        var MOCK_EXECUTORES = [
+            { nome: 'Ana Silva', av: 5, calia: 3, ebm: 2, total: 10, emAnalise: 4, analisadas: 6, nfs: ['1234', '1235', '1236'] },
+            { nome: 'Carlos Santos', av: 3, calia: 4, ebm: 1, total: 8, emAnalise: 2, analisadas: 6, nfs: ['1240', '1241'] },
+            { nome: 'Maria Oliveira', av: 2, calia: 5, ebm: 3, total: 10, emAnalise: 3, analisadas: 7, nfs: ['1250', '1251', '1252'] }
+        ];
+        var MOCK_DADOS = {
+            emProcesso: [
+                { agencia: 'AV', campanha: 'Campanha Verão 2026', controle: '00123.456789/2026-01', qtd: 5, valor: 125000.50, dataAtesto: '2026-01-03', statusPag: 'dicom', obs: '' },
+                { agencia: 'CALIA', campanha: 'Institucional', controle: '00123.456790/2026-02', qtd: 3, valor: 89500.00, dataAtesto: '2026-01-02', statusPag: 'aguardando', obs: '' }
+            ],
+            atestadas: [
+                { agencia: 'AV', campanha: 'Campanha Verão 2026', qtdEmAnalise: 2, qtdAtestada: 8, qtdPendente: 1, valorEmAnalise: 25000, valorAtestado: 100000, valorPendente: 5000, pendentes: [{ nf: '1234', veiculo: 'TV Globo', executor: 'Ana Silva', tipo_midia: 'TV' }], obs: '' },
+                { agencia: 'EBM', campanha: 'Digital Q1', qtdEmAnalise: 1, qtdAtestada: 5, qtdPendente: 0, valorEmAnalise: 10000, valorAtestado: 45000, valorPendente: 0, pendentes: [], obs: '' }
+            ],
+            pagas: [
+                { agencia: 'CALIA', campanha: 'Black Friday 2025', controle: '00123.456780/2025-99', qtd: 12, valor: 350000.00, dataPago: '2025-12-20' },
+                { agencia: 'AV', campanha: 'Natal 2025', controle: '00123.456781/2025-98', qtd: 8, valor: 220000.00, dataPago: '2025-12-28' }
+            ]
+        };
         var searchTimeoutGerador = null;
+        var executorExpanded = false;
 
         // ==========================================
         // FUNÇÕES UTILITÁRIAS
@@ -626,7 +781,7 @@
         function showLoading(show) {
             document.getElementById('loading').classList.toggle('show', show);
         }
-
+        
         function showError(msg) {
             var el = document.getElementById('error');
             el.textContent = msg;
@@ -653,6 +808,16 @@
             var dia = String(d.getDate()).padStart(2, '0');
             var mes = String(d.getMonth() + 1).padStart(2, '0');
             var ano = d.getFullYear();
+            return dia + '/' + mes + '/' + ano;
+        }
+
+        function formatDateWithDayInfo(date) {
+            if (!date) return { main: '-', sub: '' };
+            var d = new Date(date);
+            if (isNaN(d)) return { main: '-', sub: '' };
+            var dia = String(d.getDate()).padStart(2, '0');
+            var mes = String(d.getMonth() + 1).padStart(2, '0');
+            var ano = d.getFullYear();
             var diaSemana = DIAS_SEMANA[d.getDay()];
             var hoje = new Date();
             hoje.setHours(0, 0, 0, 0);
@@ -664,7 +829,10 @@
             if (diffDias === 0) agoText = 'hoje';
             else if (diffDias === 1) agoText = 'há 1 dia';
             else if (diffDias > 1) agoText = 'há ' + diffDias + ' dias';
-            return '<span>' + dia + '/' + mes + '/' + ano + '</span><span class="data-dia">' + diaSemana + (agoText ? ' · ' + agoText : '') + '</span>';
+            return {
+                main: dia + '/' + mes + '/' + ano,
+                sub: diaSemana + (agoText ? ' · ' + agoText : '')
+            };
         }
 
         function formatDateSimple(dateStr) {
@@ -682,6 +850,23 @@
             if (upper.indexOf('CALIA') !== -1) return 'agencia-calia';
             if (upper.indexOf('EBM') !== -1) return 'agencia-ebm';
             return '';
+        }
+
+        // ==========================================
+        // TOGGLE EXECUTOR SECTION
+        // ==========================================
+        function toggleExecutorSection() {
+            var card = document.getElementById('executorCard');
+            var content = document.getElementById('executorContent');
+            executorExpanded = !executorExpanded;
+            
+            if (executorExpanded) {
+                card.classList.add('expanded');
+                content.classList.add('show');
+            } else {
+                card.classList.remove('expanded');
+                content.classList.remove('show');
+            }
         }
 
         // ==========================================
@@ -721,15 +906,15 @@
         // ==========================================
         function renderEmProcesso() {
             var tbody = document.getElementById('tbody-processo');
-            var count = document.getElementById('count-processo');
+            var count = document.getElementById('countProcesso');
             var items = dados.emProcesso || [];
             count.textContent = items.length + ' processo(s)';
-
+            
             if (items.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="8"><div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6M9 13h6M9 17h4"/></svg><p>Nenhum pagamento em processo</p></div></td></tr>';
                 return;
             }
-
+            
             var totalValor = 0;
             var totalQtd = 0;
             var html = items.map(function(item) {
@@ -737,327 +922,369 @@
                 totalValor += item.valor;
                 totalQtd += item.qtd;
                 var agencyClass = getAgencyClass(item.agencia);
+                var dateInfo = formatDateWithDayInfo(item.dataAtesto);
                 return '<tr>' +
                     '<td class="agencia ' + agencyClass + '">' + (item.agencia || '-') + '</td>' +
                     '<td class="campanha">' + (item.campanha || '-') + '</td>' +
                     '<td><span class="controle">' + (item.controle || '-') + '</span></td>' +
                     '<td class="qtd">' + item.qtd + '</td>' +
                     '<td class="valor">' + formatCurrency(item.valor) + '</td>' +
-                    '<td class="data">' + formatDate(item.dataAtesto) + '</td>' +
+                    '<td><div class="data-info"><span class="data-main">' + dateInfo.main + '</span><span class="data-sub">' + dateInfo.sub + '</span></div></td>' +
                     '<td>' + createStatusSelect(item.statusPag || 'montando', key) + '</td>' +
                     '<td><input type="text" class="obs-input" style="min-width: 200px;" placeholder="Observação..." value="' + escapeHtml(item.obs || '') + '" onchange="saveObs(\'emProcesso\', \'' + escapeHtml(key) + '\', this.value)"></td>' +
                     '</tr>';
             }).join('');
-
+            
             html += '<tr class="summary-row">' +
                 '<td><strong>Total</strong></td><td></td><td></td>' +
                 '<td class="qtd"><strong>' + totalQtd + '</strong></td>' +
                 '<td class="valor"><strong>' + formatCurrency(totalValor) + '</strong></td>' +
                 '<td></td><td></td><td></td></tr>';
-
+            
             tbody.innerHTML = html;
         }
 
         // ==========================================
-        // RENDER ATESTADAS - Com cores de agência, diligência e tooltip
+        // RENDER ATESTADAS - Com em análise na Qtd e Valor, tipo de mídia nas pendências
         // ==========================================
         function renderAtestadas() {
             var tbody = document.getElementById('tbody-atestadas');
-            var countEl = document.getElementById('count-atestadas');
+            var countEl = document.getElementById('countAtestadas');
             var items = dados.atestadas || [];
-
-            // Ordenar por agência: AV > Calia > EBM
-            var agenciaOrdem = { 'AV': 1, 'CALIA': 2, 'EBM': 3 };
-            items.sort(function(a, b) {
-                var agA = (a.agencia || '').toUpperCase();
-                var agB = (b.agencia || '').toUpperCase();
-                var ordemA = agenciaOrdem[agA] || (agA.indexOf('AV') !== -1 ? 1 : agA.indexOf('CALIA') !== -1 ? 2 : agA.indexOf('EBM') !== -1 ? 3 : 4);
-                var ordemB = agenciaOrdem[agB] || (agB.indexOf('AV') !== -1 ? 1 : agB.indexOf('CALIA') !== -1 ? 2 : agB.indexOf('EBM') !== -1 ? 3 : 4);
-                return ordemA - ordemB;
-            });
-
             var emProcessoItems = dados.emProcesso || [];
             var emProcessoKeys = {};
             emProcessoItems.forEach(function(item) {
                 var key = (item.agencia || '') + '|' + (item.campanha || '');
                 emProcessoKeys[key] = true;
             });
-
-            var totalEmAnalise = 0, totalAtestadas = 0, totalPendentes = 0, totalDiligencia = 0;
+            var totalEmAnalise = 0, totalAtestadas = 0, totalPendentes = 0;
             items.forEach(function(item) {
                 totalEmAnalise += item.qtdEmAnalise || 0;
                 totalAtestadas += item.qtdAtestada || 0;
                 totalPendentes += item.qtdPendente || 0;
-                totalDiligencia += item.qtdDiligencia || 0;
             });
-
             var countHtml = '';
             if (totalEmAnalise > 0) countHtml += '<span class="count-badge gray">' + totalEmAnalise + ' em análise</span>';
             countHtml += '<span class="count-badge blue">' + totalAtestadas + ' atestadas</span>';
             if (totalPendentes > 0) countHtml += '<span class="count-badge red">' + totalPendentes + ' inconformidades</span>';
-            if (totalDiligencia > 0) countHtml += '<span class="count-badge orange">' + totalDiligencia + ' em diligência</span>';
             countEl.innerHTML = countHtml;
-
             if (items.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg><p>Nenhuma nota atestada pendente</p></div></td></tr>';
                 return;
             }
-
-            var totalValorEmAnalise = 0, totalValorAtestado = 0, totalValorPendente = 0, totalValorDiligencia = 0;
-            var totalQtdEmAnalise = 0, totalQtdAtestada = 0, totalQtdPendente = 0, totalQtdDiligencia = 0;
-
+            var totalValorEmAnalise = 0, totalValorAtestado = 0, totalValorPendente = 0;
+            var totalQtdEmAnalise = 0, totalQtdAtestada = 0, totalQtdPendente = 0;
+            
             var html = items.map(function(item) {
                 var key = (item.agencia || '') + '|' + (item.campanha || '');
                 totalValorEmAnalise += item.valorEmAnalise || 0;
                 totalValorAtestado += item.valorAtestado || 0;
                 totalValorPendente += item.valorPendente || 0;
-                totalValorDiligencia += item.valorDiligencia || 0;
                 totalQtdEmAnalise += item.qtdEmAnalise || 0;
                 totalQtdAtestada += item.qtdAtestada || 0;
                 totalQtdPendente += item.qtdPendente || 0;
-                totalQtdDiligencia += item.qtdDiligencia || 0;
-
-                // Pendências / Inconformidades com tooltip (coluna P - motivo), tipo de mídia e executor (coluna N)
-                var pendentesHtml = '';
+                
+                // Inconformidades com tipo de mídia inline
+                var pendentesHtml = '-';
                 if (item.pendentes && item.pendentes.length > 0) {
                     pendentesHtml = item.pendentes.map(function(p) {
-                        var tooltip = p.motivo ? ' title="' + escapeHtml(p.motivo) + '"' : '';
-                        var tipoMidia = p.tipoMidia ? ' | ' + p.tipoMidia : '';
-                        var executor = p.executor ? ' | ' + p.executor : '';
-                        return '<div class="pendente-item"' + tooltip + '><span class="pendente-info">NF: ' + (p.nf || '-') + tipoMidia + ' | ' + (p.veiculo || '-') + executor + '</span></div>';
+                        var tipoMidia = p.tipo_midia || p.tipoMidia || '';
+                        var tipoMidiaText = tipoMidia ? ' | ' + escapeHtml(tipoMidia) : '';
+                        return '<div class="pendente-item"><span class="pendente-info">NF: ' + (p.nf || '-') + ' | ' + (p.veiculo || '-') + tipoMidiaText + ' | ' + (p.executor || '-') + '</span></div>';
                     }).join('');
                 }
-
-                // Em diligência interna - mostrar apenas quando existir
-                if (item.diligencias && item.diligencias.length > 0) {
-                    pendentesHtml += item.diligencias.map(function(d) {
-                        var tooltip = d.motivo ? ' title="' + escapeHtml(d.motivo) + '"' : '';
-                        var tipoMidia = d.tipoMidia ? ' | ' + d.tipoMidia : '';
-                        var executor = d.executor ? ' | ' + d.executor : '';
-                        return '<div class="diligencia-item"' + tooltip + '><span>NF: ' + (d.nf || '-') + tipoMidia + ' (diligência)' + executor + '</span></div>';
-                    }).join('');
-                }
-
-                if (!pendentesHtml) pendentesHtml = '-';
-
-                var qtdTotal = (item.qtdEmAnalise || 0) + (item.qtdAtestada || 0) + (item.qtdPendente || 0) + (item.qtdDiligencia || 0);
-                var qtdHtml = '<div style="color: hsl(220, 15%, 35%);">' + qtdTotal + '</div><div class="qtd-sub" style="color: hsl(220, 10%, 60%); font-size: 0.75rem;"><div>' + (item.qtdEmAnalise || 0) + '</div><div>' + (item.qtdAtestada || 0) + '</div>';
-                if ((item.qtdPendente || 0) > 0) qtdHtml += '<div>' + item.qtdPendente + '</div>';
-                if ((item.qtdDiligencia || 0) > 0) qtdHtml += '<div>' + item.qtdDiligencia + '</div>';
-                qtdHtml += '</div>';
-
-                var valorTotal = (item.valorEmAnalise || 0) + (item.valorAtestado || 0) + (item.valorPendente || 0) + (item.valorDiligencia || 0);
-                var valorHtml = '<div style="color: hsl(220, 15%, 35%);">' + formatCurrency(valorTotal) + '</div><div class="valor-sub" style="color: hsl(220, 10%, 60%); font-size: 0.75rem;"><div>' + formatCurrency(item.valorEmAnalise || 0) + '</div><div>' + formatCurrency(item.valorAtestado || 0) + '</div>';
-                if ((item.valorPendente || 0) > 0) valorHtml += '<div>' + formatCurrency(item.valorPendente) + '</div>';
-                if ((item.valorDiligencia || 0) > 0) valorHtml += '<div>' + formatCurrency(item.valorDiligencia) + '</div>';
-                valorHtml += '</div>';
-
+                
+                // Qtd com identificação (em análise, atestada, inconform.)
+                var qtdTotal = (item.qtdEmAnalise || 0) + (item.qtdAtestada || 0) + (item.qtdPendente || 0);
+                var qtdHtml = '<div><strong>' + qtdTotal + '</strong></div><div class="qtd-sub" style="color: hsl(220, 10%, 50%); font-size: 0.7rem;">' +
+                    '<div>' + (item.qtdEmAnalise || 0) + ' análise</div>' +
+                    '<div>' + (item.qtdAtestada || 0) + ' atestadas</div>' +
+                    '<div>' + (item.qtdPendente || 0) + ' inconform.</div></div>';
+                
+                // Valor sem identificação (só valores)
+                var valorTotal = (item.valorEmAnalise || 0) + (item.valorAtestado || 0) + (item.valorPendente || 0);
+                var valorHtml = '<div><strong>' + formatCurrency(valorTotal) + '</strong></div><div class="valor-sub" style="color: hsl(220, 10%, 50%);">' +
+                    '<div>' + formatCurrency(item.valorEmAnalise || 0) + '</div>' +
+                    '<div>' + formatCurrency(item.valorAtestado || 0) + '</div>' +
+                    '<div>' + formatCurrency(item.valorPendente || 0) + '</div></div>';
+                
                 var agencyClass = getAgencyClass(item.agencia);
                 return '<tr>' +
-                    '<td class="agencia ' + agencyClass + '" style="text-align:center;">' + (item.agencia || '-') + '</td>' +
-                    '<td class="campanha" style="text-align:center;">' + (item.campanha || '-') + '</td>' +
-                    '<td class="qtd" style="text-align:center;">' + qtdHtml + '</td>' +
-                    '<td style="text-align:center;">' + valorHtml + '</td>' +
+                    '<td class="agencia ' + agencyClass + '">' + (item.agencia || '-') + '</td>' +
+                    '<td class="campanha">' + (item.campanha || '-') + '</td>' +
+                    '<td class="qtd">' + qtdHtml + '</td>' +
+                    '<td class="valor">' + valorHtml + '</td>' +
                     '<td class="pendentes-cell">' + pendentesHtml + '</td>' +
-                    '<td><input type="text" class="obs-input" style="min-width: 200px;" placeholder="Observação..." value="' + escapeHtml(item.obs || '') + '" onchange="saveObs(\'atestadas\', \'' + escapeHtml(key) + '\', this.value)"></td>' +
+                    '<td><input type="text" class="obs-input" placeholder="Observação..." value="' + escapeHtml(item.obs || '') + '" onchange="saveObs(\'atestadas\', \'' + escapeHtml(key) + '\', this.value)"></td>' +
                     '</tr>';
             }).join('');
-
-            var summaryQtdTotal = totalQtdEmAnalise + totalQtdAtestada + totalQtdPendente + totalQtdDiligencia;
-            var summaryQtdHtml = '<div style="color: hsl(220, 15%, 35%); font-weight: 600;">' + summaryQtdTotal + '</div><div class="qtd-sub" style="color: hsl(220, 10%, 60%); font-size: 0.75rem;"><div>' + totalQtdEmAnalise + '</div><div>' + totalQtdAtestada + '</div>';
-            if (totalQtdPendente > 0) summaryQtdHtml += '<div>' + totalQtdPendente + '</div>';
-            if (totalQtdDiligencia > 0) summaryQtdHtml += '<div>' + totalQtdDiligencia + '</div>';
-            summaryQtdHtml += '</div>';
-
-            var summaryValorTotal = totalValorEmAnalise + totalValorAtestado + totalValorPendente + totalValorDiligencia;
-            var summaryValorHtml = '<div style="color: hsl(220, 15%, 35%); font-weight: 600;">' + formatCurrency(summaryValorTotal) + '</div><div class="valor-sub" style="color: hsl(220, 10%, 60%); font-size: 0.75rem;"><div>' + formatCurrency(totalValorEmAnalise) + '</div><div>' + formatCurrency(totalValorAtestado) + '</div>';
-            if (totalValorPendente > 0) summaryValorHtml += '<div>' + formatCurrency(totalValorPendente) + '</div>';
-            if (totalValorDiligencia > 0) summaryValorHtml += '<div>' + formatCurrency(totalValorDiligencia) + '</div>';
-            summaryValorHtml += '</div>';
-
-            html += '<tr class="summary-row"><td colspan="2" style="text-align:center;"><strong>Total</strong></td><td class="qtd" style="text-align:center;">' + summaryQtdHtml + '</td><td style="text-align:center;">' + summaryValorHtml + '</td><td colspan="2"></td></tr>';
+            
+            // Summary row com identificação
+            var summaryQtdTotal = totalQtdEmAnalise + totalQtdAtestada + totalQtdPendente;
+            var summaryQtdHtml = '<strong>' + summaryQtdTotal + '</strong><div class="qtd-sub" style="color: hsl(220, 10%, 50%); font-size: 0.7rem;">' +
+                '<div>' + totalQtdEmAnalise + ' análise</div>' +
+                '<div>' + totalQtdAtestada + ' atestadas</div>' +
+                '<div>' + totalQtdPendente + ' inconform.</div></div>';
+            var summaryValorTotal = totalValorEmAnalise + totalValorAtestado + totalValorPendente;
+            var summaryValorHtml = '<strong>' + formatCurrency(summaryValorTotal) + '</strong><div class="valor-sub" style="color: hsl(220, 10%, 50%);">' +
+                '<div>' + formatCurrency(totalValorEmAnalise) + '</div>' +
+                '<div>' + formatCurrency(totalValorAtestado) + '</div>' +
+                '<div>' + formatCurrency(totalValorPendente) + '</div></div>';
+            html += '<tr class="summary-row"><td colspan="2"><strong>Total</strong></td><td class="qtd">' + summaryQtdHtml + '</td><td class="valor">' + summaryValorHtml + '</td><td colspan="2"></td></tr>';
             tbody.innerHTML = html;
         }
 
         // ==========================================
-        // RENDER PAGAS
+        // RENDER PAGAS - Data com dia da semana e "há x dias" em linha menor
         // ==========================================
         function renderPagas() {
             var tbody = document.getElementById('tbody-pagas');
-            var count = document.getElementById('count-pagas');
+            var count = document.getElementById('countPagas');
             var items = dados.pagas || [];
             count.textContent = items.length + ' processo(s)';
-
+            
             if (items.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg><p>Nenhum pagamento recente</p></div></td></tr>';
                 return;
             }
-
-            var totalValor = 0;
-            var totalQtd = 0;
+            
             var html = items.map(function(item) {
                 var agencyClass = getAgencyClass(item.agencia);
-                totalValor += item.valor || 0;
-                totalQtd += item.qtd || 0;
-                
-                // Formatar data com dia da semana e dias atrás em linha menor
-                var dataHtml = '-';
-                if (item.dataPago) {
-                    var d = new Date(item.dataPago);
-                    if (!isNaN(d)) {
-                        var dia = String(d.getDate()).padStart(2, '0');
-                        var mes = String(d.getMonth() + 1).padStart(2, '0');
-                        var ano = d.getFullYear();
-                        var diaSemana = DIAS_SEMANA[d.getDay()];
-                        var hoje = new Date();
-                        hoje.setHours(0, 0, 0, 0);
-                        var dataComp = new Date(d);
-                        dataComp.setHours(0, 0, 0, 0);
-                        var diffMs = hoje - dataComp;
-                        var diffDias = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-                        var agoText = '';
-                        if (diffDias === 0) agoText = 'hoje';
-                        else if (diffDias === 1) agoText = 'há 1 dia';
-                        else if (diffDias > 1) agoText = 'há ' + diffDias + ' dias';
-                        dataHtml = '<div>' + dia + '/' + mes + '/' + ano + '</div><div style="font-size: 0.7rem; color: hsl(220, 10%, 55%);">' + diaSemana + (agoText ? ' · ' + agoText : '') + '</div>';
-                    }
-                }
-                
+                var dateInfo = formatDateWithDayInfo(item.dataPago);
                 return '<tr>' +
                     '<td class="agencia ' + agencyClass + '">' + (item.agencia || '-') + '</td>' +
                     '<td class="campanha">' + (item.campanha || '-') + '</td>' +
                     '<td><span class="controle">' + (item.controle || '-') + '</span></td>' +
-                    '<td class="qtd" style="font-weight: 400;">' + item.qtd + '</td>' +
-                    '<td style="color: hsl(220, 15%, 35%);">' + formatCurrency(item.valor) + '</td>' +
-                    '<td class="data">' + dataHtml + '</td>' +
+                    '<td class="qtd">' + item.qtd + '</td>' +
+                    '<td class="valor">' + formatCurrency(item.valor) + '</td>' +
+                    '<td><div class="data-info"><span class="data-main">' + dateInfo.main + '</span><span class="data-sub">' + dateInfo.sub + '</span></div></td>' +
                     '</tr>';
             }).join('');
-
-            html += '<tr class="summary-row">' +
-                '<td colspan="3"><strong>Total</strong></td>' +
-                '<td class="qtd" style="font-weight: 600;">' + totalQtd + '</td>' +
-                '<td style="color: hsl(220, 15%, 35%); font-weight: 600;">' + formatCurrency(totalValor) + '</td>' +
-                '<td></td></tr>';
-
+            
             tbody.innerHTML = html;
         }
 
         // ==========================================
-        // EXECUTORES - Menu suspenso com data mais recente
+        // EXECUTORES - Com multi-seleção de datas
         // ==========================================
+        var executorSelectedDates = [];
+        var executorDatasDisponiveis = [];
+
+        function toggleDateDropdown(e) {
+            e.stopPropagation();
+            var dropdown = document.getElementById('multiDateDropdown');
+            dropdown.classList.toggle('open');
+        }
+
+        function closeDateDropdown() {
+            document.getElementById('multiDateDropdown').classList.remove('open');
+        }
+
+        // Fechar dropdown ao clicar fora
+        document.addEventListener('click', function(e) {
+            var dropdown = document.getElementById('multiDateDropdown');
+            var btn = document.getElementById('multiDateBtn');
+            if (dropdown && !dropdown.contains(e.target) && btn && !btn.contains(e.target)) {
+                dropdown.classList.remove('open');
+            }
+        });
+
+        function updateExecutorDateLabel() {
+            var label = document.getElementById('executorDateLabel');
+            if (executorSelectedDates.length === 0) {
+                label.textContent = 'Selecionar';
+            } else if (executorSelectedDates.length === 1) {
+                label.textContent = formatDateSimple(executorSelectedDates[0]);
+            } else {
+                label.textContent = executorSelectedDates.length + ' datas';
+            }
+        }
+
+        function renderDateDropdown() {
+            var dropdown = document.getElementById('multiDateDropdown');
+            var html = executorDatasDisponiveis.map(function(data) {
+                var checked = executorSelectedDates.indexOf(data) !== -1 ? 'checked' : '';
+                return '<label class="multi-date-item"><input type="checkbox" value="' + data + '" ' + checked + ' onchange="toggleDateSelection(\'' + data + '\')">' + formatDateSimple(data) + '</label>';
+            }).join('');
+            dropdown.innerHTML = html;
+        }
+
+        function toggleDateSelection(data) {
+            var idx = executorSelectedDates.indexOf(data);
+            if (idx === -1) {
+                executorSelectedDates.push(data);
+            } else {
+                executorSelectedDates.splice(idx, 1);
+            }
+            executorSelectedDates.sort(function(a, b) {
+                return executorDatasDisponiveis.indexOf(a) - executorDatasDisponiveis.indexOf(b);
+            });
+            updateExecutorDateLabel();
+            carregarExecutoresMultiData();
+        }
+
         function carregarExecutorDatasDisponiveis() {
+            console.log('[DEBUG] carregarExecutorDatasDisponiveis chamado');
+            
             if (!window.google || !google.script || !google.script.run) {
-                document.getElementById('executorDateSelect').innerHTML = '<option value="">Não disponível</option>';
+                console.log('[DEBUG] Executores: Usando dados de exemplo');
+                executorDatasDisponiveis = ['2026-01-06', '2026-01-05', '2026-01-04', '2026-01-03'];
+                executorSelectedDates = [executorDatasDisponiveis[0]];
+                updateExecutorDateLabel();
+                renderDateDropdown();
+                renderExecutores({ executores: MOCK_EXECUTORES, datasDisponiveis: executorDatasDisponiveis });
                 return;
             }
-
+            
+            console.log('[DEBUG] Chamando google.script.run.getDadosExecutores(null)');
+            
             google.script.run
                 .withSuccessHandler(function(result) {
-                    var select = document.getElementById('executorDateSelect');
-                    var datasDisponiveis = result.datasDisponiveis || [];
-
-                    if (datasDisponiveis.length === 0) {
-                        select.innerHTML = '<option value="">Nenhuma data disponível</option>';
+                    console.log('[DEBUG] getDadosExecutores sucesso:', result);
+                    executorDatasDisponiveis = result.datasDisponiveis || [];
+                    
+                    if (executorDatasDisponiveis.length === 0) {
+                        document.getElementById('executorDateLabel').textContent = 'Sem dados';
                         return;
                     }
-
-                    // Primeira opção é a data mais recente (já vem ordenada)
-                    var html = '';
-                    datasDisponiveis.forEach(function(data, idx) {
-                        var selected = idx === 0 ? 'selected' : '';
-                        html += '<option value="' + data + '" ' + selected + '>' + formatDateSimple(data) + '</option>';
-                    });
-                    select.innerHTML = html;
-
-                    // Carregar executores da data mais recente
+                    
+                    executorSelectedDates = [executorDatasDisponiveis[0]];
+                    updateExecutorDateLabel();
+                    renderDateDropdown();
                     renderExecutores(result);
                 })
                 .withFailureHandler(function(err) {
                     console.error('Erro ao carregar datas:', err);
-                    document.getElementById('executorDateSelect').innerHTML = '<option value="">Erro ao carregar</option>';
+                    document.getElementById('executorDateLabel').textContent = 'Erro';
                 })
-                .getDadosExecutores(null); // null = pegar data mais recente
+                .getDadosExecutores(null);
         }
 
-        function carregarExecutores(dataSelecionada) {
+        function carregarExecutoresMultiData() {
             if (!window.google || !google.script || !google.script.run) return;
-
-            document.getElementById('executorTableContainer').innerHTML = '<div class="empty-state"><div class="spinner" style="width:24px;height:24px;margin:0 auto 12px;"></div><p>Carregando...</p></div>';
-
-            google.script.run
-                .withSuccessHandler(renderExecutores)
-                .withFailureHandler(function(err) {
-                    document.getElementById('executorTableContainer').innerHTML = '<div class="empty-state"><p style="color:hsl(0,75%,45%);">Erro ao carregar: ' + err.message + '</p></div>';
-                })
-                .getDadosExecutores(dataSelecionada);
+            if (executorSelectedDates.length === 0) {
+                document.getElementById('tbody-executor').innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px;">Selecione ao menos uma data</td></tr>';
+                return;
+            }
+            
+            document.getElementById('tbody-executor').innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px;"><div class="spinner" style="width:24px;height:24px;margin:0 auto 12px;"></div><p>Carregando...</p></td></tr>';
+            
+            var pendingRequests = executorSelectedDates.length;
+            var allExecutores = {};
+            
+            executorSelectedDates.forEach(function(data) {
+                google.script.run
+                    .withSuccessHandler(function(result) {
+                        (result.executores || []).forEach(function(exec) {
+                            if (!allExecutores[exec.nome]) {
+                                allExecutores[exec.nome] = { nome: exec.nome, av: 0, calia: 0, ebm: 0, total: 0, emAnalise: 0, analisadas: 0, nfsAv: [], nfsCalia: [], nfsEbm: [] };
+                            }
+                            allExecutores[exec.nome].av += exec.av || 0;
+                            allExecutores[exec.nome].calia += exec.calia || 0;
+                            allExecutores[exec.nome].ebm += exec.ebm || 0;
+                            allExecutores[exec.nome].total += exec.total || 0;
+                            allExecutores[exec.nome].emAnalise += exec.emAnalise || 0;
+                            allExecutores[exec.nome].analisadas += exec.analisadas || 0;
+                            if (exec.nfsAv) allExecutores[exec.nome].nfsAv = allExecutores[exec.nome].nfsAv.concat(exec.nfsAv);
+                            if (exec.nfsCalia) allExecutores[exec.nome].nfsCalia = allExecutores[exec.nome].nfsCalia.concat(exec.nfsCalia);
+                            if (exec.nfsEbm) allExecutores[exec.nome].nfsEbm = allExecutores[exec.nome].nfsEbm.concat(exec.nfsEbm);
+                        });
+                        
+                        pendingRequests--;
+                        if (pendingRequests === 0) {
+                            var sorted = Object.values(allExecutores).sort(function(a, b) { return b.total - a.total; });
+                            renderExecutores({ executores: sorted, datasDisponiveis: executorDatasDisponiveis });
+                        }
+                    })
+                    .withFailureHandler(function(err) {
+                        pendingRequests--;
+                        if (pendingRequests === 0) {
+                            document.getElementById('tbody-executor').innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px; color:hsl(0,75%,45%);">Erro ao carregar</td></tr>';
+                        }
+                    })
+                    .getDadosExecutores(data);
+            });
         }
 
         function renderExecutores(result) {
-            var container = document.getElementById('executorTableContainer');
+            var thead = document.getElementById('executor-thead');
+            var tbody = document.getElementById('tbody-executor');
             var executores = result.executores || [];
-
-            if (executores.length === 0) {
-                container.innerHTML = '<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M8 15h8M9 9h.01M15 9h.01"/></svg><p>Nenhum executor encontrado para esta data</p></div>';
-                return;
-            }
-
-            var totalAv = 0, totalCalia = 0, totalEbm = 0, totalGeral = 0, totalValor = 0, totalEmAnalise = 0;
-
-            var html = '<table class="executor-table"><thead><tr>' +
+            
+            // Render thead - NFs numa só coluna em 3 linhas
+            thead.innerHTML = '<tr>' +
                 '<th>Executor</th>' +
                 '<th class="center" style="color:hsl(270,70%,55%);">AV</th>' +
                 '<th class="center" style="color:hsl(30,90%,50%);">CALIA</th>' +
                 '<th class="center" style="color:hsl(220,10%,50%);">EBM</th>' +
                 '<th class="center">Total</th>' +
+                '<th class="center">Em Análise</th>' +
                 '<th class="center">Analisadas</th>' +
-                '<th class="center">Valor</th>' +
-                '</tr></thead><tbody>';
-
-            executores.forEach(function(exec) {
+                '<th>NFs</th>' +
+                '</tr>';
+            
+            if (executores.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px;">Nenhum executor encontrado para esta data</td></tr>';
+                return;
+            }
+            
+            var totalAv = 0, totalCalia = 0, totalEbm = 0, totalGeral = 0, totalEmAnalise = 0, totalAnalisadas = 0;
+            
+            var html = executores.map(function(exec) {
                 totalAv += exec.av || 0;
                 totalCalia += exec.calia || 0;
                 totalEbm += exec.ebm || 0;
                 totalGeral += exec.total || 0;
-                totalValor += exec.valor || 0;
-                // Analisadas = total - emAnalise (valores do consolidado coluna M)
-                var analisadas = (exec.total || 0) - (exec.emAnalise || 0);
-                totalEmAnalise += analisadas;
-
-                html += '<tr>' +
+                totalEmAnalise += exec.emAnalise || 0;
+                totalAnalisadas += exec.analisadas || 0;
+                
+                // NFs numa só coluna, 3 linhas separadas por agência
+                var nfsAvText = exec.nfsAv && exec.nfsAv.length > 0 ? exec.nfsAv.join(', ') : '-';
+                var nfsCaliaText = exec.nfsCalia && exec.nfsCalia.length > 0 ? exec.nfsCalia.join(', ') : '-';
+                var nfsEbmText = exec.nfsEbm && exec.nfsEbm.length > 0 ? exec.nfsEbm.join(', ') : '-';
+                var nfsHtml = '<div style="font-size:0.75rem;line-height:1.4;">' +
+                    '<div style="color:hsl(270,70%,55%);"><strong>AV:</strong> ' + nfsAvText + '</div>' +
+                    '<div style="color:hsl(30,90%,50%);"><strong>CALIA:</strong> ' + nfsCaliaText + '</div>' +
+                    '<div style="color:hsl(220,10%,50%);"><strong>EBM:</strong> ' + nfsEbmText + '</div>' +
+                    '</div>';
+                
+                return '<tr>' +
                     '<td class="executor-name">' + escapeHtml(exec.nome) + '</td>' +
                     '<td class="count av">' + (exec.av || 0) + '</td>' +
                     '<td class="count calia">' + (exec.calia || 0) + '</td>' +
                     '<td class="count ebm">' + (exec.ebm || 0) + '</td>' +
-                    '<td class="count">' + (exec.total || 0) + '</td>' +
-                    '<td class="count">' + analisadas + '</td>' +
-                    '<td class="count">' + formatCurrency(exec.valor || 0) + '</td>' +
+                    '<td class="count total">' + (exec.total || 0) + '</td>' +
+                    '<td class="count" style="color:hsl(220,10%,50%);">' + (exec.emAnalise || 0) + '</td>' +
+                    '<td class="count" style="color:hsl(142,70%,45%);">' + (exec.analisadas || 0) + '</td>' +
+                    '<td class="nfs-cell">' + nfsHtml + '</td>' +
                     '</tr>';
-            });
-
+            }).join('');
+            
             html += '<tr class="summary-row">' +
-                '<td>TOTAL</td>' +
-                '<td class="count av">' + totalAv + '</td>' +
-                '<td class="count calia">' + totalCalia + '</td>' +
-                '<td class="count ebm">' + totalEbm + '</td>' +
-                '<td class="count">' + totalGeral + '</td>' +
-                '<td class="count">' + totalEmAnalise + '</td>' +
-                '<td class="count">' + formatCurrency(totalValor) + '</td>' +
-                '</tr></tbody></table>';
-
-            container.innerHTML = html;
+                '<td><strong>TOTAL</strong></td>' +
+                '<td class="count av"><strong>' + totalAv + '</strong></td>' +
+                '<td class="count calia"><strong>' + totalCalia + '</strong></td>' +
+                '<td class="count ebm"><strong>' + totalEbm + '</strong></td>' +
+                '<td class="count total"><strong>' + totalGeral + '</strong></td>' +
+                '<td class="count"><strong>' + totalEmAnalise + '</strong></td>' +
+                '<td class="count" style="color:hsl(142,70%,45%);"><strong>' + totalAnalisadas + '</strong></td>' +
+                '<td></td>' +
+                '</tr>';
+            
+            tbody.innerHTML = html;
         }
 
         // ==========================================
-        // GERADOR - Expande automaticamente ao digitar
+        // GERADOR - Modelo do html_tabelacontrole
         // ==========================================
         function debounceSearchGerador() {
             clearTimeout(searchTimeoutGerador);
             var valor = document.getElementById('valorBuscaGerador').value.trim();
-
+            
             // Expandir automaticamente ao digitar
             var content = document.getElementById('geradorContent');
             var card = document.getElementById('geradorCard');
-
+            
             if (valor.length > 0) {
                 content.classList.add('show');
                 card.classList.add('expanded');
@@ -1065,11 +1292,12 @@
                 content.classList.remove('show');
                 card.classList.remove('expanded');
                 document.getElementById('statusSaldoGerador').innerHTML = '';
+                document.getElementById('certidoesAreaGerador').innerHTML = '';
                 document.getElementById('atestoInfoGerador').innerHTML = '';
-                document.getElementById('tableContainerGerador').innerHTML = '';
+                document.getElementById('resultadoGerador').innerHTML = '';
                 return;
             }
-
+            
             searchTimeoutGerador = setTimeout(function() {
                 buscarDadosGerador(valor);
             }, 400);
@@ -1077,19 +1305,39 @@
 
         function buscarDadosGerador(valor) {
             document.getElementById('loadingGerador').style.display = 'block';
-            document.getElementById('tableContainerGerador').innerHTML = '';
-
+            document.getElementById('resultadoGerador').innerHTML = '';
+            document.getElementById('certidoesAreaGerador').innerHTML = '';
+            
             if (window.google && google.script && google.script.run) {
+                console.log('[DEBUG] Buscando dados para:', valor);
+                
                 google.script.run
                     .withSuccessHandler(exibirTabelaGerador)
                     .withFailureHandler(function(err) {
+                        console.error('[DEBUG] Erro filtrarControleDePagamento:', err);
                         document.getElementById('loadingGerador').style.display = 'none';
-                        document.getElementById('tableContainerGerador').innerHTML = '<p style="color:hsl(0,75%,45%);">Erro: ' + err.message + '</p>';
+                        document.getElementById('resultadoGerador').innerHTML = '<p style="color:hsl(0,75%,45%);">Erro: ' + err.message + '</p>';
                     })
                     .filtrarControleDePagamento(valor);
-
+                
+                // getSaldoByPI retorna a agência, depois buscamos as certidões
                 google.script.run
-                    .withSuccessHandler(updateSaldoGerador)
+                    .withSuccessHandler(function(result) {
+                        console.log('[DEBUG] getSaldoByPI resultado:', result);
+                        updateSaldoGerador(result);
+                        // Buscar certidões usando a agência retornada
+                        if (result && result.agencia) {
+                            google.script.run
+                                .withSuccessHandler(updateCertidoesGerador)
+                                .withFailureHandler(function(err) {
+                                    console.error('[DEBUG] Erro getCertidoesByAgencia:', err);
+                                })
+                                .getCertidoesByAgencia(result.agencia);
+                        }
+                    })
+                    .withFailureHandler(function(err) {
+                        console.error('[DEBUG] Erro getSaldoByPI:', err);
+                    })
                     .getSaldoByPI(valor);
             }
         }
@@ -1103,33 +1351,134 @@
             }
         }
 
+        function updateCertidoesGerador(result) {
+            console.log('[DEBUG] Certidões resultado:', result);
+            var div = document.getElementById('certidoesAreaGerador');
+            if (result && result.agencia_cert) {
+                var html = '<strong>Certidões:</strong> ';
+                html += '<strong>RFB</strong> ' + (result.rfb || '-') + ', ';
+                html += '<strong>SEFAZ DF</strong> ' + (result.sefaz_df || '-') + ', ';
+                html += '<strong>FGTS</strong> ' + (result.fgts || '-') + ', ';
+                html += '<strong>TST</strong> ' + (result.tst || '-');
+                if (result.link) {
+                    html += ' <a href="' + result.link + '" target="_blank" style="color:hsl(217,90%,45%);">🔗</a>';
+                }
+                div.innerHTML = html;
+            } else {
+                div.innerHTML = '';
+            }
+        }
+
+        function copyToClipboard(text) {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text);
+            } else {
+                var textarea = document.createElement('textarea');
+                textarea.value = text;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+            }
+        }
+
         function exibirTabelaGerador(data) {
             document.getElementById('loadingGerador').style.display = 'none';
-            var container = document.getElementById('tableContainerGerador');
-
+            var container = document.getElementById('resultadoGerador');
+            
             if (!data || data.length === 0) {
                 container.innerHTML = '<p style="color:hsl(0,75%,45%);">Nenhuma Nota Fiscal encontrada.</p>';
                 return;
             }
-
+            
+            var totalNF = 0;
+            var totalGlosa = 0;
             var totalLiquido = 0;
             var nfList = [];
+            var temGlosa = false;
+            
             data.forEach(function(r) {
-                totalLiquido += Number(r.valor_nf) || 0;
+                var valorNfAgencia = Number(r.valor_nf_agencia) || Number(r.valor_nf) || 0;
+                var glosa = Number(r.glosa) || 0;
+                var valorNf = Number(r.valor_nf) || 0;
+                totalNF += valorNfAgencia;
+                totalGlosa += glosa;
+                totalLiquido += valorNf;
+                if (glosa > 0) temGlosa = true;
                 if (r.nf && r.nf !== '-') nfList.push(r.nf);
             });
-
+            
             nfList = [...new Set(nfList)].sort(function(a, b) { return Number(a) - Number(b); });
-            var nfTexto = nfList.length > 1 ? nfList.slice(0, -1).join(', ') + ' e ' + nfList[nfList.length - 1] : nfList[0];
+            var nfTexto = nfList.length > 1 ? nfList.slice(0, -1).join(', ') + ' e ' + nfList[nfList.length - 1] : (nfList[0] || '');
+            var atestoText = nfTexto + ', no montante total de ' + formatCurrency(totalLiquido);
+            
+            // Atesto box com botão copiar (evita strings complexas em onclick)
+            var atestoEl = document.getElementById('atestoInfoGerador');
+            atestoEl.innerHTML =
+                '<div class="atesto-box">' +
+                    '<div style="flex:1;"><strong style="color:hsl(217,90%,45%);">Texto para atesto:</strong> ' +
+                        escapeHtml(nfTexto) +
+                        ', no montante total de <strong>' + formatCurrency(totalLiquido) + '</strong>' +
+                    '</div>' +
+                    '<button class="copy-btn" id="copyAtestoBtn" type="button">Copiar</button>' +
+                '</div>';
 
-            document.getElementById('atestoInfoGerador').innerHTML = '<div style="background:hsl(217,90%,97%);padding:12px 16px;border-radius:8px;border:1px solid hsl(217,90%,90%);"><strong style="color:hsl(217,90%,45%);">Texto para atesto:</strong> ' + nfTexto + ', no montante total de <strong>' + formatCurrency(totalLiquido) + '</strong></div>';
-
-            var html = '<table class="executor-table" style="margin-top:20px;"><thead><tr><th>Ord.</th><th>NF</th><th>Veículo/Fornecedor</th><th>CNPJ</th><th>Tipo de Mídia</th><th>Valor da NF</th></tr></thead><tbody>';
+            // bind do botão após inserir o HTML
+            var copyBtn = document.getElementById('copyAtestoBtn');
+            if (copyBtn) {
+                copyBtn.onclick = function() {
+                    copyToClipboard(atestoText);
+                    copyBtn.textContent = 'Copiado!';
+                    setTimeout(function() { copyBtn.textContent = 'Copiar'; }, 2000);
+                };
+            }
+            
+            // Tabela no formato do html_tabelacontrole
+            var colSpan = temGlosa ? 9 : 7;
+            var html = '<table class="gerador-table">' +
+                '<thead>' +
+                    '<tr><td colspan="' + colSpan + '" style="text-align:left;font-weight:bold;padding:10px 12px;border:1px solid black;">4. CONTROLE DE SALDO ORÇAMENTÁRIO</td></tr>' +
+                    '<tr>' +
+                        '<th>Ord.</th>' +
+                        '<th>NF</th>' +
+                        '<th>Veículo/Fornecedor</th>' +
+                        '<th>CNPJ</th>' +
+                        '<th>Tipo de Mídia</th>' +
+                        '<th>Valor da NF</th>' +
+                        (temGlosa ? '<th>Glosa</th><th>Valor após Glosa</th>' : '') +
+                        '<th>Saldo do Empenho</th>' +
+                    '</tr>' +
+                '</thead><tbody>';
+            
             data.forEach(function(r, i) {
-                html += '<tr><td>' + (i + 1) + '</td><td>' + (r.nf || '-') + '</td><td>' + (r.veiculo_forn || '-') + '</td><td>' + (r.cnpj || '-') + '</td><td>' + (r.tipo_midia || '-') + '</td><td class="valor">' + formatCurrency(r.valor_nf) + '</td></tr>';
+                var valorNfAgencia = Number(r.valor_nf_agencia) || Number(r.valor_nf) || 0;
+                var glosa = Number(r.glosa) || 0;
+                var valorNf = Number(r.valor_nf) || 0;
+                
+                html += '<tr>' +
+                    '<td>' + (i + 1) + '</td>' +
+                    '<td>' + (r.nf || '-') + '</td>' +
+                    '<td class="veiculo-cell">' + (r.veiculo_forn || '-') + '</td>' +
+                    '<td>' + (r.cnpj || '-') + '</td>' +
+                    '<td>' + (r.tipo_midia || '-') + '</td>' +
+                    '<td>' + formatCurrency(valorNfAgencia) + '</td>' +
+                    (temGlosa ? '<td class="glosa-cell">' + (glosa > 0 ? formatCurrency(glosa) : '-') + '</td><td' + (glosa > 0 ? ' style="font-weight:bold;"' : '') + '>' + formatCurrency(valorNf) + '</td>' : '') +
+                    '<td>-</td>' +
+                    '</tr>';
             });
-            html += '<tr class="summary-row"><td colspan="5"><strong>TOTAL</strong></td><td class="valor"><strong>' + formatCurrency(totalLiquido) + '</strong></td></tr></tbody></table>';
-
+            
+            // Calcular saldo final (será preenchido pelo backend)
+            var saldoFinal = '-';
+            
+            html += '<tr class="summary-row">' +
+                '<td colspan="5" style="text-align:right;padding-right:16px;"><strong>TOTAL</strong></td>' +
+                '<td' + (!temGlosa ? ' style="font-weight:bold;"' : '') + '>' + formatCurrency(totalNF) + '</td>' +
+                (temGlosa ? '<td class="glosa-cell">' + formatCurrency(totalGlosa) + '</td><td style="font-weight:bold;">' + formatCurrency(totalLiquido) + '</td>' : '') +
+                '<td>' + saldoFinal + '</td>' +
+                '</tr>';
+            
+            html += '</tbody></table>';
+            
             container.innerHTML = html;
         }
 
@@ -1139,18 +1488,28 @@
         function loadData() {
             showLoading(true);
             showError('');
-
+            
+            console.log('[DEBUG] loadData chamado');
+            console.log('[DEBUG] window.google:', !!window.google);
+            console.log('[DEBUG] google.script:', window.google ? !!google.script : 'N/A');
+            console.log('[DEBUG] google.script.run:', window.google && google.script ? !!google.script.run : 'N/A');
+            
             if (!window.google || !google.script || !google.script.run) {
                 showLoading(false);
-                showError('Este painel precisa ser aberto pela URL do Web App do Google Apps Script.');
+                console.log('[DEBUG] Usando dados de exemplo (não está no Apps Script)');
+                // Usar dados de exemplo quando não está no Apps Script
+                dados = MOCK_DADOS;
                 renderEmProcesso();
                 renderAtestadas();
                 renderPagas();
                 return;
             }
-
+            
+            console.log('[DEBUG] Chamando google.script.run.getDados()');
+            
             google.script.run
                 .withSuccessHandler(function(result) {
+                    console.log('[DEBUG] getDados sucesso:', result);
                     showLoading(false);
                     dados = result || { emProcesso: [], atestadas: [], pagas: [] };
                     renderEmProcesso();
@@ -1158,6 +1517,7 @@
                     renderPagas();
                 })
                 .withFailureHandler(function(err) {
+                    console.error('[DEBUG] getDados erro:', err);
                     showLoading(false);
                     showError('Erro ao carregar dados: ' + (err && err.message ? err.message : String(err)));
                     renderEmProcesso();
@@ -1171,6 +1531,11 @@
         // INIT
         // ==========================================
         document.addEventListener('DOMContentLoaded', function() {
+            // Event listeners (após DOM pronto)
+            var inputGerador = document.getElementById('valorBuscaGerador');
+            if (inputGerador) inputGerador.addEventListener('input', debounceSearchGerador);
+
+
             renderEmProcesso();
             renderAtestadas();
             renderPagas();
