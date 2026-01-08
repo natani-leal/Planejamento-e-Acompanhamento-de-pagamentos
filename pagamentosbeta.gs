@@ -1,278 +1,594 @@
-/**
- * Code.gs - PROJETO FOCO: CONTROLE DE SALDO ORÇAMENTÁRIO
- * * Este código extrai dados da planilha "Consolidado", "SaldoEmpenhos" e "Certidões"
- * para alimentar o App Web.
- */
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <title>Controle de Saldo Orçamentário</title>
+  <style>
+    :root {
+      --color-primary: #007bff;
+      --color-secondary: #0056b3;
+      --color-maroon: #800020;
+    }
 
-const URL_PLANILHA = 'https://docs.google.com/spreadsheets/d/15ZflxC82kDMcK8k4CbZQmX_fO9wDUl86tGYlJ3IMiT4/edit';
-const SHEET_NAME = 'Consolidado';
-const SHEET_NAME_EMPENHOS = 'SaldoEmpenhos'; // Nome da aba de Saldo/Empenhos
-const SHEET_NAME_CERTIDOES = 'Certidões'; // Nome da aba de Certidões
+    body { 
+      font-family: Calibri, sans-serif; 
+      padding: 20px;
+      background-color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start; 
+    }
 
-// Função utilitária para formatar a data como DD/MM/YY no Apps Script
-function formatSheetDate(dateValue) {
-  if (dateValue instanceof Date && !isNaN(dateValue)) {
-    const d = dateValue.getDate().toString().padStart(2, '0');
-    const m = (dateValue.getMonth() + 1).toString().padStart(2, '0');
-    const y = dateValue.getFullYear().toString().slice(-2);
-    return `${d}/${m}/${y}`;
+    body, input, th, td, p, span, a, div {
+      font-family: Calibri, sans-serif !important;
+      font-size: 1em;
+      color: #333;
+    }
+
+    .container-central {
+      width: 100%;
+      max-width: 1200px;
+      background-color: white;
+      padding: 0;
+    }
+
+    .header-title {
+      text-align: left;
+      font-weight: bold;
+      margin: 0 0 20px 0;
+      font-size: 1.1em;
+      color: #444;
+      border-bottom: 2px solid #eee;
+      padding-bottom: 10px;
+      width: 100%;
+    }
+
+    /* BUSCA */
+    .search-container {
+      width: 100%;
+      margin-bottom: 20px;
+    }
+
+    .search-box-row-main {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    .search-input-group input {
+      padding: 10px 15px;
+      width: 380px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      transition: border-color .3s, box-shadow .3s;
+    }
+
+    .search-input-group input:focus {
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px rgba(0, 123, 255, .25);
+      outline: none;
+    }
+
+    .copy-button-small {
+      background: none;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      padding: 0;
+    }
+
+    .copy-button-small svg {
+      width: 18px;
+      height: 18px;
+      fill: var(--color-primary);
+    }
+
+    .copy-button-small:hover svg {
+      fill: var(--color-secondary);
+    }
+
+    /* STATUS SALDO */
+    #statusSaldo {
+      margin-top: 10px;
+    }
+
+    .info-saldo-text {
+      font-weight: bold;
+      color: var(--color-secondary);
+    }
+
+    /* CERTIDÕES */
+    #certidoes-area {
+      width: 100%;
+      margin-top: 15px;
+    }
+
+    .certidao-item {
+      display: inline-block;
+      margin-right: 12px;
+      padding: 3px 6px;
+      background: #f5f5f5;
+      border-radius: 4px;
+    }
+
+    .certidao-nome {
+      font-weight: bold;
+      margin-right: 4px;
+    }
+
+    .certidao-link-icon {
+      margin-left: 10px;
+      font-size: 1.1em;
+      text-decoration: none;
+      color: var(--color-primary);
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .certidao-link-icon:hover {
+      color: var(--color-secondary);
+    }
+
+    .warning-producao {
+      margin-top: 8px;
+      padding-left: 5px;
+      border-left: 3px solid var(--color-maroon);
+      font-size: .95em;
+    }
+
+    /* ATESTO */
+    #atesto-info-container {
+      margin-top: 25px;
+      margin-bottom: 25px;
+    }
+
+    .atesto-values {
+      display: inline-flex;
+      gap: 6px;
+      align-items: center;
+      font-size: 1em;
+      white-space: nowrap;
+    }
+
+    /* POPUP COPIAR */
+    #copy-popup {
+      background-color: var(--color-secondary);
+      color: white;
+      font-weight: bold;
+      position: fixed;
+      bottom: 22px;
+      right: 22px;
+      padding: 10px 20px;
+      border-radius: 5px;
+      font-size: .9em;
+      display: none;
+    }
+
+    /* TABELA */
+    .result-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 30px;
+      background-color: white;
+    }
+
+    .result-table th,
+    .result-table td {
+      border: 1px solid #000;
+      padding: 10px;
+      text-align: center;
+      vertical-align: middle;
+      background-color: white !important;
+      white-space: nowrap;
+    }
+
+    /* COLUNAS */
+    .valor-cell { text-align: center !important; }
+
+    .glosa-cell,
+    .glosa-total {
+      color: var(--color-maroon);
+      font-weight: bold;
+    }
+
+    .total-negrito {
+      font-weight: bold !important;
+    }
+
+    .negative-balance {
+      color: var(--color-maroon) !important;
+      font-weight: bold;
+    }
+
+    /* CARREGANDO */
+    #loading {
+      color: #444;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container-central">
+  <div class="search-container">
+    <div class="search-box-row-main">
+      <div class="search-input-group">
+        <input type="text" id="valorBusca"
+          oninput="debounceSearch();"
+          placeholder="Digite o nº SEI do Controle de pagamento"
+          inputmode="numeric">
+      </div>
+
+      <!-- BOTÃO COPIAR ATESTO -->
+      <button class="copy-button-small"
+        onclick="
+          let texto = document.getElementById('nfList')?.textContent || '';
+          texto = texto.replace('Texto para atesto:', '').trim();
+          copiarParaClipboard(texto);
+        "
+        title="Copiar texto para atesto">
+        <svg viewBox='0 0 24 24'>
+          <path d='M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2
+            v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z'/>
+        </svg>
+      </button>
+    </div>
+
+    <div id="statusSaldo"></div>
+    <div id="certidoes-area"></div>
+  </div>
+
+  <!-- ATESTO GERADO AUTOMATICAMENTE -->
+  <div id="atesto-info-container"></div>
+
+  <p id="loading" style="display:none;">Carregando dados...</p>
+
+  <!-- CONTAINER DA TABELA -->
+  <div id="table-container"></div>
+</div>
+
+<!-- POPUP -->
+<div id="copy-popup">Copiado!</div>
+
+<script>
+/* VARIÁVEIS GLOBAIS */
+let searchTimeout = null;
+window.totalValorPago = 0;
+window.saldoEmpenhoAtual = 0;
+
+/* ============================
+   COPIAR / POPUP
+============================ */
+function showCopyPopup() {
+  const popup = document.getElementById("copy-popup");
+  popup.style.display = "block";
+  popup.style.opacity = "1";
+
+  setTimeout(() => {
+    popup.style.opacity = "0";
+    setTimeout(() => (popup.style.display = "none"), 300);
+  }, 1200);
+}
+
+function copiarParaClipboard(texto) {
+  navigator.clipboard.writeText(texto)
+    .then(showCopyPopup)
+    .catch(() => alert("Erro ao copiar automaticamente."));
+}
+
+/* ============================
+   FORMATAR VALOR
+============================ */
+function formatBRL(v) {
+  const n = Number(v);
+  if (isNaN(n)) return "-";
+  return n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+}
+
+/* ============================
+   DEBOUNCE DA BUSCA
+============================ */
+function debounceSearch() {
+  clearTimeout(searchTimeout);
+
+  searchTimeout = setTimeout(() => {
+    const valor = document.getElementById("valorBusca").value.trim();
+
+    if (!valor) {
+      document.getElementById("table-container").innerHTML = "";
+      document.getElementById("certidoes-area").innerHTML = "";
+      document.getElementById("atesto-info-container").innerHTML = "";
+      document.getElementById("statusSaldo").innerHTML = "";
+      return;
+    }
+
+    buscarDados(valor);
+    buscarSaldo(valor);
+  }, 300);
+}
+
+/* ============================
+   BUSCAR SALDO
+============================ */
+function buscarSaldo(valor) {
+  google.script.run
+    .withSuccessHandler(updateSaldo)
+    .withFailureHandler(handleError)
+    .getSaldoByPI(valor);
+}
+
+function updateSaldo(result) {
+  const div = document.getElementById("statusSaldo");
+
+  if (result?.agencia && result?.campanha) {
+    window.saldoEmpenhoAtual = Number(result.saldo || 0);
+
+    div.innerHTML = `
+      Agência: <span class="info-saldo-text">${result.agencia}</span>,
+      Campanha: <span class="info-saldo-text">${result.campanha}</span>,
+      Saldo Atual: <span class="info-saldo-text">${formatBRL(window.saldoEmpenhoAtual)}</span>
+    `;
+  } else {
+    div.innerHTML = `<span style="color:var(--color-maroon);font-weight:bold;">Agência/Campanha não encontradas.</span>`;
+    window.saldoEmpenhoAtual = 0;
   }
-  return String(dateValue || 'N/A');
+
+  calcularSaldoFinal();
 }
 
-// Função principal de entrada do App Web
-function doGet() {
-  return HtmlService.createHtmlOutputFromFile('controleDepagamento')
-    .setTitle('Controle de Saldo Orçamentário')
-    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
-}
+/* ============================
+   CALCULAR SALDO FINAL
+============================ */
+function calcularSaldoFinal() {
+  const cell = document.getElementById("saldoFinalCell");
+  if (!cell) return;
 
-// ----------------------------------------------------------------------
-// Função auxiliar para abrir a planilha
-// ----------------------------------------------------------------------
-function getSpreadsheet() {
-  // Extrai o ID da URL
-  const match = URL_PLANILHA.match(/\/d\/([a-zA-Z0-9_-]+)/);
-  const spreadsheetId = match ? match[1] : URL_PLANILHA;
-  return SpreadsheetApp.openById(spreadsheetId);
-}
+  const saldoFinal = (window.saldoEmpenhoAtual || 0) - (window.totalValorPago || 0);
 
+  cell.textContent = formatBRL(saldoFinal);
 
-// ======================================================================
-// 1. FUNÇÃO DE BUSCA DA ABA CONSOLIDADO (USADA PELA BUSCA SEI)
-// ======================================================================
-
-function filtrarControleDePagamento(valorBusca) {
-  try {
-    const ss = getSpreadsheet();
-    const sh = ss.getSheetByName(SHEET_NAME);
-    
-    if (!sh) {
-       throw new Error(`A aba com o nome "${SHEET_NAME}" não foi encontrada.`);
-    }
-    
-    // Lê a faixa de dados
-    const rows = sh.getDataRange().getValues();
-    const out = [];
-
-    // CRÍTICO: Remoção do .toUpperCase() e tratamento de string para busca
-    const buscaStr = String(valorBusca || "").trim();
-
-    // Itera pelas linhas (começa da segunda linha, índice 1)
-    for (let i = 1; i < rows.length; i++) {
-      const r = rows[i];
-      
-      // Coluna T (índice 19) - Critério de filtro (Nº SEI/PI)
-      const valorT_raw = r[19];
-      let valorT = "";
-
-      // Trata números como texto (Nº SEI/PI)
-      if (typeof valorT_raw === 'number') {
-          valorT = valorT_raw.toFixed(0); 
-      } else {
-          valorT = String(valorT_raw || "");
-      }
-      
-      valorT = valorT.trim();
-      
-      // Linhas vazias são ignoradas
-      if (!r[0] && !r[1] && !r[4]) continue;
-
-      // CRITÉRIO DE FILTRO: Busca por Inclusão (Valor T e Busca Str limpas)
-      if (buscaStr === "" || valorT.includes(buscaStr)) {
-        
-        out.push({
-          // Coluna A (0) - Agência Principal (Chave para Certidão)
-          agencia_principal: String(r[0] || ""), 
-          
-          // Coluna G (6) - Valor Nota Agência
-          valor_nf_agencia: (r[6] === "" || r[6] == null) ? 0 : Number(r[6]),
-          
-          // Coluna J (9) - Veículo/Forncededor (Mantido para a Tabela de NFs)
-          veiculo_forn: String(r[9] || ""), 
-          
-          // Coluna K (10) - CNPJ 
-          cnpj: String(r[10] || ""), 
-          
-          // Coluna L (11) - Tipo de Mídia 
-          tipo_midia: String(r[11] || ""), 
-          
-          // Coluna AB (27) - Valor Realmente Pago (Montante Total)
-          valor_nf: (r[27] === "" || r[27] == null) ? 0 : Number(r[27]), 
-          
-          // Coluna F (5) - NF
-          nf: String(r[5] || ""), 
-
-          // Coluna O (14) - Glosa
-          glosa: (r[14] === "" || r[14] == null) ? 0 : Number(r[14]),
-        });
-      }
-    }
-
-    Logger.log(`[Consolidado] Total de linhas encontradas para o SEI/PI (${buscaStr}): ${out.length}`);
-    return out;
-  } catch (e) {
-    Logger.log("Erro ao processar planilha (Consolidado): " + e.message);
-    throw new Error("Erro ao acessar a aba 'Consolidado' ou nome da aba incorreto. Detalhes: " + e.message);
+  if (saldoFinal < 0) {
+    cell.classList.add("negative-balance");
+  } else {
+    cell.classList.remove("negative-balance");
   }
 }
 
+/* ============================
+   ERRO
+============================ */
+function handleError(error) {
+  document.getElementById("loading").style.display = "none";
+  document.getElementById("table-container").innerHTML =
+    `<p style="color:var(--color-maroon);font-weight:bold;">ERRO: ${error.message || error}</p>`;
+}
 
-// ======================================================================
-// 2. FUNÇÃO PARA BUSCAR O SALDO CRUZANDO DADOS COM O PI
-// ======================================================================
+/* ============================
+   BUSCAR DADOS DA TABELA
+============================ */
+function buscarDados(valor) {
+  document.getElementById("loading").style.display = "block";
+  document.getElementById("table-container").innerHTML = "";
 
-/**
- * Busca Agência (Col. A) e Campanha (Col. C) na Consolidado usando o PI (Col. T),
- * e então usa esses dados para buscar o Saldo Atual (Col. H) em SaldoEmpenhos.
- * * Retorna um objeto contendo o saldo, agência e campanha.
- */
-function getSaldoByPI(valorBusca) {
-  const ss = getSpreadsheet();
-  // Mantido em maiúsculas para cruzar com a aba SaldoEmpenhos
-  const buscaStr = String(valorBusca || "").trim().toUpperCase();
+  google.script.run
+    .withSuccessHandler(exibirTabela)
+    .withFailureHandler(handleError)
+    .filtrarControleDePagamento(valor);
+}
 
-  // Retorno padrão se a busca for vazia
-  const defaultReturn = { saldo: 0, agencia: null, campanha: null };
-  if (!buscaStr) return defaultReturn;
+/* ============================
+   EXIBIR TABELA PRINCIPAL
+============================ */
+function exibirTabela(data) {
+  document.getElementById("loading").style.display = "none";
+  const container = document.getElementById("table-container");
 
-  let agencia = null;
-  let campanha = null;
-  let saldoAtual = 0;
-
-  // 1. BUSCAR AGÊNCIA (A) E CAMPANHA (C) NA ABA CONSOLIDADO
-  try {
-    const shConsolidado = ss.getSheetByName(SHEET_NAME);
-    if (!shConsolidado) throw new Error(`A aba "${SHEET_NAME}" não foi encontrada.`);
-    
-    const rowsConsolidado = shConsolidado.getDataRange().getValues();
-
-    for (let i = 1; i < rowsConsolidado.length; i++) {
-      const r = rowsConsolidado[i];
-      // Coluna T (índice 19) - Critério de filtro (Nº SEI/PI)
-      const valorT_raw = r[19];
-      let valorT = typeof valorT_raw === 'number' ? valorT_raw.toFixed(0) : String(valorT_raw || "");
-      // Limpa e compara
-      valorT = valorT.trim().toUpperCase(); 
-
-      // Busca por Inclusão (Para encontrar o primeiro match e obter Agência/Campanha)
-      if (valorT.includes(buscaStr)) {
-        // Coluna A (índice 0) - Agência
-        agencia = String(r[0] || "").trim();
-        // Coluna C (índice 2) - Campanha
-        campanha = String(r[2] || "").trim();
-        break; 
-      }
-    }
-
-    if (!agencia || !campanha) {
-        return defaultReturn;
-    }
-
-    // 2. BUSCAR SALDO ATUAL (H) NA ABA SALDOEMPENHOS
-    const shEmpenhos = ss.getSheetByName(SHEET_NAME_EMPENHOS);
-    if (!shEmpenhos) throw new Error(`A aba "${SHEET_NAME_EMPENHOS}" não foi encontrada.`);
-    
-    const rowsEmpenhos = shEmpenhos.getDataRange().getValues();
-    
-    // Converte e limpa para comparação
-    const buscaAgenciaUpper = agencia.toUpperCase();
-    const buscaCampanhaUpper = campanha.toUpperCase();
-    
-    for (let i = 1; i < rowsEmpenhos.length; i++) {
-      const r = rowsEmpenhos[i];
-      
-      // Coluna F (5) - Agência na SaldoEmpenhos
-      const valorAgenciaEmpenho = String(r[5] || "").trim().toUpperCase();
-      
-      // Coluna E (4) - Campanha na SaldoEmpenhos
-      const valorCampanhaEmpenho = String(r[4] || "").trim().toUpperCase();
-
-      // CRITÉRIO DE CRUZAMENTO: Busca por Inclusão
-      if (valorAgenciaEmpenho.includes(buscaAgenciaUpper) && valorCampanhaEmpenho.includes(buscaCampanhaUpper)) {
-        
-        // Coluna H (7) - Saldo Atual
-        const valorBrutoH = (r[7] === "" || r[7] == null) ? 0 : Number(r[7]);
-        
-        // SOLUÇÃO EPSILON: Trata erro de precisão de ponto flutuante
-        const EPSILON = 0.000001; 
-
-        if (Math.abs(valorBrutoH) < EPSILON) {
-            saldoAtual = 0;
-        } else {
-            // Mantém a precisão total
-            saldoAtual = valorBrutoH;
-        }
-        
-        break; 
-      }
-    }
-
-    return { 
-        saldo: saldoAtual, 
-        agencia: agencia, 
-        campanha: campanha 
-    };
-    
-  } catch (e) {
-    Logger.log("Erro ao buscar Saldo por PI: " + e.message);
-    return defaultReturn; 
+  if (!data || data.length === 0) {
+    container.innerHTML =
+      `<p style="color:var(--color-maroon);">Nenhuma Nota Fiscal encontrada.</p>`;
+    document.getElementById("certidoes-area").innerHTML = "";
+    document.getElementById("atesto-info-container").innerHTML = "";
+    return;
   }
-}
 
+  /* --- BUSCA DE CERTIDÕES --- */
+  const agencia = data[0].agencia_principal;
+  const tiposMidia = data.map(r => r.tipo_midia);
+  const veiculos = data.map(r => r.veiculo_forn);
 
-// ======================================================================
-// 3. FUNÇÃO PARA BUSCAR CERTIDÕES POR AGÊNCIA
-// ======================================================================
+  google.script.run
+    .withSuccessHandler(d => exibirCertidoes(d, tiposMidia))
+    .withFailureHandler(handleError)
+    .getCertidoesByAgencia(agencia);
 
-function getCertidoesByAgencia(agenciaBusca) {
-    const defaultReturn = { 
-        rfb: null, 
-        sefaz_df: null, 
-        fgts: null, 
-        tst: null, 
-        link: null, 
-        agencia_cert: null 
-    };
-    
-    const buscaAgencia = String(agenciaBusca || "").trim().toUpperCase(); 
-    if (!buscaAgencia) return defaultReturn;
-    
-    try {
-        const ss = getSpreadsheet();
-        const sh = ss.getSheetByName(SHEET_NAME_CERTIDOES);
+  /* --- PROCESSAMENTO DE VALORES --- */
+  let totalNF = 0;
+  let totalGlosa = 0;
+  let totalLiquido = 0;
 
-        if (!sh) {
-            Logger.log(`A aba com o nome "${SHEET_NAME_CERTIDOES}" não foi encontrada.`);
-            return defaultReturn;
-        }
-        
-        const rows = sh.getDataRange().getValues();
+  let nfList = [];
 
-        for (let i = 1; i < rows.length; i++) {
-            const r = rows[i];
-            
-            // Coluna A (0) - Agência na Certidões
-            const agenciaCertidao = String(r[0] || "").trim().toUpperCase();
-            
-            if (agenciaCertidao.includes(buscaAgencia) || buscaAgencia.includes(agenciaCertidao)) {
-                
-                return {
-                    agencia_cert: String(r[0] || ""),
-                    // CRÍTICO: Formatação de data aplicada aqui
-                    rfb: formatSheetDate(r[3]),
-                    sefaz_df: formatSheetDate(r[4]),
-                    fgts: formatSheetDate(r[5]),
-                    tst: formatSheetDate(r[6]),
-                    link: String(r[7] || ""),
-                };
-            }
-        }
+  data.forEach(r => {
+    const nf = Number(r.valor_nf_agencia) || 0;
+    const gl = Number(r.glosa) || 0;
+    const liq = Number(r.valor_nf) || 0;
 
-        return defaultReturn; 
-        
-    } catch (e) {
-        Logger.log("Erro ao buscar Certidões por Agência: " + e.message);
-        return defaultReturn;
+    totalNF += nf;
+    totalGlosa += gl;
+    totalLiquido += liq;
+
+    if (r.nf && r.nf !== "-") nfList.push(r.nf);
+  });
+
+  window.totalValorPago = totalLiquido;
+
+  nfList = [...new Set(nfList)].sort((a, b) => Number(a) - Number(b));
+
+  const nfTexto =
+    nfList.length > 1
+      ? nfList.slice(0, -1).join(", ") + " e " + nfList[nfList.length - 1]
+      : nfList[0];
+
+  const totalFormatado = formatBRL(totalLiquido);
+
+  /* --- TEXTO PARA ATESTO --- */
+  document.getElementById("atesto-info-container").innerHTML = `
+    <div id="atesto-content-container">
+      <div class="atesto-values" id="nfList">
+        <span style="font-weight:bold;color:var(--color-secondary);">Texto para atesto:</span>
+        <span class="atesto-nf-numbers">${nfTexto}</span>,
+        no montante total de <span style="font-weight:bold;">${totalFormatado}</span>
+
+        <button class="copy-button-small"
+          onclick="
+            let full = document.getElementById('nfList').textContent.trim();
+            let clean = full.replace('Texto para atesto:', '').trim();
+            copiarParaClipboard(clean);
+          "
+          title="Copiar texto do atesto">
+          <svg viewBox='0 0 24 24'>
+            <path d='M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2
+                     v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z'/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  `;
+
+  /* --- TABELA --- */
+  const temGlosa = totalGlosa > 0;
+
+  let html = `
+    <table id="relatorio-tabela" class="result-table">
+      <thead>
+        <tr>
+          <td colspan="${temGlosa ? 9 : 7}"
+            style="text-align:left; font-weight:bold; padding:10px;">
+            4. CONTROLE DE SALDO ORÇAMENTÁRIO
+          </td>
+        </tr>
+
+        <tr>
+          <th>Ord.</th>
+          <th>NF</th>
+          <th>Veículo/Fornecedor</th>
+          <th>CNPJ</th>
+          <th>Tipo de Mídia</th>
+          <th>Valor da NF</th>
+          ${temGlosa ? "<th>Glosa</th><th>Valor após Glosa</th>" : ""}
+          <th>Saldo do Empenho</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
+
+  /* --- LINHAS DA TABELA --- */
+  data.forEach((r, i) => {
+    const nf = Number(r.valor_nf_agencia) || 0;
+    const gl = Number(r.glosa) || 0;
+    const liq = Number(r.valor_nf) || 0;
+
+    html += `
+      <tr>
+        <td>${i + 1}</td>
+        <td>${r.nf || "-"}</td>
+        <td>${r.veiculo_forn || "-"}</td>
+        <td>${r.cnpj || "-"}</td>
+        <td>${r.tipo_midia || "-"}</td>
+        <td class="valor-cell">${formatBRL(nf)}</td>
+    `;
+
+    if (temGlosa) {
+      html += `
+        <td class="valor-cell glosa-cell">
+          ${gl > 0 ? formatBRL(gl) : "-"}
+        </td>
+        <td class="valor-cell ${gl > 0 ? "total-negrito" : ""}">
+          ${formatBRL(liq)}
+        </td>
+      `;
     }
+
+    html += `<td class="valor-cell">-</td></tr>`;
+  });
+
+  /* --- TOTAL --- */
+  html += `
+    <tr class="total-row">
+      <td colspan="5" style="text-align:right; font-weight:bold; padding-right:15px;">
+        TOTAL
+      </td>
+
+      <td class="valor-cell ${!temGlosa ? "total-negrito" : ""}">
+        ${formatBRL(totalNF)}
+      </td>
+  `;
+
+  if (temGlosa) {
+    html += `
+      <td class="valor-cell glosa-total">${formatBRL(totalGlosa)}</td>
+      <td class="valor-cell total-negrito">${formatBRL(totalLiquido)}</td>
+    `;
+  }
+
+  html += `
+      <td id="saldoFinalCell" class="valor-cell">-</td>
+    </tr>
+    </tbody>
+    </table>
+  `;
+
+  container.innerHTML = html;
+
+  calcularSaldoFinal();
 }
+
+/* ============================
+   CERTIDÕES
+============================ */
+function exibirCertidoes(data, tiposMidia) {
+  const container = document.getElementById("certidoes-area");
+  container.innerHTML = "";
+
+  if (!data || !data.agencia_cert) {
+    container.innerHTML =
+      `<p style="color:var(--color-maroon);font-weight:bold;">Certidões: Informação não encontrada.</p>`;
+    return;
+  }
+
+  const lista = [
+    { nome: "RFB", data: data.rfb },
+    { nome: "SEFAZ DF", data: data.sefaz_df },
+    { nome: "FGTS", data: data.fgts },
+    { nome: "TST", data: data.tst }
+  ];
+
+  let html = `
+    <strong>Certidões:</strong>
+    ${lista
+      .map(c => `<span class="certidao-nome">${c.nome}</span> ${c.data}`)
+      .join(", ")}
+  `;
+
+  if (data.link) {
+    html += `
+      <a href="${data.link}" target="_blank" class="certidao-link-icon">🔗</a>
+    `;
+  }
+
+  if (tiposMidia.some(t => String(t).toUpperCase().includes("PRODUÇÃO"))) {
+    html += `
+      <p class="warning-producao">
+        lembre-se de verificar validade das certidões das NFs de produção
+      </p>
+    `;
+  }
+
+  container.innerHTML = html;
+}
+</script>
+
+</body>
+</html>
