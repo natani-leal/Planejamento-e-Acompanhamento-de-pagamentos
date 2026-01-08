@@ -1,446 +1,16 @@
-// ==========================================
-// ARQUIVO: Código.gs (Backend) - VERSÃO CORRIGIDA
-// ==========================================
+/**
+ * Code.gs - PROJETO FOCO: CONTROLE DE SALDO ORÇAMENTÁRIO
+ * * Este código extrai dados da planilha "Consolidado", "SaldoEmpenhos" e "Certidões"
+ * para alimentar o App Web.
+ */
 
-// Configuração
-var SPREADSHEET_ID = '15ZflxC82kDMcK8k4CbZQmX_fO9wDUl86tGYlJ3IMiT4';
-var ABA_CONSOLIDADO = 'Consolidado';
+const URL_PLANILHA = 'https://docs.google.com/spreadsheets/d/15ZflxC82kDMcK8k4CbZQmX_fO9wDUl86tGYlJ3IMiT4/edit';
+const SHEET_NAME = 'Consolidado';
+const SHEET_NAME_EMPENHOS = 'SaldoEmpenhos'; // Nome da aba de Saldo/Empenhos
+const SHEET_NAME_CERTIDOES = 'Certidões'; // Nome da aba de Certidões
 
-var COL = {
-  AGENCIA: 0,           // A
-  DATA_CONSOLIDADO: 1,  // B
-  CAMPANHA: 2,          // C
-  NF: 5,                // F
-  VEICULO: 9,           // J
-  TIPO_MIDIA: 11,       // L
-  STATUS_PAG: 12,       // M
-  EXECUTOR: 13,         // N
-  ATESTO: 18,           // S
-  CONTROLE: 19,         // T
-  DATA_PAGO: 20,        // U
-  VALOR: 27             // AB
-};
-
-var STATUS = {
-  EM_PROCESSO: 'em processo de pagamento',
-  ATESTADA: 'atestada',
-  INCONFORMIDADE: 'com inconformidade',
-  PAGA: 'paga',
-  EM_ANALISE: 'em análise'
-};
-
-// --- PERSISTENCE HELPERS ---
-function getStoredData_() {
-  var props = PropertiesService.getScriptProperties();
-  var data = props.getProperty('DASHBOARD_DATA');
-  return data ? JSON.parse(data) : {};
-}
-
-function saveStoredData_(data) {
-  var props = PropertiesService.getScriptProperties();
-  props.setProperty('DASHBOARD_DATA', JSON.stringify(data));
-}
-
-function getKey_(row) {
-  var controle = String(row[COL.CONTROLE] || 'SEM_CONTROLE');
-  return row[COL.AGENCIA] + '|' + row[COL.CAMPANHA] + '|' + controle;
-}
-
-// --- PUBLIC FUNCTIONS ---
-
-function doGet() {
-  return HtmlService.createHtmlOutputFromFile('Index')
-    .setTitle('Controle de Pagamentos')
-    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
-}
-
-function getSheet_() {
-  return SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName(ABA_CONSOLIDADO);
-}
-
-function getAllData_() {
-  var sheet = getSheet_();
-  var data = sheet.getDataRange().getValues();
-  return data.slice(1);
-}
-
-function formatDateForJSON_(date) {
-  if (!date) return null;
-  if (date instanceof Date) {
-    return date.toISOString();
-  }
-  return null;
-}
-
-function saveStatus(key, newStatus) {
-  var stored = getStoredData_();
-  if (!stored[key]) stored[key] = {};
-  stored[key].statusPag = newStatus;
-  saveStoredData_(stored);
-  return true;
-}
-
-function saveObs(key, newObs) {
-  var stored = getStoredData_();
-  if (!stored[key]) stored[key] = {};
-  stored[key].obs = newObs;
-  saveStoredData_(stored);
-  return true;
-}
-
-// Função genérica para salvar campos (chamada pelo frontend)
-function saveField(section, key, field, value) {
-  var stored = getStoredData_();
-  if (!stored[key]) stored[key] = {};
-  stored[key][field] = value;
-  saveStoredData_(stored);
-  return true;
-}
-
-function getEmProcesso() {
-  var data = getAllData_();
-  var stored = getStoredData_();
-  var grupos = {};
-
-  data.forEach(function(row) {
-    var status = String(row[COL.STATUS_PAG] || '').toLowerCase().trim();
-    if (status === STATUS.EM_PROCESSO) {
-      var key = getKey_(row);
-      if (!grupos[key]) {
-        var saved = stored[key] || {};
-        grupos[key] = {
-          agencia: row[COL.AGENCIA],
-          campanha: row[COL.CAMPANHA],
-          controle: String(row[COL.CONTROLE] || 'SEM_CONTROLE'),
-          qtd: 0,
-          valor: 0,
-          dataAtesto: null,
-          obs: saved.obs || '',
-          statusPag: saved.statusPag || 'montando'
-        };
-      }
-      grupos[key].qtd++;
-      grupos[key].valor += parseFloat(row[COL.VALOR]) || 0;
-      var dataAtesto = row[COL.ATESTO];
-      if (dataAtesto && (!grupos[key].dataAtesto || dataAtesto < grupos[key].dataAtesto)) {
-        grupos[key].dataAtesto = formatDateForJSON_(dataAtesto);
-      }
-    }
-  });
-
-  var result = Object.values(grupos);
-  result.sort(function(a, b) {
-    if (!a.dataAtesto) return 1;
-    if (!b.dataAtesto) return -1;
-    return new Date(a.dataAtesto) - new Date(b.dataAtesto);
-  });
-  return result;
-}
-
-// CORRIGIDO: getAtestadas - só conta "em análise" explícito
-function getAtestadas() {
-  var data = getAllData_();
-  var stored = getStoredData_();
-  var grupos = {};
-
-  data.forEach(function(row) {
-    var status = String(row[COL.STATUS_PAG] || '').toLowerCase().trim();
-    var isAtestada = status.indexOf('atestada') !== -1;
-    var isInconformidade = status.indexOf('inconformidade') !== -1;
-    // CORRIGIDO: Só conta "em análise" se tiver explicitamente no texto
-    var isEmAnalise = status.indexOf('analise') !== -1 || status.indexOf('análise') !== -1;
-
-    if (isAtestada || isInconformidade || isEmAnalise) {
-      var groupKey = row[COL.AGENCIA] + '|' + row[COL.CAMPANHA];
-      if (!grupos[groupKey]) {
-        var saved = stored[groupKey] || {};
-        grupos[groupKey] = {
-          agencia: row[COL.AGENCIA],
-          campanha: row[COL.CAMPANHA],
-          qtdEmAnalise: 0,
-          valorEmAnalise: 0,
-          qtdAtestada: 0,
-          valorAtestado: 0,
-          qtdPendente: 0,
-          valorPendente: 0,
-          pendentes: [],
-          obs: saved.obs || ''
-        };
-      }
-      var valor = parseFloat(row[COL.VALOR]) || 0;
-
-      if (isEmAnalise && !isAtestada && !isInconformidade) {
-        grupos[groupKey].qtdEmAnalise++;
-        grupos[groupKey].valorEmAnalise += valor;
-      } else if (isAtestada && !isInconformidade) {
-        grupos[groupKey].qtdAtestada++;
-        grupos[groupKey].valorAtestado += valor;
-      }
-
-      if (isInconformidade) {
-        grupos[groupKey].qtdPendente++;
-        grupos[groupKey].valorPendente += valor;
-        grupos[groupKey].pendentes.push({
-          nf: row[COL.NF],
-          veiculo: row[COL.VEICULO],
-          executor: row[COL.EXECUTOR],
-          tipoMidia: row[COL.TIPO_MIDIA],
-          tipo: 'Inconformidade',
-          valor: valor
-        });
-      }
-    }
-  });
-  return Object.values(grupos);
-}
-
-function getUltimasPagas() {
-  var data = getAllData_();
-  var grupos = {};
-  var hoje = new Date();
-  var limite = new Date(hoje.getTime() - 30 * 24 * 60 * 60 * 1000);
-
-  data.forEach(function(row) {
-    var status = String(row[COL.STATUS_PAG] || '').toLowerCase().trim();
-    var dataPago = row[COL.DATA_PAGO];
-    if (status === STATUS.PAGA && dataPago && dataPago >= limite) {
-      var key = getKey_(row);
-      if (!grupos[key]) {
-        grupos[key] = {
-          agencia: row[COL.AGENCIA],
-          campanha: row[COL.CAMPANHA],
-          controle: String(row[COL.CONTROLE] || 'SEM_CONTROLE'),
-          qtd: 0,
-          valor: 0,
-          dataPago: formatDateForJSON_(dataPago)
-        };
-      }
-      grupos[key].qtd++;
-      grupos[key].valor += parseFloat(row[COL.VALOR]) || 0;
-      if (dataPago > new Date(grupos[key].dataPago)) {
-        grupos[key].dataPago = formatDateForJSON_(dataPago);
-      }
-    }
-  });
-  var result = Object.values(grupos);
-  result.sort(function(a, b) {
-    return new Date(b.dataPago) - new Date(a.dataPago);
-  });
-  return result;
-}
-
-function getDados() {
-  return {
-    emProcesso: getEmProcesso(),
-    atestadas: getAtestadas(),
-    pagas: getUltimasPagas()
-  };
-}
-
-// CORRIGIDO: getDadosExecutores - com analisadas calculado
-function getDadosExecutores(dataStr) {
-  var data = getAllData_();
-  var datas = {};
-  var executores = {};
-
-  // Coletar datas da coluna B (DATA_CONSOLIDADO)
-  data.forEach(function(row) {
-    var dataNota = row[COL.DATA_CONSOLIDADO];
-    if (dataNota && dataNota instanceof Date) {
-      var key = Utilities.formatDate(dataNota, Session.getScriptTimeZone(), 'yyyy-MM-dd');
-      if (key) datas[key] = true;
-    }
-  });
-
-  var datasOrdenadas = Object.keys(datas).sort().reverse();
-
-  var dataSelecionada = dataStr;
-  if (!dataSelecionada && datasOrdenadas.length > 0) {
-    dataSelecionada = datasOrdenadas[0];
-  }
-
-  if (!dataSelecionada) {
-    return { datasDisponiveis: datasOrdenadas, executores: [], dataSelecionada: null };
-  }
-
-  data.forEach(function(row) {
-    var dataNota = row[COL.DATA_CONSOLIDADO];
-    if (!dataNota || !(dataNota instanceof Date)) return;
-
-    var dataNotaStr = Utilities.formatDate(dataNota, Session.getScriptTimeZone(), 'yyyy-MM-dd');
-    if (dataNotaStr !== dataSelecionada) return;
-
-    var executor = String(row[COL.EXECUTOR] || '').trim();
-    if (!executor) executor = 'SEM EXECUTOR';
-
-    var agencia = String(row[COL.AGENCIA] || '').toUpperCase().trim();
-    var statusRaw = String(row[COL.STATUS_PAG] || '').toLowerCase().trim();
-    var nf = String(row[COL.NF] || '').trim();
-
-    // CORRIGIDO: Só conta "em análise" se tiver explicitamente no texto
-    var emAnalise = statusRaw.indexOf('analise') !== -1 || statusRaw.indexOf('análise') !== -1;
-    // Analisadas = tem status preenchido e NÃO é "em análise"
-    var analisada = statusRaw !== '' && !emAnalise;
-
-    if (!executores[executor]) {
-      executores[executor] = {
-        nome: executor,
-        av: 0, calia: 0, ebm: 0, total: 0,
-        emAnalise: 0,
-        analisadas: 0,
-        nfsAv: [], nfsCalia: [], nfsEbm: []
-      };
-    }
-
-    if (agencia.indexOf('AV') !== -1 || agencia === 'AV') {
-      executores[executor].av++;
-      if (nf) executores[executor].nfsAv.push(nf);
-    } else if (agencia.indexOf('CALIA') !== -1) {
-      executores[executor].calia++;
-      if (nf) executores[executor].nfsCalia.push(nf);
-    } else if (agencia.indexOf('EBM') !== -1) {
-      executores[executor].ebm++;
-      if (nf) executores[executor].nfsEbm.push(nf);
-    }
-
-    executores[executor].total++;
-    if (emAnalise) executores[executor].emAnalise++;
-    if (analisada) executores[executor].analisadas++;
-  });
-
-  var result = Object.values(executores);
-  result.sort(function(a, b) { return b.total - a.total; });
-
-  return {
-    datasDisponiveis: datasOrdenadas,
-    executores: result,
-    dataSelecionada: dataSelecionada
-  };
-}
-
-// ======================================================================
-// GERADOR DE TABELA DE CONTROLE DE PAGAMENTO
-// ======================================================================
-
-const SHEET_NAME_EMPENHOS = 'SaldoEmpenhos';
-const SHEET_NAME_CERTIDOES = 'Certidões';
-
-function filtrarControleDePagamento(valorBusca) {
-  try {
-    const data = getAllData_();
-    const out = [];
-    const buscaStr = String(valorBusca || "").trim();
-
-    for (let i = 0; i < data.length; i++) {
-      const r = data[i];
-      const valorT_raw = r[COL.CONTROLE];
-      let valorT = typeof valorT_raw === 'number' ? valorT_raw.toFixed(0) : String(valorT_raw || "");
-      valorT = valorT.trim();
-
-      if (!r[0] && !r[2] && !r[5]) continue;
-
-      if (buscaStr === "" || valorT.includes(buscaStr)) {
-        out.push({
-          agencia_principal: String(r[COL.AGENCIA] || ""),
-          valor_nf_agencia: (r[6] === "" || r[6] == null) ? 0 : Number(r[6]),
-          veiculo_forn: String(r[COL.VEICULO] || ""),
-          cnpj: String(r[10] || ""),
-          tipo_midia: String(r[COL.TIPO_MIDIA] || ""),
-          valor_nf: (r[COL.VALOR] === "" || r[COL.VALOR] == null) ? 0 : Number(r[COL.VALOR]),
-          nf: String(r[COL.NF] || ""),
-          glosa: (r[14] === "" || r[14] == null) ? 0 : Number(r[14]),
-        });
-      }
-    }
-    return out;
-  } catch (e) {
-    throw new Error("Erro ao filtrar controle: " + e.message);
-  }
-}
-
-function getSaldoByPI(valorBusca) {
-  const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
-  const buscaStr = String(valorBusca || "").trim().toUpperCase();
-  const defaultReturn = { saldo: 0, agencia: null, campanha: null };
-  if (!buscaStr) return defaultReturn;
-
-  let agencia = null;
-  let campanha = null;
-  let saldoAtual = 0;
-
-  try {
-    const data = getAllData_();
-    for (let i = 0; i < data.length; i++) {
-      const r = data[i];
-      const valorT_raw = r[COL.CONTROLE];
-      let valorT = typeof valorT_raw === 'number' ? valorT_raw.toFixed(0) : String(valorT_raw || "");
-      valorT = valorT.trim().toUpperCase();
-
-      if (valorT.includes(buscaStr)) {
-        agencia = String(r[COL.AGENCIA] || "").trim();
-        campanha = String(r[COL.CAMPANHA] || "").trim();
-        break;
-      }
-    }
-
-    if (!agencia || !campanha) return defaultReturn;
-
-    const shEmpenhos = ss.getSheetByName(SHEET_NAME_EMPENHOS);
-    if (!shEmpenhos) return { ...defaultReturn, agencia, campanha };
-
-    const rowsEmpenhos = shEmpenhos.getDataRange().getValues();
-    const buscaAgenciaUpper = agencia.toUpperCase();
-    const buscaCampanhaUpper = campanha.toUpperCase();
-
-    for (let i = 1; i < rowsEmpenhos.length; i++) {
-      const r = rowsEmpenhos[i];
-      const valorAgenciaEmpenho = String(r[5] || "").trim().toUpperCase();
-      const valorCampanhaEmpenho = String(r[4] || "").trim().toUpperCase();
-
-      if (valorAgenciaEmpenho.includes(buscaAgenciaUpper) && valorCampanhaEmpenho.includes(buscaCampanhaUpper)) {
-        saldoAtual = (r[7] === "" || r[7] == null) ? 0 : Number(r[7]);
-        break;
-      }
-    }
-
-    return { saldo: saldoAtual, agencia: agencia, campanha: campanha };
-  } catch (e) {
-    return defaultReturn;
-  }
-}
-
-function getCertidoesByAgencia(agenciaBusca) {
-  const defaultReturn = { rfb: null, sefaz_df: null, fgts: null, tst: null, link: null, agencia_cert: null };
-  const buscaAgencia = String(agenciaBusca || "").trim().toUpperCase();
-  if (!buscaAgencia) return defaultReturn;
-
-  try {
-    const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
-    const sh = ss.getSheetByName(SHEET_NAME_CERTIDOES);
-    if (!sh) return defaultReturn;
-
-    const rows = sh.getDataRange().getValues();
-    for (let i = 1; i < rows.length; i++) {
-      const r = rows[i];
-      const agenciaCertidao = String(r[0] || "").trim().toUpperCase();
-      if (agenciaCertidao.includes(buscaAgencia) || buscaAgencia.includes(agenciaCertidao)) {
-        return {
-          agencia_cert: String(r[0] || ""),
-          rfb: formatSheetDate_(r[3]),
-          sefaz_df: formatSheetDate_(r[4]),
-          fgts: formatSheetDate_(r[5]),
-          tst: formatSheetDate_(r[6]),
-          link: String(r[7] || ""),
-        };
-      }
-    }
-    return defaultReturn;
-  } catch (e) {
-    return defaultReturn;
-  }
-}
-
-function formatSheetDate_(dateValue) {
+// Função utilitária para formatar a data como DD/MM/YY no Apps Script
+function formatSheetDate(dateValue) {
   if (dateValue instanceof Date && !isNaN(dateValue)) {
     const d = dateValue.getDate().toString().padStart(2, '0');
     const m = (dateValue.getMonth() + 1).toString().padStart(2, '0');
@@ -448,4 +18,261 @@ function formatSheetDate_(dateValue) {
     return `${d}/${m}/${y}`;
   }
   return String(dateValue || 'N/A');
+}
+
+// Função principal de entrada do App Web
+function doGet() {
+  return HtmlService.createHtmlOutputFromFile('controleDepagamento')
+    .setTitle('Controle de Saldo Orçamentário')
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+}
+
+// ----------------------------------------------------------------------
+// Função auxiliar para abrir a planilha
+// ----------------------------------------------------------------------
+function getSpreadsheet() {
+  // Extrai o ID da URL
+  const match = URL_PLANILHA.match(/\/d\/([a-zA-Z0-9_-]+)/);
+  const spreadsheetId = match ? match[1] : URL_PLANILHA;
+  return SpreadsheetApp.openById(spreadsheetId);
+}
+
+
+// ======================================================================
+// 1. FUNÇÃO DE BUSCA DA ABA CONSOLIDADO (USADA PELA BUSCA SEI)
+// ======================================================================
+
+function filtrarControleDePagamento(valorBusca) {
+  try {
+    const ss = getSpreadsheet();
+    const sh = ss.getSheetByName(SHEET_NAME);
+    
+    if (!sh) {
+       throw new Error(`A aba com o nome "${SHEET_NAME}" não foi encontrada.`);
+    }
+    
+    // Lê a faixa de dados
+    const rows = sh.getDataRange().getValues();
+    const out = [];
+
+    // CRÍTICO: Remoção do .toUpperCase() e tratamento de string para busca
+    const buscaStr = String(valorBusca || "").trim();
+
+    // Itera pelas linhas (começa da segunda linha, índice 1)
+    for (let i = 1; i < rows.length; i++) {
+      const r = rows[i];
+      
+      // Coluna T (índice 19) - Critério de filtro (Nº SEI/PI)
+      const valorT_raw = r[19];
+      let valorT = "";
+
+      // Trata números como texto (Nº SEI/PI)
+      if (typeof valorT_raw === 'number') {
+          valorT = valorT_raw.toFixed(0); 
+      } else {
+          valorT = String(valorT_raw || "");
+      }
+      
+      valorT = valorT.trim();
+      
+      // Linhas vazias são ignoradas
+      if (!r[0] && !r[1] && !r[4]) continue;
+
+      // CRITÉRIO DE FILTRO: Busca por Inclusão (Valor T e Busca Str limpas)
+      if (buscaStr === "" || valorT.includes(buscaStr)) {
+        
+        out.push({
+          // Coluna A (0) - Agência Principal (Chave para Certidão)
+          agencia_principal: String(r[0] || ""), 
+          
+          // Coluna G (6) - Valor Nota Agência
+          valor_nf_agencia: (r[6] === "" || r[6] == null) ? 0 : Number(r[6]),
+          
+          // Coluna J (9) - Veículo/Forncededor (Mantido para a Tabela de NFs)
+          veiculo_forn: String(r[9] || ""), 
+          
+          // Coluna K (10) - CNPJ 
+          cnpj: String(r[10] || ""), 
+          
+          // Coluna L (11) - Tipo de Mídia 
+          tipo_midia: String(r[11] || ""), 
+          
+          // Coluna AB (27) - Valor Realmente Pago (Montante Total)
+          valor_nf: (r[27] === "" || r[27] == null) ? 0 : Number(r[27]), 
+          
+          // Coluna F (5) - NF
+          nf: String(r[5] || ""), 
+
+          // Coluna O (14) - Glosa
+          glosa: (r[14] === "" || r[14] == null) ? 0 : Number(r[14]),
+        });
+      }
+    }
+
+    Logger.log(`[Consolidado] Total de linhas encontradas para o SEI/PI (${buscaStr}): ${out.length}`);
+    return out;
+  } catch (e) {
+    Logger.log("Erro ao processar planilha (Consolidado): " + e.message);
+    throw new Error("Erro ao acessar a aba 'Consolidado' ou nome da aba incorreto. Detalhes: " + e.message);
+  }
+}
+
+
+// ======================================================================
+// 2. FUNÇÃO PARA BUSCAR O SALDO CRUZANDO DADOS COM O PI
+// ======================================================================
+
+/**
+ * Busca Agência (Col. A) e Campanha (Col. C) na Consolidado usando o PI (Col. T),
+ * e então usa esses dados para buscar o Saldo Atual (Col. H) em SaldoEmpenhos.
+ * * Retorna um objeto contendo o saldo, agência e campanha.
+ */
+function getSaldoByPI(valorBusca) {
+  const ss = getSpreadsheet();
+  // Mantido em maiúsculas para cruzar com a aba SaldoEmpenhos
+  const buscaStr = String(valorBusca || "").trim().toUpperCase();
+
+  // Retorno padrão se a busca for vazia
+  const defaultReturn = { saldo: 0, agencia: null, campanha: null };
+  if (!buscaStr) return defaultReturn;
+
+  let agencia = null;
+  let campanha = null;
+  let saldoAtual = 0;
+
+  // 1. BUSCAR AGÊNCIA (A) E CAMPANHA (C) NA ABA CONSOLIDADO
+  try {
+    const shConsolidado = ss.getSheetByName(SHEET_NAME);
+    if (!shConsolidado) throw new Error(`A aba "${SHEET_NAME}" não foi encontrada.`);
+    
+    const rowsConsolidado = shConsolidado.getDataRange().getValues();
+
+    for (let i = 1; i < rowsConsolidado.length; i++) {
+      const r = rowsConsolidado[i];
+      // Coluna T (índice 19) - Critério de filtro (Nº SEI/PI)
+      const valorT_raw = r[19];
+      let valorT = typeof valorT_raw === 'number' ? valorT_raw.toFixed(0) : String(valorT_raw || "");
+      // Limpa e compara
+      valorT = valorT.trim().toUpperCase(); 
+
+      // Busca por Inclusão (Para encontrar o primeiro match e obter Agência/Campanha)
+      if (valorT.includes(buscaStr)) {
+        // Coluna A (índice 0) - Agência
+        agencia = String(r[0] || "").trim();
+        // Coluna C (índice 2) - Campanha
+        campanha = String(r[2] || "").trim();
+        break; 
+      }
+    }
+
+    if (!agencia || !campanha) {
+        return defaultReturn;
+    }
+
+    // 2. BUSCAR SALDO ATUAL (H) NA ABA SALDOEMPENHOS
+    const shEmpenhos = ss.getSheetByName(SHEET_NAME_EMPENHOS);
+    if (!shEmpenhos) throw new Error(`A aba "${SHEET_NAME_EMPENHOS}" não foi encontrada.`);
+    
+    const rowsEmpenhos = shEmpenhos.getDataRange().getValues();
+    
+    // Converte e limpa para comparação
+    const buscaAgenciaUpper = agencia.toUpperCase();
+    const buscaCampanhaUpper = campanha.toUpperCase();
+    
+    for (let i = 1; i < rowsEmpenhos.length; i++) {
+      const r = rowsEmpenhos[i];
+      
+      // Coluna F (5) - Agência na SaldoEmpenhos
+      const valorAgenciaEmpenho = String(r[5] || "").trim().toUpperCase();
+      
+      // Coluna E (4) - Campanha na SaldoEmpenhos
+      const valorCampanhaEmpenho = String(r[4] || "").trim().toUpperCase();
+
+      // CRITÉRIO DE CRUZAMENTO: Busca por Inclusão
+      if (valorAgenciaEmpenho.includes(buscaAgenciaUpper) && valorCampanhaEmpenho.includes(buscaCampanhaUpper)) {
+        
+        // Coluna H (7) - Saldo Atual
+        const valorBrutoH = (r[7] === "" || r[7] == null) ? 0 : Number(r[7]);
+        
+        // SOLUÇÃO EPSILON: Trata erro de precisão de ponto flutuante
+        const EPSILON = 0.000001; 
+
+        if (Math.abs(valorBrutoH) < EPSILON) {
+            saldoAtual = 0;
+        } else {
+            // Mantém a precisão total
+            saldoAtual = valorBrutoH;
+        }
+        
+        break; 
+      }
+    }
+
+    return { 
+        saldo: saldoAtual, 
+        agencia: agencia, 
+        campanha: campanha 
+    };
+    
+  } catch (e) {
+    Logger.log("Erro ao buscar Saldo por PI: " + e.message);
+    return defaultReturn; 
+  }
+}
+
+
+// ======================================================================
+// 3. FUNÇÃO PARA BUSCAR CERTIDÕES POR AGÊNCIA
+// ======================================================================
+
+function getCertidoesByAgencia(agenciaBusca) {
+    const defaultReturn = { 
+        rfb: null, 
+        sefaz_df: null, 
+        fgts: null, 
+        tst: null, 
+        link: null, 
+        agencia_cert: null 
+    };
+    
+    const buscaAgencia = String(agenciaBusca || "").trim().toUpperCase(); 
+    if (!buscaAgencia) return defaultReturn;
+    
+    try {
+        const ss = getSpreadsheet();
+        const sh = ss.getSheetByName(SHEET_NAME_CERTIDOES);
+
+        if (!sh) {
+            Logger.log(`A aba com o nome "${SHEET_NAME_CERTIDOES}" não foi encontrada.`);
+            return defaultReturn;
+        }
+        
+        const rows = sh.getDataRange().getValues();
+
+        for (let i = 1; i < rows.length; i++) {
+            const r = rows[i];
+            
+            // Coluna A (0) - Agência na Certidões
+            const agenciaCertidao = String(r[0] || "").trim().toUpperCase();
+            
+            if (agenciaCertidao.includes(buscaAgencia) || buscaAgencia.includes(agenciaCertidao)) {
+                
+                return {
+                    agencia_cert: String(r[0] || ""),
+                    // CRÍTICO: Formatação de data aplicada aqui
+                    rfb: formatSheetDate(r[3]),
+                    sefaz_df: formatSheetDate(r[4]),
+                    fgts: formatSheetDate(r[5]),
+                    tst: formatSheetDate(r[6]),
+                    link: String(r[7] || ""),
+                };
+            }
+        }
+
+        return defaultReturn; 
+        
+    } catch (e) {
+        Logger.log("Erro ao buscar Certidões por Agência: " + e.message);
+        return defaultReturn;
+    }
 }
