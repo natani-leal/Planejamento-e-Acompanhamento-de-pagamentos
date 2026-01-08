@@ -72,12 +72,14 @@
             font-size: 1rem;
             font-weight: 600;
             color: hsl(220, 25%, 25%);
+            cursor: pointer;
         }
         .section-title .dot {
             width: 8px;
             height: 8px;
             border-radius: 50%;
         }
+        .section.executor .dot { background: hsl(252, 85%, 60%); }
         .section.processo .dot { background: hsl(38, 95%, 55%); }
         .section.atestadas .dot { background: hsl(142, 70%, 45%); }
         .section.pagas .dot { background: hsl(217, 90%, 60%); }
@@ -105,13 +107,35 @@
             margin-bottom: 24px;
         }
 
-        /* Link Card - Input ANTES da expansão */
+        /* Link Card - Input ANTES da expansão - mesma altura do section.executor */
         .link-card {
             background: white;
             border: 1px solid hsl(220, 15%, 90%);
             border-radius: 12px;
             padding: 1rem 1.5rem;
             transition: all 0.2s ease;
+            min-height: auto;
+        }
+        
+        /* Section executor - altura consistente com link-card quando colapsado */
+        .section.executor {
+            padding: 1rem 1.5rem;
+        }
+        .section.executor .section-header {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+        .section.executor .collapsible-content.open ~ .section-header,
+        .section.executor.has-content .section-header {
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid hsl(220, 15%, 94%);
+        }
+        .section.executor .collapsible-content.open {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid hsl(220, 15%, 94%);
         }
         .link-card:hover {
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
@@ -125,7 +149,6 @@
             align-items: center;
             flex-wrap: wrap;
             gap: 12px;
-            cursor: pointer;
         }
         .link-card-icon {
             width: 24px;
@@ -182,44 +205,88 @@
             display: block;
         }
 
-        /* Executor Date Selector - Menu Suspenso */
+        /* Collapsible content */
+        .collapsible-content {
+            display: none;
+            animation: fadeIn 0.3s ease-out;
+        }
+        .collapsible-content.open {
+            display: block;
+        }
+        .collapse-icon {
+            transition: transform 0.2s ease;
+        }
+        .collapse-icon.open {
+            transform: rotate(180deg);
+        }
+
+        /* Executor Date Selector - Dropdown múltiplo */
         .executor-date-select {
             margin-left: auto;
             padding-left: 16px;
+            position: relative;
         }
-        .date-select-dropdown {
+        .date-dropdown-trigger {
             width: 320px;
             padding: 10px 14px;
             border: 1px solid hsl(220, 15%, 90%);
             border-radius: 8px;
             font-size: 0.875rem;
             font-family: inherit;
-            background: hsl(220, 20%, 98%);
+            background: white;
             cursor: pointer;
             transition: all 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
-        .date-select-dropdown:focus {
+        .date-dropdown-trigger:hover {
+            border-color: hsl(252, 85%, 60%);
+        }
+        .date-dropdown-trigger:focus {
             outline: none;
             border-color: hsl(252, 85%, 60%);
             background: white;
             box-shadow: 0 0 0 3px hsla(252, 85%, 60%, 0.15);
         }
-
-        /* Chevron para expandir */
-        .link-card-chevron {
-            margin-left: 8px;
-            transition: transform 0.3s ease;
-            color: hsl(220, 10%, 50%);
+        .date-dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            width: 320px;
+            max-height: 300px;
+            overflow-y: auto;
+            background: white;
+            border: 1px solid hsl(220, 15%, 90%);
+            border-radius: 8px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            margin-top: 4px;
         }
-        .link-card-chevron.expanded {
-            transform: rotate(180deg);
+        .date-dropdown-menu.open {
+            display: block;
         }
-
-        /* Date preview no header */
-        .date-preview {
-            font-size: 0.8rem;
-            color: hsl(220, 10%, 50%);
-            font-weight: 400;
+        .date-dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: background 0.15s;
+        }
+        .date-dropdown-item:hover {
+            background: hsl(220, 20%, 97%);
+        }
+        .date-dropdown-item.selected {
+            background: hsl(252, 85%, 97%);
+        }
+        .date-dropdown-item input[type="checkbox"] {
+            margin: 0;
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
         }
 
         /* Table */
@@ -230,7 +297,7 @@
             font-size: 0.875rem;
         }
         th {
-            text-align: left;
+            text-align: center;
             padding: 12px 16px;
             background: hsl(220, 20%, 97%);
             font-weight: 600;
@@ -238,12 +305,13 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
             color: hsl(220, 10%, 50%);
-            border-bottom: 2px solid hsl(220, 15%, 92%);
+            border-bottom: 1px solid hsl(220, 15%, 92%);
         }
         td {
             padding: 14px 16px;
             border-bottom: 1px solid hsl(220, 15%, 95%);
             vertical-align: middle;
+            text-align: center;
         }
         tr:hover td { background: hsl(220, 20%, 98%); }
         tr:last-child td { border-bottom: none; }
@@ -257,14 +325,13 @@
             border-radius: 4px;
             color: hsl(220, 25%, 40%);
         }
-        .qtd { text-align: center; font-weight: 400; }
+        .qtd { text-align: center; color: hsl(220, 10%, 50%); }
         .valor {
-            font-weight: 400;
-            color: hsl(220, 15%, 30%);
+            color: hsl(220, 10%, 50%);
             white-space: nowrap;
         }
 
-        /* Count Badge - CINZA ESCURO ao invés de verde */
+        /* Count Badge */
         .count-badge {
             padding: 4px 12px;
             border-radius: 20px;
@@ -281,8 +348,8 @@
             color: hsl(0, 75%, 45%);
         }
         .count-badge.gray {
-            background: hsl(220, 10%, 30%);
-            color: white;
+            background: hsl(220, 15%, 96%);
+            color: hsl(220, 10%, 50%);
         }
         .count-badge.orange {
             background: hsl(38, 95%, 95%);
@@ -292,7 +359,7 @@
         /* Executor Table */
         .executor-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
         .executor-table th {
-            text-align: left;
+            text-align: center;
             padding: 12px 16px;
             background: hsl(220, 20%, 97%);
             font-weight: 600;
@@ -300,35 +367,46 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
             color: hsl(220, 10%, 50%);
-            border-bottom: 2px solid hsl(220, 15%, 92%);
+            border-bottom: 1px solid hsl(220, 15%, 92%);
         }
-        .executor-table th.center { text-align: center; }
+        .executor-table th:first-child { text-align: left; }
         .executor-table td {
             padding: 14px 16px;
             border-bottom: 1px solid hsl(220, 15%, 95%);
             vertical-align: middle;
             text-align: center;
+            color: hsl(220, 10%, 50%);
+            font-weight: 400;
         }
         .executor-table td:first-child { text-align: left; }
         .executor-table tr:hover td { background: hsl(220, 20%, 98%); }
         .executor-table .executor-name { font-weight: 600; color: hsl(220, 15%, 30%); vertical-align: middle; }
-        .executor-table .count { text-align: center; font-weight: 600; vertical-align: middle; }
+        .executor-table .count { text-align: center; font-weight: 400; vertical-align: middle; color: hsl(220, 10%, 50%); }
         .executor-table .count.av { color: hsl(270, 70%, 55%); }
         .executor-table .count.calia { color: hsl(30, 90%, 50%); }
         .executor-table .count.ebm { color: hsl(220, 10%, 50%); }
         .executor-table .valor {
             font-weight: 400;
-            color: hsl(142, 70%, 40%);
+            color: hsl(220, 10%, 50%);
             white-space: nowrap;
             text-align: center;
         }
+        .executor-table .notas-cell {
+            text-align: left;
+            font-size: 0.75rem;
+            line-height: 1.6;
+        }
+        .executor-table .notas-cell .nota-line {
+            white-space: nowrap;
+        }
         .executor-table .summary-row {
             background: hsl(220, 20%, 97%) !important;
-            font-weight: 700;
+            font-weight: 600;
         }
         .executor-table .summary-row td {
-            border-top: 2px solid hsl(220, 15%, 90%);
+            border-top: 1px solid hsl(220, 15%, 90%);
             padding-top: 16px;
+            font-weight: 600;
         }
 
         /* Status Select - Cinza claro padrão, apenas OB colorido */
@@ -446,7 +524,7 @@
             font-weight: 600;
         }
         .summary-row td {
-            border-top: 2px solid hsl(220, 15%, 90%);
+            border-top: 1px solid hsl(220, 15%, 90%);
         }
 
         /* Error */
@@ -462,111 +540,132 @@
         }
         #error.show { display: block; }
 
+        /* Processo table - centralizado */
+        .section.processo td { text-align: center; vertical-align: middle; }
+        .section.processo th { text-align: center; }
+        .section.processo .controle { display: inline-block; }
+        .section.processo .data-cell { 
+            text-align: center;
+        }
+        .section.processo .data-main {
+            display: block;
+            color: hsl(220, 10%, 40%);
+        }
+        .section.processo .data-sub {
+            display: block;
+            font-size: 0.75rem;
+            color: hsl(220, 10%, 55%);
+            margin-top: 2px;
+        }
+
         /* Pagas table centered */
         .section.pagas td { text-align: center; vertical-align: middle; }
         .section.pagas th { text-align: center; }
         .section.pagas .controle { display: inline-block; }
+        .section.pagas .data-main {
+            display: block;
+            color: hsl(220, 10%, 40%);
+        }
+        .section.pagas .data-sub {
+            display: block;
+            font-size: 0.75rem;
+            color: hsl(220, 10%, 55%);
+            margin-top: 2px;
+        }
 
-        /* ==========================================
-           GERADOR DE TABELA - ESTILO BETA
-           ========================================== */
-        .gerador-table {
+        /* Atestadas table */
+        .section.atestadas td { text-align: center; vertical-align: middle; }
+        .section.atestadas th { text-align: center; }
+        .section.atestadas .qtd-main {
+            color: hsl(220, 15%, 35%);
+        }
+        .section.atestadas .qtd-sub {
+            font-size: 0.75rem;
+            color: hsl(220, 10%, 60%);
+        }
+        .section.atestadas .valor-main {
+            color: hsl(220, 15%, 35%);
+        }
+        .section.atestadas .valor-sub {
+            font-size: 0.75rem;
+            color: hsl(220, 10%, 60%);
+        }
+
+        /* ===== TABELA CONTROLE DE PAGAMENTO - ESTILOS ESPECÍFICOS ===== */
+        .controle-table-title {
+            text-align: left;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #000;
+            padding: 12px 16px;
+            background: white;
+            border: 1px solid #000;
+            border-bottom: none;
+        }
+        .controle-pagamento-table {
             width: 100%;
             border-collapse: collapse;
             font-size: 0.85rem;
-            margin-top: 0;
-            background: transparent;
+            margin-bottom: 16px;
         }
-        .gerador-table th,
-        .gerador-table td {
-            border: 1px solid hsl(220, 20%, 30%);
-            padding: 8px 12px;
+        .controle-pagamento-table th,
+        .controle-pagamento-table td {
+            border: 1px solid #000;
+            padding: 10px 12px;
             text-align: center;
+            color: #000;
         }
-        .gerador-table th {
-            background: hsl(220, 20%, 95%);
+        .controle-pagamento-table th {
+            background: white;
             font-weight: 600;
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             text-transform: uppercase;
             letter-spacing: 0.3px;
-            color: hsl(220, 25%, 25%);
-            text-align: center;
+            color: #000;
         }
-        .gerador-table td {
-            background: transparent;
-            color: hsl(220, 25%, 20%);
-            font-weight: 400;
+        .controle-pagamento-table tr:last-child td {
+            font-weight: 700;
+            background: white;
         }
-        .gerador-table td.valor,
-        .gerador-table th.valor {
-            text-align: right;
-            white-space: nowrap;
-            font-weight: 400;
-        }
-        .gerador-table td.center {
-            text-align: center;
-        }
-        .gerador-table .summary-row td {
-            background: hsl(220, 20%, 95%);
-            font-weight: 400;
+        .controle-pagamento-table tr:last-child td:first-child {
             text-align: left;
         }
-        .gerador-table .summary-row td:last-child {
-            font-weight: 700;
-        }
-        .gerador-table .summary-row td.valor {
-            font-weight: 400;
-        }
-        .gerador-table .summary-row td.valor:last-child {
-            font-weight: 700;
-        }
-        /* Título na primeira linha da tabela */
-        .gerador-table .title-row th {
-            background: hsl(220, 20%, 95%);
-            font-size: 0.9rem;
-            font-weight: 700;
-            text-transform: none;
-            letter-spacing: 0;
-        }
-        .gerador-title {
-            display: none;
-        }
-        .gerador-info-box {
-            background: transparent;
-            padding: 12px 16px;
-            border-radius: 8px;
-            border: 1px solid hsl(220, 15%, 85%);
-            margin-bottom: 12px;
-        }
-        .gerador-certidoes {
-            background: hsl(142, 50%, 97%);
-            padding: 10px 16px;
-            border-radius: 8px;
-            border: 1px solid hsl(142, 50%, 85%);
-            margin-bottom: 12px;
-            font-size: 0.875rem;
-        }
-        .gerador-certidoes a {
-            color: hsl(217, 90%, 45%);
-            text-decoration: none;
-            margin-left: 8px;
-        }
-        .gerador-certidoes a:hover {
-            text-decoration: underline;
-        }
-        .gerador-datetime {
-            font-size: 0.8rem;
+        .controle-pagamento-table .saldo-dash {
             color: hsl(220, 10%, 50%);
-            margin-bottom: 8px;
-        }
-        .gerador-header-info {
-            margin-bottom: 12px;
-            font-size: 0.9rem;
         }
 
-        /* Container com padding para não cortar última linha */
-        #tableContainerGerador {
-            padding-bottom: 20px;
+        /* Texto para atesto - SEM fundo */
+        .atesto-text {
+            padding: 12px 0;
+            font-size: 0.875rem;
+            margin-bottom: 16px;
+        }
+        .atesto-text strong {
+            color: hsl(217, 90%, 45%);
+        }
+
+        /* Copy button */
+        .copy-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: hsl(252, 85%, 60%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .copy-btn:hover {
+            background: hsl(252, 85%, 50%);
+            transform: translateY(-1px);
+        }
+        .copy-btn svg {
+            width: 16px;
+            height: 16px;
         }
     </style>
 </head>
@@ -575,74 +674,74 @@
         <div class="spinner"></div>
         <p>Carregando dados...</p>
     </div>
+
     <div id="error"></div>
 
     <div class="container">
-        <!-- Header -->
         <div class="header">
             <div class="header-badge">
                 <svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <rect x="2" y="3" width="20" height="14" rx="2"/>
+                    <path d="M8 21h8M12 17v4"/>
                 </svg>
-                <h1>Planejamento e acompanhamento de pagamentos</h1>
+                <h1>Planejamento de Pagamentos</h1>
             </div>
         </div>
 
-        <!-- MOVIDO PARA O TOPO: Divisão de Notas por Executor - AGORA EXPANSÍVEL -->
-        <div class="cards-row">
-            <div class="link-card" id="executorCard">
-                <div class="link-card-header" onclick="toggleExecutorCard()">
-                    <div class="link-card-icon" style="background: hsl(252, 85%, 92%); color: hsl(252, 85%, 60%);">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+        <!-- Divisão de Notas por Executor - Collapsible -->
+        <div class="section executor">
+            <div class="section-header" style="cursor: pointer;" onclick="toggleExecutorSection()">
+                <h2 class="section-title">
+                    <span class="dot"></span>
+                    Divisão de Notas por Executor
+                    <svg id="executorCollapseIcon" class="collapse-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </h2>
+                <div class="executor-date-select" onclick="event.stopPropagation();">
+                    <div class="date-dropdown-trigger" onclick="toggleDateDropdown(event)">
+                        <span id="selectedDatesText">Selecione as datas</span>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="6 9 12 15 18 9"></polyline>
                         </svg>
                     </div>
-                    <h2 class="link-card-title">Divisão de Notas por Executor</h2>
-                    <span class="date-preview" id="executorDatePreview">Carregando...</span>
-                    <svg class="link-card-chevron" id="executorChevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
-                    </svg>
+                    <div id="dateDropdownMenu" class="date-dropdown-menu"></div>
                 </div>
-                <div class="link-card-content" id="executorContent">
-                    <div class="executor-date-select" style="margin-bottom: 16px; padding-left: 0;">
-                        <select id="executorDateSelect" class="date-select-dropdown" onchange="carregarExecutores(this.value)">
-                            <option value="">Carregando datas...</option>
-                        </select>
-                    </div>
-                    <div id="executorTableContainer">
-                        <div class="empty-state">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                                <circle cx="12" cy="12" r="10"/>
-                                <path d="M12 6v6l4 2"/>
-                            </svg>
-                            <p>Carregando dados dos executores...</p>
-                        </div>
+            </div>
+            <div id="executorCollapsibleContent" class="collapsible-content open">
+                <div id="executorTableContainer">
+                    <div class="empty-state">
+                        <div class="spinner" style="width:24px;height:24px;margin:0 auto 12px;"></div>
+                        <p>Carregando executores...</p>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Gerar Tabela de Controle de Pagamento -->
-            <div class="link-card" id="geradorCard">
+        <!-- Gerador de Tabela de Controle de Pagamento -->
+        <div class="cards-row">
+            <div id="geradorCard" class="link-card">
                 <div class="link-card-header">
-                    <div class="link-card-icon" style="background: hsl(38, 95%, 92%); color: hsl(38, 95%, 55%);">
+                    <div class="link-card-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                            <polyline points="14 2 14 8 20 8"/>
+                            <line x1="16" y1="13" x2="8" y2="13"/>
+                            <line x1="16" y1="17" x2="8" y2="17"/>
+                            <polyline points="10 9 9 9 8 9"/>
                         </svg>
                     </div>
-                    <h2 class="link-card-title">Gerar Tabela de Controle de Pagamento</h2>
+                    <span class="link-card-title">Gerar Tabela de Controle de Pagamento</span>
                     <div class="gerador-input-inline">
-                        <input type="text" id="valorBuscaGerador" class="gerador-input" placeholder="Digite o nº SEI do Controle" oninput="debounceSearchGerador()">
+                        <input type="text" id="valorBuscaGerador" class="gerador-input" placeholder="Digite o Nº SEI do Controle de Pagamento..." oninput="debounceSearchGerador()">
                     </div>
                 </div>
-                <div class="link-card-content" id="geradorContent">
-                    <div id="geradorDateTime" class="gerador-datetime"></div>
-                    <div id="statusSaldoGerador" class="gerador-header-info"></div>
-                    <div id="certidoesAreaGerador"></div>
-                    <div id="atestoInfoGerador"></div>
-                    <div id="loadingGerador" style="display:none; text-align: center; padding: 20px;">
-                        <div class="spinner" style="margin: 0 auto; width: 32px; height: 32px;"></div>
-                        <p style="margin-top: 10px;">Buscando dados...</p>
+                <div id="geradorContent" class="link-card-content">
+                    <div id="loadingGerador" style="display:none;text-align:center;padding:20px;">
+                        <div class="spinner" style="width:24px;height:24px;margin:0 auto;"></div>
                     </div>
+                    <div id="statusSaldoGerador" style="margin-bottom: 12px; font-size: 0.875rem;"></div>
+                    <div id="atestoInfoGerador"></div>
                     <div id="tableContainerGerador"></div>
                 </div>
             </div>
@@ -655,7 +754,7 @@
                     <span class="dot"></span>
                     Notas em Processo de Pagamento
                 </h2>
-                <span id="count-processo" class="count-badge gray">0 processo(s)</span>
+                <span id="count-processo" class="count-badge orange">0 processo(s)</span>
             </div>
             <div class="table-wrapper">
                 <table>
@@ -664,8 +763,8 @@
                             <th>Agência</th>
                             <th>Campanha</th>
                             <th>Controle</th>
-                            <th style="text-align:center">Qtd NFs</th>
-                            <th>Valor Total</th>
+                            <th>Qtd NFs</th>
+                            <th>Valor</th>
                             <th>Data Atesto</th>
                             <th>Status</th>
                             <th>Observação</th>
@@ -683,7 +782,7 @@
                     <span class="dot"></span>
                     Notas em análise, atestadas ou com inconformidade
                 </h2>
-                <div class="section-count" id="count-atestadas"></div>
+                <span id="count-atestadas"></span>
             </div>
             <div class="table-wrapper">
                 <table>
@@ -691,9 +790,9 @@
                         <tr>
                             <th>Agência</th>
                             <th>Campanha</th>
-                            <th style="text-align:center">Qtd NFs</th>
+                            <th>Qtd</th>
                             <th>Valor</th>
-                            <th>Inconformidades</th>
+                            <th>Pendências/Inconformidades</th>
                             <th>Observação</th>
                         </tr>
                     </thead>
@@ -702,7 +801,7 @@
             </div>
         </div>
 
-        <!-- Pagas (último mês) -->
+        <!-- Pagas -->
         <div class="section pagas">
             <div class="section-header">
                 <h2 class="section-title">
@@ -744,8 +843,9 @@
             { value: 'enviado', label: 'Controle Retenções Enviado' }
         ];
         var searchTimeoutGerador = null;
-        window.saldoAtualGerador = 0;
-        var executorExpanded = false;
+        var selectedDates = [];
+        var datasDisponiveis = [];
+        var executorSectionOpen = true;
 
         // ==========================================
         // FUNÇÕES UTILITÁRIAS
@@ -774,9 +874,9 @@
         }
 
         function formatDate(date) {
-            if (!date) return '-';
+            if (!date) return { main: '-', sub: '' };
             var d = new Date(date);
-            if (isNaN(d)) return '-';
+            if (isNaN(d)) return { main: '-', sub: '' };
             var dia = String(d.getDate()).padStart(2, '0');
             var mes = String(d.getMonth() + 1).padStart(2, '0');
             var ano = d.getFullYear();
@@ -789,9 +889,12 @@
             var diffDias = Math.floor(diffMs / (1000 * 60 * 60 * 24));
             var agoText = '';
             if (diffDias === 0) agoText = 'hoje';
-            else if (diffDias === 1) agoText = 'há 1 dia';
-            else if (diffDias > 1) agoText = 'há ' + diffDias + ' dias';
-            return '<span>' + dia + '/' + mes + '/' + ano + '</span><span class="data-dia">' + diaSemana + (agoText ? ' · ' + agoText : '') + '</span>';
+            else if (diffDias === 1) agoText = '1 dia';
+            else if (diffDias > 1) agoText = diffDias + ' dias';
+            return {
+                main: dia + '/' + mes + '/' + ano,
+                sub: diaSemana + (agoText ? ' • ' + agoText : '')
+            };
         }
 
         function formatDateSimple(dateStr) {
@@ -801,6 +904,20 @@
             return parts[2] + '/' + parts[1] + '/' + parts[0];
         }
 
+        function formatDatePagas(date, mesRef) {
+            if (!date) return { main: '-', sub: '' };
+            var d = new Date(date);
+            if (isNaN(d)) return { main: '-', sub: '' };
+            var dia = String(d.getDate()).padStart(2, '0');
+            var mes = String(d.getMonth() + 1).padStart(2, '0');
+            var ano = d.getFullYear();
+            return {
+                main: dia + '/' + mes + '/' + ano,
+                sub: mesRef ? 'Ref: ' + mesRef : ''
+            };
+        }
+
+        // Cores das agências: AV = Roxo, CALIA = Laranja, EBM = Cinza
         function getAgencyClass(agencia) {
             if (!agencia) return '';
             var upper = agencia.toUpperCase();
@@ -811,22 +928,18 @@
         }
 
         // ==========================================
-        // TOGGLE EXECUTOR CARD
+        // TOGGLE EXECUTOR SECTION
         // ==========================================
-        function toggleExecutorCard() {
-            executorExpanded = !executorExpanded;
-            var content = document.getElementById('executorContent');
-            var chevron = document.getElementById('executorChevron');
-            var card = document.getElementById('executorCard');
-            
-            if (executorExpanded) {
-                content.classList.add('show');
-                chevron.classList.add('expanded');
-                card.classList.add('expanded');
+        function toggleExecutorSection() {
+            executorSectionOpen = !executorSectionOpen;
+            var content = document.getElementById('executorCollapsibleContent');
+            var icon = document.getElementById('executorCollapseIcon');
+            if (executorSectionOpen) {
+                content.classList.add('open');
+                icon.classList.remove('open');
             } else {
-                content.classList.remove('show');
-                chevron.classList.remove('expanded');
-                card.classList.remove('expanded');
+                content.classList.remove('open');
+                icon.classList.add('open');
             }
         }
 
@@ -863,7 +976,7 @@
         }
 
         // ==========================================
-        // RENDER EM PROCESSO
+        // RENDER EM PROCESSO - Centralizado com totais
         // ==========================================
         function renderEmProcesso() {
             var tbody = document.getElementById('tbody-processo');
@@ -883,35 +996,37 @@
                 totalValor += item.valor;
                 totalQtd += item.qtd;
                 var agencyClass = getAgencyClass(item.agencia);
+                var dateInfo = formatDate(item.dataAtesto);
                 return '<tr>' +
                     '<td class="agencia ' + agencyClass + '">' + (item.agencia || '-') + '</td>' +
                     '<td class="campanha">' + (item.campanha || '-') + '</td>' +
                     '<td><span class="controle">' + (item.controle || '-') + '</span></td>' +
                     '<td class="qtd">' + item.qtd + '</td>' +
                     '<td class="valor">' + formatCurrency(item.valor) + '</td>' +
-                    '<td class="data">' + formatDate(item.dataAtesto) + '</td>' +
+                    '<td class="data-cell"><span class="data-main">' + dateInfo.main + '</span><span class="data-sub">' + dateInfo.sub + '</span></td>' +
                     '<td>' + createStatusSelect(item.statusPag || 'montando', key) + '</td>' +
                     '<td><input type="text" class="obs-input" style="min-width: 200px;" placeholder="Observação..." value="' + escapeHtml(item.obs || '') + '" onchange="saveObs(\'emProcesso\', \'' + escapeHtml(key) + '\', this.value)"></td>' +
                     '</tr>';
             }).join('');
 
             html += '<tr class="summary-row">' +
-                '<td><strong>Total</strong></td><td></td><td></td>' +
+                '<td colspan="3" style="text-align:right;"><strong>Total</strong></td>' +
                 '<td class="qtd"><strong>' + totalQtd + '</strong></td>' +
                 '<td class="valor"><strong>' + formatCurrency(totalValor) + '</strong></td>' +
-                '<td></td><td></td><td></td></tr>';
+                '<td colspan="3"></td></tr>';
 
             tbody.innerHTML = html;
         }
 
         // ==========================================
-        // RENDER ATESTADAS
+        // RENDER ATESTADAS - Com padrão cinza escuro/claro
         // ==========================================
         function renderAtestadas() {
             var tbody = document.getElementById('tbody-atestadas');
             var countEl = document.getElementById('count-atestadas');
             var items = dados.atestadas || [];
 
+            // Ordenar por agência: AV > Calia > EBM
             var agenciaOrdem = { 'AV': 1, 'CALIA': 2, 'EBM': 3 };
             items.sort(function(a, b) {
                 var agA = (a.agencia || '').toUpperCase();
@@ -931,7 +1046,7 @@
 
             var countHtml = '';
             if (totalEmAnalise > 0) countHtml += '<span class="count-badge gray">' + totalEmAnalise + ' em análise</span>';
-            if (totalAtestadas > 0) countHtml += '<span class="count-badge blue">' + totalAtestadas + ' atestadas</span>';
+            countHtml += '<span class="count-badge blue">' + totalAtestadas + ' atestadas</span>';
             if (totalPendentes > 0) countHtml += '<span class="count-badge red">' + totalPendentes + ' inconformidades</span>';
             if (totalDiligencia > 0) countHtml += '<span class="count-badge orange">' + totalDiligencia + ' em diligência</span>';
             countEl.innerHTML = countHtml;
@@ -944,7 +1059,7 @@
             var totalValorEmAnalise = 0, totalValorAtestado = 0, totalValorPendente = 0, totalValorDiligencia = 0;
             var totalQtdEmAnalise = 0, totalQtdAtestada = 0, totalQtdPendente = 0, totalQtdDiligencia = 0;
 
-            var html = items.map(function(item) {
+            var html = items.map(function(item, index) {
                 var key = (item.agencia || '') + '|' + (item.campanha || '');
                 totalValorEmAnalise += item.valorEmAnalise || 0;
                 totalValorAtestado += item.valorAtestado || 0;
@@ -955,14 +1070,13 @@
                 totalQtdPendente += item.qtdPendente || 0;
                 totalQtdDiligencia += item.qtdDiligencia || 0;
 
+                // Pendências / Inconformidades com tooltip
                 var pendentesHtml = '';
                 if (item.pendentes && item.pendentes.length > 0) {
                     pendentesHtml = item.pendentes.map(function(p) {
                         var tooltip = p.motivo ? ' title="' + escapeHtml(p.motivo) + '"' : '';
                         var tipoMidia = p.tipoMidia ? ' | ' + p.tipoMidia : '';
-                        var executor = p.executor ? ' | ' + p.executor : '';
-                        var veiculo = p.veiculo ? ' | ' + p.veiculo : '';
-                        return '<div class="pendente-item"' + tooltip + '><span class="pendente-info">NF: ' + (p.nf || '-') + tipoMidia + veiculo + executor + '</span></div>';
+                        return '<div class="pendente-item"' + tooltip + '><span class="pendente-info">NF: ' + (p.nf || '-') + tipoMidia + ' | ' + (p.veiculo || '-') + '</span></div>';
                     }).join('');
                 }
 
@@ -970,31 +1084,34 @@
                     pendentesHtml += item.diligencias.map(function(d) {
                         var tooltip = d.motivo ? ' title="' + escapeHtml(d.motivo) + '"' : '';
                         var tipoMidia = d.tipoMidia ? ' | ' + d.tipoMidia : '';
-                        var executor = d.executor ? ' | ' + d.executor : '';
-                        var veiculo = d.veiculo ? ' | ' + d.veiculo : '';
-                        return '<div class="diligencia-item"' + tooltip + '><span>NF: ' + (d.nf || '-') + tipoMidia + veiculo + ' (diligência)' + executor + '</span></div>';
+                        return '<div class="diligencia-item"' + tooltip + '><span>NF: ' + (d.nf || '-') + tipoMidia + ' (diligência)</span></div>';
                     }).join('');
                 }
 
                 if (!pendentesHtml) pendentesHtml = '-';
 
-                // Qtd - mostrar apenas os que têm valor > 0
+                // Qtd e Valor - primeira linha cinza escuro, demais cinza claro
                 var qtdTotal = (item.qtdEmAnalise || 0) + (item.qtdAtestada || 0) + (item.qtdPendente || 0) + (item.qtdDiligencia || 0);
-                var qtdHtml = '<div>' + qtdTotal + '</div><div class="qtd-sub" style="color: hsl(220, 10%, 50%);">';
-                if ((item.qtdEmAnalise || 0) > 0) qtdHtml += '<div>' + item.qtdEmAnalise + ' em análise</div>';
-                if ((item.qtdAtestada || 0) > 0) qtdHtml += '<div>' + item.qtdAtestada + ' atestadas</div>';
-                if ((item.qtdPendente || 0) > 0) qtdHtml += '<div>' + item.qtdPendente + ' inconform.</div>';
-                if ((item.qtdDiligencia || 0) > 0) qtdHtml += '<div>' + item.qtdDiligencia + ' diligência</div>';
-                qtdHtml += '</div>';
+                var qtdHtml = '<div class="qtd-main">' + qtdTotal + '</div>';
+                var qtdSubParts = [];
+                if ((item.qtdEmAnalise || 0) > 0) qtdSubParts.push(item.qtdEmAnalise + ' em análise');
+                if ((item.qtdAtestada || 0) > 0) qtdSubParts.push(item.qtdAtestada + ' atestadas');
+                if ((item.qtdPendente || 0) > 0) qtdSubParts.push(item.qtdPendente + ' inconform.');
+                if ((item.qtdDiligencia || 0) > 0) qtdSubParts.push(item.qtdDiligencia + ' diligência');
+                if (qtdSubParts.length > 0) {
+                    qtdHtml += '<div class="qtd-sub">' + qtdSubParts.map(function(p) { return '<div>' + p + '</div>'; }).join('') + '</div>';
+                }
 
-                // Valor - mostrar apenas valores, sem labels, e só se > 0
                 var valorTotal = (item.valorEmAnalise || 0) + (item.valorAtestado || 0) + (item.valorPendente || 0) + (item.valorDiligencia || 0);
-                var valorHtml = '<div>' + formatCurrency(valorTotal) + '</div><div class="valor-sub" style="color: hsl(220, 10%, 50%);">';
-                if ((item.valorEmAnalise || 0) > 0) valorHtml += '<div>' + formatCurrency(item.valorEmAnalise) + '</div>';
-                if ((item.valorAtestado || 0) > 0) valorHtml += '<div>' + formatCurrency(item.valorAtestado) + '</div>';
-                if ((item.valorPendente || 0) > 0) valorHtml += '<div>' + formatCurrency(item.valorPendente) + '</div>';
-                if ((item.valorDiligencia || 0) > 0) valorHtml += '<div>' + formatCurrency(item.valorDiligencia) + '</div>';
-                valorHtml += '</div>';
+                var valorHtml = '<div class="valor-main">' + formatCurrency(valorTotal) + '</div>';
+                var valorSubParts = [];
+                if ((item.valorEmAnalise || 0) > 0) valorSubParts.push(formatCurrency(item.valorEmAnalise));
+                if ((item.valorAtestado || 0) > 0) valorSubParts.push(formatCurrency(item.valorAtestado));
+                if ((item.valorPendente || 0) > 0) valorSubParts.push(formatCurrency(item.valorPendente));
+                if ((item.valorDiligencia || 0) > 0) valorSubParts.push(formatCurrency(item.valorDiligencia));
+                if (valorSubParts.length > 0) {
+                    valorHtml += '<div class="valor-sub">' + valorSubParts.map(function(p) { return '<div>' + p + '</div>'; }).join('') + '</div>';
+                }
 
                 var agencyClass = getAgencyClass(item.agencia);
                 return '<tr>' +
@@ -1002,23 +1119,40 @@
                     '<td class="campanha">' + (item.campanha || '-') + '</td>' +
                     '<td class="qtd">' + qtdHtml + '</td>' +
                     '<td class="valor">' + valorHtml + '</td>' +
-                    '<td class="pendentes-cell">' + pendentesHtml + '</td>' +
+                    '<td class="pendentes-cell" style="text-align:left;">' + pendentesHtml + '</td>' +
                     '<td><input type="text" class="obs-input" style="min-width: 200px;" placeholder="Observação..." value="' + escapeHtml(item.obs || '') + '" onchange="saveObs(\'atestadas\', \'' + escapeHtml(key) + '\', this.value)"></td>' +
                     '</tr>';
             }).join('');
 
+            // Summary row
             var summaryQtdTotal = totalQtdEmAnalise + totalQtdAtestada + totalQtdPendente + totalQtdDiligencia;
-            var summaryQtdHtml = '<div>' + summaryQtdTotal + '</div>';
+            var summaryQtdHtml = '<div class="qtd-main"><strong>' + summaryQtdTotal + '</strong></div>';
+            var summaryQtdSubParts = [];
+            if (totalQtdEmAnalise > 0) summaryQtdSubParts.push(totalQtdEmAnalise + ' em análise');
+            if (totalQtdAtestada > 0) summaryQtdSubParts.push(totalQtdAtestada + ' atestadas');
+            if (totalQtdPendente > 0) summaryQtdSubParts.push(totalQtdPendente + ' inconform.');
+            if (totalQtdDiligencia > 0) summaryQtdSubParts.push(totalQtdDiligencia + ' diligência');
+            if (summaryQtdSubParts.length > 0) {
+                summaryQtdHtml += '<div class="qtd-sub">' + summaryQtdSubParts.map(function(p) { return '<div>' + p + '</div>'; }).join('') + '</div>';
+            }
 
             var summaryValorTotal = totalValorEmAnalise + totalValorAtestado + totalValorPendente + totalValorDiligencia;
-            var summaryValorHtml = '<div>' + formatCurrency(summaryValorTotal) + '</div>';
+            var summaryValorHtml = '<div class="valor-main"><strong>' + formatCurrency(summaryValorTotal) + '</strong></div>';
+            var summaryValorSubParts = [];
+            if (totalValorEmAnalise > 0) summaryValorSubParts.push(formatCurrency(totalValorEmAnalise));
+            if (totalValorAtestado > 0) summaryValorSubParts.push(formatCurrency(totalValorAtestado));
+            if (totalValorPendente > 0) summaryValorSubParts.push(formatCurrency(totalValorPendente));
+            if (totalValorDiligencia > 0) summaryValorSubParts.push(formatCurrency(totalValorDiligencia));
+            if (summaryValorSubParts.length > 0) {
+                summaryValorHtml += '<div class="valor-sub">' + summaryValorSubParts.map(function(p) { return '<div>' + p + '</div>'; }).join('') + '</div>';
+            }
 
-            html += '<tr class="summary-row"><td colspan="2"><strong>Total</strong></td><td class="qtd">' + summaryQtdHtml + '</td><td class="valor">' + summaryValorHtml + '</td><td colspan="2"></td></tr>';
+            html += '<tr class="summary-row"><td colspan="2" style="text-align:left;"><strong>Total</strong></td><td class="qtd">' + summaryQtdHtml + '</td><td class="valor">' + summaryValorHtml + '</td><td colspan="2"></td></tr>';
             tbody.innerHTML = html;
         }
 
         // ==========================================
-        // RENDER PAGAS
+        // RENDER PAGAS - Com data em duas linhas e linha total
         // ==========================================
         function renderPagas() {
             var tbody = document.getElementById('tbody-pagas');
@@ -1027,105 +1161,143 @@
             count.textContent = items.length + ' processo(s)';
 
             if (items.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg><p>Nenhum pagamento recente</p></div></td></tr>';
+                tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg><p>Nenhum pagamento no último mês</p></div></td></tr>';
                 return;
             }
 
-            var totalValor = 0;
             var totalQtd = 0;
+            var totalValor = 0;
+
             var html = items.map(function(item) {
                 var agencyClass = getAgencyClass(item.agencia);
-                totalValor += item.valor || 0;
+                var dateInfo = formatDatePagas(item.dataPago, item.mesReferencia);
                 totalQtd += item.qtd || 0;
-
-                var dataHtml = '-';
-                if (item.dataPago) {
-                    var d = new Date(item.dataPago);
-                    if (!isNaN(d)) {
-                        var dia = String(d.getDate()).padStart(2, '0');
-                        var mes = String(d.getMonth() + 1).padStart(2, '0');
-                        var ano = d.getFullYear();
-                        var diaSemana = DIAS_SEMANA[d.getDay()];
-                        var hoje = new Date();
-                        hoje.setHours(0, 0, 0, 0);
-                        var dataComp = new Date(d);
-                        dataComp.setHours(0, 0, 0, 0);
-                        var diffMs = hoje - dataComp;
-                        var diffDias = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-                        var agoText = '';
-                        if (diffDias === 0) agoText = 'hoje';
-                        else if (diffDias === 1) agoText = 'há 1 dia';
-                        else if (diffDias > 1) agoText = 'há ' + diffDias + ' dias';
-                        dataHtml = '<div>' + dia + '/' + mes + '/' + ano + '</div><div style="font-size: 0.7rem; color: hsl(220, 10%, 55%);">' + diaSemana + (agoText ? ' · ' + agoText : '') + '</div>';
-                    }
-                }
-
+                totalValor += item.valor || 0;
                 return '<tr>' +
-                    '<td class="agencia ' + agencyClass + '">' + (item.agencia || '-') + '</td>' +
-                    '<td class="campanha">' + (item.campanha || '-') + '</td>' +
+                    '<td class="agencia ' + agencyClass + '" style="color:hsl(220,10%,50%);">' + (item.agencia || '-') + '</td>' +
+                    '<td class="campanha" style="color:hsl(220,10%,50%);">' + (item.campanha || '-') + '</td>' +
                     '<td><span class="controle">' + (item.controle || '-') + '</span></td>' +
-                    '<td class="qtd">' + item.qtd + '</td>' +
-                    '<td class="valor">' + formatCurrency(item.valor) + '</td>' +
-                    '<td class="data">' + dataHtml + '</td>' +
+                    '<td class="qtd" style="color:hsl(220,10%,50%);">' + (item.qtd || 0) + '</td>' +
+                    '<td class="valor" style="color:hsl(220,10%,50%);font-weight:400;">' + formatCurrency(item.valor) + '</td>' +
+                    '<td><span class="data-main">' + dateInfo.main + '</span><span class="data-sub">' + dateInfo.sub + '</span></td>' +
                     '</tr>';
             }).join('');
 
+            // Linha total
             html += '<tr class="summary-row">' +
-                '<td colspan="3"><strong>Total</strong></td>' +
-                '<td class="qtd">' + totalQtd + '</td>' +
-                '<td class="valor">' + formatCurrency(totalValor) + '</td>' +
-                '<td></td></tr>';
+                '<td style="text-align:left;"><strong>Total</strong></td>' +
+                '<td></td><td></td>' +
+                '<td class="qtd" style="color:hsl(220,10%,50%);"><strong>' + totalQtd + '</strong></td>' +
+                '<td class="valor" style="color:hsl(220,10%,50%);"><strong>' + formatCurrency(totalValor) + '</strong></td>' +
+                '<td></td>' +
+                '</tr>';
 
             tbody.innerHTML = html;
         }
 
         // ==========================================
-        // EXECUTORES
+        // LOAD DATA
         // ==========================================
+        function loadData() {
+            showLoading(true);
+            if (window.google && google.script && google.script.run) {
+                google.script.run
+                    .withSuccessHandler(function(result) {
+                        showLoading(false);
+                        dados = result;
+                        renderEmProcesso();
+                        renderAtestadas();
+                        renderPagas();
+                    })
+                    .withFailureHandler(function(err) {
+                        showLoading(false);
+                        showError('Erro ao carregar dados: ' + err.message);
+                    })
+                    .getDados();
+            } else {
+                showLoading(false);
+            }
+        }
+
+        // ==========================================
+        // DATE DROPDOWN - Pré-seleciona data mais recente
+        // ==========================================
+        function toggleDateDropdown(event) {
+            event.stopPropagation();
+            var menu = document.getElementById('dateDropdownMenu');
+            menu.classList.toggle('open');
+        }
+
+        function updateSelectedDatesText() {
+            var textEl = document.getElementById('selectedDatesText');
+            if (selectedDates.length === 0) {
+                textEl.textContent = 'Selecione as datas';
+            } else if (selectedDates.length === 1) {
+                textEl.textContent = formatDateSimple(selectedDates[0]);
+            } else {
+                textEl.textContent = selectedDates.length + ' datas selecionadas';
+            }
+        }
+
+        function renderDateDropdown() {
+            var menu = document.getElementById('dateDropdownMenu');
+            menu.innerHTML = datasDisponiveis.map(function(data) {
+                var isSelected = selectedDates.indexOf(data) !== -1;
+                return '<div class="date-dropdown-item ' + (isSelected ? 'selected' : '') + '" onclick="toggleDateSelection(\'' + data + '\')">' +
+                    '<input type="checkbox" ' + (isSelected ? 'checked' : '') + '>' +
+                    '<span>' + formatDateSimple(data) + '</span>' +
+                '</div>';
+            }).join('');
+            updateSelectedDatesText();
+        }
+
+        function toggleDateSelection(data) {
+            event.stopPropagation();
+            var idx = selectedDates.indexOf(data);
+            if (idx !== -1) {
+                selectedDates.splice(idx, 1);
+            } else {
+                selectedDates.push(data);
+            }
+            renderDateDropdown();
+            carregarExecutoresPorDatas();
+        }
+
         function carregarExecutorDatasDisponiveis() {
             if (!window.google || !google.script || !google.script.run) {
-                document.getElementById('executorDateSelect').innerHTML = '<option value="">Não disponível</option>';
-                document.getElementById('executorDatePreview').textContent = 'Não disponível';
+                document.getElementById('selectedDatesText').textContent = 'Não disponível';
                 return;
             }
 
             google.script.run
                 .withSuccessHandler(function(result) {
-                    var select = document.getElementById('executorDateSelect');
-                    var preview = document.getElementById('executorDatePreview');
-                    var datasDisponiveis = result.datasDisponiveis || [];
+                    datasDisponiveis = result.datasDisponiveis || [];
 
                     if (datasDisponiveis.length === 0) {
-                        select.innerHTML = '<option value="">Nenhuma data disponível</option>';
-                        preview.textContent = 'Sem dados';
+                        document.getElementById('selectedDatesText').textContent = 'Nenhuma data disponível';
                         return;
                     }
 
-                    var html = '';
-                    datasDisponiveis.forEach(function(data, idx) {
-                        var selected = idx === 0 ? 'selected' : '';
-                        html += '<option value="' + data + '" ' + selected + '>' + formatDateSimple(data) + '</option>';
-                    });
-                    select.innerHTML = html;
-                    
-                    // Mostrar data mais recente no preview
-                    preview.textContent = formatDateSimple(datasDisponiveis[0]);
+                    // Selecionar a data mais recente por padrão (primeira da lista = mais recente)
+                    selectedDates = [datasDisponiveis[0]];
+                    renderDateDropdown();
 
+                    // Carregar executores da data mais recente
                     renderExecutores(result);
                 })
                 .withFailureHandler(function(err) {
                     console.error('Erro ao carregar datas:', err);
-                    document.getElementById('executorDateSelect').innerHTML = '<option value="">Erro ao carregar</option>';
-                    document.getElementById('executorDatePreview').textContent = 'Erro';
+                    document.getElementById('selectedDatesText').textContent = 'Erro ao carregar';
                 })
                 .getDadosExecutores(null);
         }
 
-        function carregarExecutores(dataSelecionada) {
+        function carregarExecutoresPorDatas() {
             if (!window.google || !google.script || !google.script.run) return;
-
-            // Atualizar preview
-            document.getElementById('executorDatePreview').textContent = formatDateSimple(dataSelecionada);
+            if (selectedDates.length === 0) {
+                document.getElementById('executorTableContainer').innerHTML = '<div class="empty-state"><p>Selecione pelo menos uma data</p></div>';
+                return;
+            }
 
             document.getElementById('executorTableContainer').innerHTML = '<div class="empty-state"><div class="spinner" style="width:24px;height:24px;margin:0 auto 12px;"></div><p>Carregando...</p></div>';
 
@@ -1134,9 +1306,12 @@
                 .withFailureHandler(function(err) {
                     document.getElementById('executorTableContainer').innerHTML = '<div class="empty-state"><p style="color:hsl(0,75%,45%);">Erro ao carregar: ' + err.message + '</p></div>';
                 })
-                .getDadosExecutores(dataSelecionada);
+                .getDadosExecutoresPorDatas(selectedDates);
         }
 
+        // ==========================================
+        // RENDER EXECUTORES - Com coluna Notas (AV/CALIA/EBM em linhas separadas)
+        // ==========================================
         function renderExecutores(result) {
             var container = document.getElementById('executorTableContainer');
             var executores = result.executores || [];
@@ -1146,16 +1321,18 @@
                 return;
             }
 
-            var totalAv = 0, totalCalia = 0, totalEbm = 0, totalGeral = 0, totalValor = 0, totalAnalisadas = 0;
+            var totalAv = 0, totalCalia = 0, totalEbm = 0, totalGeral = 0, totalValor = 0, totalEmAnalise = 0;
+            var allNotasAv = [], allNotasCalia = [], allNotasEbm = [];
 
             var html = '<table class="executor-table"><thead><tr>' +
                 '<th>Executor</th>' +
-                '<th class="center" style="color:hsl(270,70%,55%);">AV</th>' +
-                '<th class="center" style="color:hsl(30,90%,50%);">CALIA</th>' +
-                '<th class="center" style="color:hsl(220,10%,50%);">EBM</th>' +
-                '<th class="center">Total</th>' +
-                '<th class="center">Analisadas</th>' +
-                '<th class="center">Valor</th>' +
+                '<th style="color:hsl(270,70%,55%);">AV</th>' +
+                '<th style="color:hsl(30,90%,50%);">CALIA</th>' +
+                '<th style="color:hsl(220,10%,50%);">EBM</th>' +
+                '<th>Total</th>' +
+                '<th>Em Análise</th>' +
+                '<th>Notas</th>' +
+                '<th>Valor</th>' +
                 '</tr></thead><tbody>';
 
             executores.forEach(function(exec) {
@@ -1164,8 +1341,25 @@
                 totalEbm += exec.ebm || 0;
                 totalGeral += exec.total || 0;
                 totalValor += exec.valor || 0;
-                var analisadas = (exec.total || 0) - (exec.emAnalise || 0);
-                totalAnalisadas += analisadas;
+                totalEmAnalise += exec.emAnalise || 0;
+
+                // Coletar notas para totais
+                if (exec.notasAv) allNotasAv = allNotasAv.concat(exec.notasAv);
+                if (exec.notasCalia) allNotasCalia = allNotasCalia.concat(exec.notasCalia);
+                if (exec.notasEbm) allNotasEbm = allNotasEbm.concat(exec.notasEbm);
+
+                // Montar notas em linhas separadas
+                var notasHtml = '';
+                if (exec.notasAv && exec.notasAv.length > 0) {
+                    notasHtml += '<div class="nota-line"><span class="agencia-av">AV:</span> ' + exec.notasAv.join(', ') + '</div>';
+                }
+                if (exec.notasCalia && exec.notasCalia.length > 0) {
+                    notasHtml += '<div class="nota-line"><span class="agencia-calia">CALIA:</span> ' + exec.notasCalia.join(', ') + '</div>';
+                }
+                if (exec.notasEbm && exec.notasEbm.length > 0) {
+                    notasHtml += '<div class="nota-line"><span class="agencia-ebm">EBM:</span> ' + exec.notasEbm.join(', ') + '</div>';
+                }
+                if (!notasHtml) notasHtml = '-';
 
                 html += '<tr>' +
                     '<td class="executor-name">' + escapeHtml(exec.nome) + '</td>' +
@@ -1173,26 +1367,41 @@
                     '<td class="count calia">' + (exec.calia || 0) + '</td>' +
                     '<td class="count ebm">' + (exec.ebm || 0) + '</td>' +
                     '<td class="count">' + (exec.total || 0) + '</td>' +
-                    '<td class="count">' + analisadas + '</td>' +
-                    '<td class="count">' + formatCurrency(exec.valor || 0) + '</td>' +
+                    '<td class="count">' + (exec.emAnalise || 0) + '</td>' +
+                    '<td class="notas-cell">' + notasHtml + '</td>' +
+                    '<td class="valor">' + formatCurrency(exec.valor || 0) + '</td>' +
                     '</tr>';
             });
 
+            // Totais - notas em linhas separadas
+            var totalNotasHtml = '';
+            if (allNotasAv.length > 0) {
+                totalNotasHtml += '<div class="nota-line"><span class="agencia-av">AV:</span> ' + allNotasAv.join(', ') + '</div>';
+            }
+            if (allNotasCalia.length > 0) {
+                totalNotasHtml += '<div class="nota-line"><span class="agencia-calia">CALIA:</span> ' + allNotasCalia.join(', ') + '</div>';
+            }
+            if (allNotasEbm.length > 0) {
+                totalNotasHtml += '<div class="nota-line"><span class="agencia-ebm">EBM:</span> ' + allNotasEbm.join(', ') + '</div>';
+            }
+            if (!totalNotasHtml) totalNotasHtml = '-';
+
             html += '<tr class="summary-row">' +
-                '<td>TOTAL</td>' +
-                '<td class="count av">' + totalAv + '</td>' +
-                '<td class="count calia">' + totalCalia + '</td>' +
-                '<td class="count ebm">' + totalEbm + '</td>' +
-                '<td class="count">' + totalGeral + '</td>' +
-                '<td class="count">' + totalAnalisadas + '</td>' +
-                '<td class="count">' + formatCurrency(totalValor) + '</td>' +
+                '<td><strong>TOTAL</strong></td>' +
+                '<td class="count av"><strong>' + totalAv + '</strong></td>' +
+                '<td class="count calia"><strong>' + totalCalia + '</strong></td>' +
+                '<td class="count ebm"><strong>' + totalEbm + '</strong></td>' +
+                '<td class="count"><strong>' + totalGeral + '</strong></td>' +
+                '<td class="count"><strong>' + totalEmAnalise + '</strong></td>' +
+                '<td class="notas-cell">' + totalNotasHtml + '</td>' +
+                '<td class="valor"><strong>' + formatCurrency(totalValor) + '</strong></td>' +
                 '</tr></tbody></table>';
 
             container.innerHTML = html;
         }
 
         // ==========================================
-        // GERADOR DE TABELA - FUNÇÕES COMPLETAS (BETA)
+        // GERADOR - Expande automaticamente ao digitar
         // ==========================================
         function debounceSearchGerador() {
             clearTimeout(searchTimeoutGerador);
@@ -1207,7 +1416,9 @@
             } else {
                 content.classList.remove('show');
                 card.classList.remove('expanded');
-                limparGerador();
+                document.getElementById('statusSaldoGerador').innerHTML = '';
+                document.getElementById('atestoInfoGerador').innerHTML = '';
+                document.getElementById('tableContainerGerador').innerHTML = '';
                 return;
             }
 
@@ -1216,26 +1427,9 @@
             }, 400);
         }
 
-        function limparGerador() {
-            document.getElementById('geradorDateTime').innerHTML = '';
-            document.getElementById('statusSaldoGerador').innerHTML = '';
-            document.getElementById('certidoesAreaGerador').innerHTML = '';
-            document.getElementById('atestoInfoGerador').innerHTML = '';
-            document.getElementById('tableContainerGerador').innerHTML = '';
-            window.saldoAtualGerador = 0;
-        }
-
         function buscarDadosGerador(valor) {
             document.getElementById('loadingGerador').style.display = 'block';
             document.getElementById('tableContainerGerador').innerHTML = '';
-
-            var agora = new Date();
-            var dataHora = String(agora.getDate()).padStart(2,'0') + '/' + 
-                String(agora.getMonth()+1).padStart(2,'0') + '/' + 
-                agora.getFullYear() + ', ' + 
-                String(agora.getHours()).padStart(2,'0') + ':' + 
-                String(agora.getMinutes()).padStart(2,'0');
-            document.getElementById('geradorDateTime').innerHTML = dataHora;
 
             if (window.google && google.script && google.script.run) {
                 google.script.run
@@ -1249,37 +1443,15 @@
                 google.script.run
                     .withSuccessHandler(updateSaldoGerador)
                     .getSaldoByPI(valor);
-
-                google.script.run
-                    .withSuccessHandler(updateCertidoesGerador)
-                    .getCertidoesByAgencia(valor);
             }
         }
 
         function updateSaldoGerador(result) {
             var div = document.getElementById('statusSaldoGerador');
             if (result && result.agencia && result.campanha) {
-                window.saldoAtualGerador = result.saldo || 0;
-                div.innerHTML = 'Agência: <strong style="color:hsl(217,90%,45%);">' + escapeHtml(result.agencia) + '</strong>, ' +
-                    'Campanha: <strong style="color:hsl(217,90%,45%);">' + escapeHtml(result.campanha) + '</strong>, ' +
-                    'Saldo Atual: <strong style="color:hsl(217,90%,45%);">' + formatCurrency(result.saldo) + '</strong>';
+                div.innerHTML = 'Agência: <strong style="color:hsl(217,90%,45%);">' + result.agencia + '</strong>, Campanha: <strong style="color:hsl(217,90%,45%);">' + result.campanha + '</strong>, Saldo Atual: <strong style="color:hsl(217,90%,45%);">' + formatCurrency(result.saldo) + '</strong>';
             } else {
-                window.saldoAtualGerador = 0;
                 div.innerHTML = '<span style="color:hsl(0,75%,45%);font-weight:bold;">Agência/Campanha não encontradas.</span>';
-            }
-        }
-
-        function updateCertidoesGerador(result) {
-            var div = document.getElementById('certidoesAreaGerador');
-            if (result && result.agencia_cert) {
-                var linkHtml = result.link ? '<a href="' + escapeHtml(result.link) + '" target="_blank">🔗</a>' : '';
-                div.innerHTML = '<div class="gerador-certidoes"><strong>Certidões:</strong> ' +
-                    'RFB ' + (result.rfb || 'N/A') + ', ' +
-                    'SEFAZ DF ' + (result.sefaz_df || 'N/A') + ', ' +
-                    'FGTS ' + (result.fgts || 'N/A') + ', ' +
-                    'TST ' + (result.tst || 'N/A') + ' ' + linkHtml + '</div>';
-            } else {
-                div.innerHTML = '';
             }
         }
 
@@ -1292,138 +1464,111 @@
                 return;
             }
 
-            var temGlosa = data.some(function(r) {
-                return r.glosa && r.glosa !== 0 && r.glosa !== '-';
-            });
-
-            var totalValorNF = 0;
-            var totalGlosa = 0;
-            var totalAposGlosa = 0;
+            var totalLiquido = 0;
             var nfList = [];
-
             data.forEach(function(r) {
-                var valorNF = Number(r.valor_nf) || 0;
-                var glosa = Number(r.glosa) || 0;
-                var valorAposGlosa = valorNF - glosa;
-                totalValorNF += valorNF;
-                totalGlosa += glosa;
-                totalAposGlosa += valorAposGlosa;
+                totalLiquido += Number(r.valor_nf) || 0;
                 if (r.nf && r.nf !== '-') nfList.push(r.nf);
             });
 
             nfList = [...new Set(nfList)].sort(function(a, b) { return Number(a) - Number(b); });
-            var nfTexto = nfList.length > 1 ? nfList.slice(0, -1).join(', ') + ' e ' + nfList[nfList.length - 1] : (nfList[0] || '-');
+            var nfTexto = nfList.length > 1 ? nfList.slice(0, -1).join(', ') + ' e ' + nfList[nfList.length - 1] : nfList[0];
 
-            var valorAtesto = temGlosa ? totalAposGlosa : totalValorNF;
-            document.getElementById('atestoInfoGerador').innerHTML = '<div class="gerador-info-box"><strong style="color:hsl(217,90%,45%);">Texto para atesto:</strong> ' + nfTexto + ', no montante total de <strong>' + formatCurrency(valorAtesto) + '</strong></div>';
+            // Texto para atesto - SEM fundo
+            document.getElementById('atestoInfoGerador').innerHTML = '<div class="atesto-text"><strong>Texto para atesto:</strong> ' + nfTexto + ', no montante total de <strong>' + formatCurrency(totalLiquido) + '</strong></div>';
 
-            var saldoRestante = window.saldoAtualGerador - valorAtesto;
-            var numCols = temGlosa ? 9 : 7;
+            // Calcular saldo progressivo
+            google.script.run
+                .withSuccessHandler(function(result) {
+                    renderTabelaControle(data, result ? result.saldo : 0, container);
+                })
+                .getSaldoByPI(document.getElementById('valorBuscaGerador').value.trim());
+        }
 
-            var html = '<table class="gerador-table">';
-            // Título na primeira linha da tabela
-            html += '<thead><tr class="title-row"><th colspan="' + numCols + '">4. CONTROLE DE SALDO ORÇAMENTÁRIO</th></tr>';
+        function renderTabelaControle(data, saldoInicial, container) {
+            var saldoAtual = saldoInicial;
+            var totalLiquido = 0;
+            data.forEach(function(r) { totalLiquido += Number(r.valor_nf) || 0; });
+            var saldoFinal = saldoAtual - totalLiquido;
+
+            // Header com título e botão copiar
+            var html = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">' +
+                '<div class="controle-table-title" style="border:none;padding:0;background:none;">4. CONTROLE DE SALDO ORÇAMENTÁRIO</div>' +
+                '<button class="copy-btn" onclick="copiarTabela()">' +
+                '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>' +
+                'Copiar Tabela' +
+                '</button></div>';
             
-            if (temGlosa) {
+            html += '<table class="controle-pagamento-table" id="tabelaControle"><thead><tr>' +
+                '<th>Ord.</th>' +
+                '<th>NF</th>' +
+                '<th>Veículo/Fornecedor</th>' +
+                '<th>CNPJ</th>' +
+                '<th>Tipo de Mídia</th>' +
+                '<th>Valor da NF</th>' +
+                '<th>Saldo</th>' +
+                '</tr></thead><tbody>';
+
+            data.forEach(function(r, index) {
+                saldoAtual = saldoAtual - (Number(r.valor_nf) || 0);
                 html += '<tr>' +
-                    '<th>Ord.</th>' +
-                    '<th>NF</th>' +
-                    '<th>Veículo/Fornecedor</th>' +
-                    '<th>CNPJ</th>' +
-                    '<th>Tipo de Mídia</th>' +
-                    '<th class="valor">Valor da NF</th>' +
-                    '<th class="valor">Glosa</th>' +
-                    '<th class="valor">Valor após Glosa</th>' +
-                    '<th class="valor">Saldo do Empenho</th>' +
-                    '</tr></thead><tbody>';
-                data.forEach(function(r, i) {
-                    var valorNF = Number(r.valor_nf) || 0;
-                    var glosa = Number(r.glosa) || 0;
-                    var valorAposGlosa = valorNF - glosa;
-                    var glosaDisplay = glosa > 0 ? formatCurrency(glosa) : '-';
-                    html += '<tr>' +
-                        '<td class="center">' + (i + 1) + '</td>' +
-                        '<td class="center">' + escapeHtml(r.nf || '-') + '</td>' +
-                        '<td class="center">' + escapeHtml(r.veiculo_forn || '-') + '</td>' +
-                        '<td class="center">' + escapeHtml(r.cnpj || '-') + '</td>' +
-                        '<td class="center">' + escapeHtml(r.tipo_midia || '-') + '</td>' +
-                        '<td class="valor">' + formatCurrency(valorNF) + '</td>' +
-                        '<td class="valor">' + glosaDisplay + '</td>' +
-                        '<td class="valor">' + formatCurrency(valorAposGlosa) + '</td>' +
-                        '<td class="valor">-</td>' +
-                        '</tr>';
-                });
-                html += '<tr class="summary-row">' +
-                    '<td colspan="5" style="text-align:right;"><strong>TOTAL</strong></td>' +
-                    '<td class="valor">' + formatCurrency(totalValorNF) + '</td>' +
-                    '<td class="valor">' + formatCurrency(totalGlosa) + '</td>' +
-                    '<td class="valor">' + formatCurrency(totalAposGlosa) + '</td>' +
-                    '<td class="valor"><strong>' + formatCurrency(saldoRestante) + '</strong></td>' +
-                    '</tr></tbody></table>';
-            } else {
-                html += '<tr>' +
-                    '<th>Ord.</th>' +
-                    '<th>NF</th>' +
-                    '<th>Veículo/Fornecedor</th>' +
-                    '<th>CNPJ</th>' +
-                    '<th>Tipo de Mídia</th>' +
-                    '<th class="valor">Valor da NF</th>' +
-                    '<th class="valor">Saldo do Empenho</th>' +
-                    '</tr></thead><tbody>';
-                data.forEach(function(r, i) {
-                    html += '<tr>' +
-                        '<td class="center">' + (i + 1) + '</td>' +
-                        '<td class="center">' + escapeHtml(r.nf || '-') + '</td>' +
-                        '<td class="center">' + escapeHtml(r.veiculo_forn || '-') + '</td>' +
-                        '<td class="center">' + escapeHtml(r.cnpj || '-') + '</td>' +
-                        '<td class="center">' + escapeHtml(r.tipo_midia || '-') + '</td>' +
-                        '<td class="valor">' + formatCurrency(r.valor_nf) + '</td>' +
-                        '<td class="valor">-</td>' +
-                        '</tr>';
-                });
-                html += '<tr class="summary-row">' +
-                    '<td colspan="5" style="text-align:right;"><strong>TOTAL</strong></td>' +
-                    '<td class="valor">' + formatCurrency(totalValorNF) + '</td>' +
-                    '<td class="valor"><strong>' + formatCurrency(saldoRestante) + '</strong></td>' +
-                    '</tr></tbody></table>';
-            }
+                    '<td>' + (index + 1) + '</td>' +
+                    '<td>' + (r.nf || '-') + '</td>' +
+                    '<td>' + (r.veiculo_forn || r.veiculo || '-') + '</td>' +
+                    '<td>' + (r.cnpj || '-') + '</td>' +
+                    '<td>' + (r.tipo_midia || '-') + '</td>' +
+                    '<td>' + formatCurrency(r.valor_nf) + '</td>' +
+                    '<td>' + formatCurrency(saldoAtual) + '</td>' +
+                    '</tr>';
+            });
+
+            // Linha de TOTAL com saldo final
+            html += '<tr>' +
+                '<td style="text-align:left;" colspan="5"><strong>TOTAL</strong></td>' +
+                '<td><strong>' + formatCurrency(totalLiquido) + '</strong></td>' +
+                '<td><strong>' + formatCurrency(saldoFinal) + '</strong></td>' +
+                '</tr>';
+
+            html += '</tbody></table>';
 
             container.innerHTML = html;
         }
 
-        // ==========================================
-        // LOAD DATA
-        // ==========================================
-        function loadData() {
-            showLoading(true);
-            showError('');
+        function copiarTabela() {
+            var table = document.getElementById('tabelaControle');
+            if (!table) return;
 
-            if (!window.google || !google.script || !google.script.run) {
-                showLoading(false);
-                showError('Este painel precisa ser aberto pela URL do Web App do Google Apps Script.');
-                renderEmProcesso();
-                renderAtestadas();
-                renderPagas();
-                return;
+            var range = document.createRange();
+            range.selectNode(table);
+            window.getSelection().removeAllRanges();
+            window.getSelection().addRange(range);
+
+            try {
+                document.execCommand('copy');
+                var btns = document.querySelectorAll('.copy-btn');
+                btns.forEach(function(btn) {
+                    btn.innerHTML = '✓ Copiado!';
+                    setTimeout(function() {
+                        btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>Copiar Tabela';
+                    }, 2000);
+                });
+            } catch (err) {
+                alert('Erro ao copiar');
             }
 
-            google.script.run
-                .withSuccessHandler(function(result) {
-                    showLoading(false);
-                    dados = result || { emProcesso: [], atestadas: [], pagas: [] };
-                    renderEmProcesso();
-                    renderAtestadas();
-                    renderPagas();
-                })
-                .withFailureHandler(function(err) {
-                    showLoading(false);
-                    showError('Erro ao carregar dados: ' + (err && err.message ? err.message : String(err)));
-                    renderEmProcesso();
-                    renderAtestadas();
-                    renderPagas();
-                })
-                .getDados();
+            window.getSelection().removeAllRanges();
         }
+
+        // ==========================================
+        // CLOSE DROPDOWN ON OUTSIDE CLICK
+        // ==========================================
+        document.addEventListener('click', function(e) {
+            var menu = document.getElementById('dateDropdownMenu');
+            var trigger = document.querySelector('.date-dropdown-trigger');
+            if (menu && !menu.contains(e.target) && !trigger.contains(e.target)) {
+                menu.classList.remove('open');
+            }
+        });
 
         // ==========================================
         // INIT
