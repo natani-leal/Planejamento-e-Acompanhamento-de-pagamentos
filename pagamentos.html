@@ -125,6 +125,7 @@
             align-items: center;
             flex-wrap: wrap;
             gap: 12px;
+            cursor: pointer;
         }
         .link-card-icon {
             width: 24px;
@@ -151,11 +152,11 @@
             margin-left: auto;
         }
         .gerador-input {
-            width: 280px;
-            padding: 8px 12px;
+            width: 320px;
+            padding: 10px 14px;
             border: 1px solid hsl(220, 15%, 90%);
-            border-radius: 6px;
-            font-size: 0.8rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
             font-family: inherit;
             background: hsl(220, 20%, 98%);
             transition: all 0.2s;
@@ -187,11 +188,11 @@
             padding-left: 16px;
         }
         .date-select-dropdown {
-            width: 280px;
-            padding: 8px 12px;
+            width: 320px;
+            padding: 10px 14px;
             border: 1px solid hsl(220, 15%, 90%);
-            border-radius: 6px;
-            font-size: 0.8rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
             font-family: inherit;
             background: hsl(220, 20%, 98%);
             cursor: pointer;
@@ -202,6 +203,23 @@
             border-color: hsl(252, 85%, 60%);
             background: white;
             box-shadow: 0 0 0 3px hsla(252, 85%, 60%, 0.15);
+        }
+
+        /* Chevron para expandir */
+        .link-card-chevron {
+            margin-left: 8px;
+            transition: transform 0.3s ease;
+            color: hsl(220, 10%, 50%);
+        }
+        .link-card-chevron.expanded {
+            transform: rotate(180deg);
+        }
+
+        /* Date preview no header */
+        .date-preview {
+            font-size: 0.8rem;
+            color: hsl(220, 10%, 50%);
+            font-weight: 400;
         }
 
         /* Table */
@@ -242,12 +260,11 @@
         .qtd { text-align: center; font-weight: 400; }
         .valor {
             font-weight: 400;
-            color: hsl(220, 15%, 35%);
+            color: hsl(220, 15%, 30%);
             white-space: nowrap;
-            text-align: center;
         }
 
-        /* Count Badge */
+        /* Count Badge - CINZA ESCURO ao invés de verde */
         .count-badge {
             padding: 4px 12px;
             border-radius: 20px;
@@ -264,8 +281,8 @@
             color: hsl(0, 75%, 45%);
         }
         .count-badge.gray {
-            background: hsl(220, 15%, 96%);
-            color: hsl(220, 10%, 50%);
+            background: hsl(220, 10%, 30%);
+            color: white;
         }
         .count-badge.orange {
             background: hsl(38, 95%, 95%);
@@ -275,7 +292,7 @@
         /* Executor Table */
         .executor-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
         .executor-table th {
-            text-align: center;
+            text-align: left;
             padding: 12px 16px;
             background: hsl(220, 20%, 97%);
             font-weight: 600;
@@ -285,7 +302,7 @@
             color: hsl(220, 10%, 50%);
             border-bottom: 2px solid hsl(220, 15%, 92%);
         }
-        .executor-table th:first-child { text-align: left; }
+        .executor-table th.center { text-align: center; }
         .executor-table td {
             padding: 14px 16px;
             border-bottom: 1px solid hsl(220, 15%, 95%);
@@ -295,25 +312,24 @@
         .executor-table td:first-child { text-align: left; }
         .executor-table tr:hover td { background: hsl(220, 20%, 98%); }
         .executor-table .executor-name { font-weight: 600; color: hsl(220, 15%, 30%); vertical-align: middle; }
-        .executor-table .count { text-align: center; font-weight: 400; vertical-align: middle; color: hsl(220, 15%, 35%); }
-        .executor-table .count.av { color: hsl(270, 70%, 55%); font-weight: 600; }
-        .executor-table .count.calia { color: hsl(30, 90%, 50%); font-weight: 600; }
-        .executor-table .count.ebm { color: hsl(220, 10%, 50%); font-weight: 600; }
+        .executor-table .count { text-align: center; font-weight: 600; vertical-align: middle; }
+        .executor-table .count.av { color: hsl(270, 70%, 55%); }
+        .executor-table .count.calia { color: hsl(30, 90%, 50%); }
+        .executor-table .count.ebm { color: hsl(220, 10%, 50%); }
         .executor-table .valor {
             font-weight: 400;
-            color: hsl(220, 15%, 35%);
+            color: hsl(142, 70%, 40%);
             white-space: nowrap;
             text-align: center;
         }
         .executor-table .summary-row {
             background: hsl(220, 20%, 97%) !important;
-            font-weight: 600;
+            font-weight: 700;
         }
         .executor-table .summary-row td {
             border-top: 2px solid hsl(220, 15%, 90%);
             padding-top: 16px;
         }
-        .executor-table .summary-row .count { font-weight: 600; }
 
         /* Status Select - Cinza claro padrão, apenas OB colorido */
         .status-select {
@@ -450,6 +466,108 @@
         .section.pagas td { text-align: center; vertical-align: middle; }
         .section.pagas th { text-align: center; }
         .section.pagas .controle { display: inline-block; }
+
+        /* ==========================================
+           GERADOR DE TABELA - ESTILO BETA
+           ========================================== */
+        .gerador-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+            margin-top: 0;
+            background: transparent;
+        }
+        .gerador-table th,
+        .gerador-table td {
+            border: 1px solid hsl(220, 20%, 30%);
+            padding: 8px 12px;
+            text-align: center;
+        }
+        .gerador-table th {
+            background: hsl(220, 20%, 95%);
+            font-weight: 600;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            color: hsl(220, 25%, 25%);
+            text-align: center;
+        }
+        .gerador-table td {
+            background: transparent;
+            color: hsl(220, 25%, 20%);
+            font-weight: 400;
+        }
+        .gerador-table td.valor,
+        .gerador-table th.valor {
+            text-align: right;
+            white-space: nowrap;
+            font-weight: 400;
+        }
+        .gerador-table td.center {
+            text-align: center;
+        }
+        .gerador-table .summary-row td {
+            background: hsl(220, 20%, 95%);
+            font-weight: 400;
+            text-align: left;
+        }
+        .gerador-table .summary-row td:last-child {
+            font-weight: 700;
+        }
+        .gerador-table .summary-row td.valor {
+            font-weight: 400;
+        }
+        .gerador-table .summary-row td.valor:last-child {
+            font-weight: 700;
+        }
+        /* Título na primeira linha da tabela */
+        .gerador-table .title-row th {
+            background: hsl(220, 20%, 95%);
+            font-size: 0.9rem;
+            font-weight: 700;
+            text-transform: none;
+            letter-spacing: 0;
+        }
+        .gerador-title {
+            display: none;
+        }
+        .gerador-info-box {
+            background: transparent;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 1px solid hsl(220, 15%, 85%);
+            margin-bottom: 12px;
+        }
+        .gerador-certidoes {
+            background: hsl(142, 50%, 97%);
+            padding: 10px 16px;
+            border-radius: 8px;
+            border: 1px solid hsl(142, 50%, 85%);
+            margin-bottom: 12px;
+            font-size: 0.875rem;
+        }
+        .gerador-certidoes a {
+            color: hsl(217, 90%, 45%);
+            text-decoration: none;
+            margin-left: 8px;
+        }
+        .gerador-certidoes a:hover {
+            text-decoration: underline;
+        }
+        .gerador-datetime {
+            font-size: 0.8rem;
+            color: hsl(220, 10%, 50%);
+            margin-bottom: 8px;
+        }
+        .gerador-header-info {
+            margin-bottom: 12px;
+            font-size: 0.9rem;
+        }
+
+        /* Container com padding para não cortar última linha */
+        #tableContainerGerador {
+            padding-bottom: 20px;
+        }
     </style>
 </head>
 <body>
@@ -470,35 +588,39 @@
             </div>
         </div>
 
-        <!-- MOVIDO PARA O TOPO: Divisão de Notas por Executor - Menu expansível -->
-        <div class="link-card" id="executorCard">
-            <div class="link-card-header" style="cursor: pointer;" onclick="toggleExecutores()">
-                <div class="link-card-icon" style="background: hsl(252, 85%, 92%); color: hsl(252, 85%, 60%);">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                    </svg>
-                </div>
-                <h2 class="link-card-title">Divisão de Notas por Executor</h2>
-                <svg id="executorChevron" style="width:18px;height:18px;margin-left:8px;transition:transform 0.2s;transform:rotate(0deg);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
-                <div class="executor-date-select" onclick="event.stopPropagation();">
-                    <select id="executorDateSelect" class="date-select-dropdown" onchange="carregarExecutores(this.value)">
-                        <option value="">Carregando datas...</option>
-                    </select>
-                </div>
-            </div>
-            <div class="link-card-content" id="executorTableContainer">
-                <div class="empty-state">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                        <circle cx="12" cy="12" r="10"/>
-                        <path d="M12 6v6l4 2"/>
-                    </svg>
-                    <p>Carregando dados dos executores...</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Cards Row -->
+        <!-- MOVIDO PARA O TOPO: Divisão de Notas por Executor - AGORA EXPANSÍVEL -->
         <div class="cards-row">
+            <div class="link-card" id="executorCard">
+                <div class="link-card-header" onclick="toggleExecutorCard()">
+                    <div class="link-card-icon" style="background: hsl(252, 85%, 92%); color: hsl(252, 85%, 60%);">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                    </div>
+                    <h2 class="link-card-title">Divisão de Notas por Executor</h2>
+                    <span class="date-preview" id="executorDatePreview">Carregando...</span>
+                    <svg class="link-card-chevron" id="executorChevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </div>
+                <div class="link-card-content" id="executorContent">
+                    <div class="executor-date-select" style="margin-bottom: 16px; padding-left: 0;">
+                        <select id="executorDateSelect" class="date-select-dropdown" onchange="carregarExecutores(this.value)">
+                            <option value="">Carregando datas...</option>
+                        </select>
+                    </div>
+                    <div id="executorTableContainer">
+                        <div class="empty-state">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <circle cx="12" cy="12" r="10"/>
+                                <path d="M12 6v6l4 2"/>
+                            </svg>
+                            <p>Carregando dados dos executores...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Gerar Tabela de Controle de Pagamento -->
             <div class="link-card" id="geradorCard">
                 <div class="link-card-header">
@@ -508,15 +630,15 @@
                         </svg>
                     </div>
                     <h2 class="link-card-title">Gerar Tabela de Controle de Pagamento</h2>
-                    <!-- Input inline com o título -->
                     <div class="gerador-input-inline">
                         <input type="text" id="valorBuscaGerador" class="gerador-input" placeholder="Digite o nº SEI do Controle" oninput="debounceSearchGerador()">
                     </div>
                 </div>
                 <div class="link-card-content" id="geradorContent">
-                    <div id="statusSaldoGerador" style="margin-top: 15px; font-size: 0.9rem;"></div>
-                    <!-- REMOVIDO: certidoesAreaGerador - pasta restrita do OneDrive -->
-                    <div id="atestoInfoGerador" style="margin-top: 20px;"></div>
+                    <div id="geradorDateTime" class="gerador-datetime"></div>
+                    <div id="statusSaldoGerador" class="gerador-header-info"></div>
+                    <div id="certidoesAreaGerador"></div>
+                    <div id="atestoInfoGerador"></div>
                     <div id="loadingGerador" style="display:none; text-align: center; padding: 20px;">
                         <div class="spinner" style="margin: 0 auto; width: 32px; height: 32px;"></div>
                         <p style="margin-top: 10px;">Buscando dados...</p>
@@ -543,8 +665,8 @@
                             <th>Campanha</th>
                             <th>Controle</th>
                             <th style="text-align:center">Qtd NFs</th>
-                            <th style="text-align:center">Valor Total</th>
-                            <th style="text-align:center">Data Atesto</th>
+                            <th>Valor Total</th>
+                            <th>Data Atesto</th>
                             <th>Status</th>
                             <th>Observação</th>
                         </tr>
@@ -567,10 +689,10 @@
                 <table>
                     <thead>
                         <tr>
-                            <th style="text-align:center">Agência</th>
-                            <th style="text-align:center">Campanha</th>
+                            <th>Agência</th>
+                            <th>Campanha</th>
                             <th style="text-align:center">Qtd NFs</th>
-                            <th style="text-align:center">Valor</th>
+                            <th>Valor</th>
                             <th>Inconformidades</th>
                             <th>Observação</th>
                         </tr>
@@ -622,6 +744,8 @@
             { value: 'enviado', label: 'Controle Retenções Enviado' }
         ];
         var searchTimeoutGerador = null;
+        window.saldoAtualGerador = 0;
+        var executorExpanded = false;
 
         // ==========================================
         // FUNÇÕES UTILITÁRIAS
@@ -645,23 +769,8 @@
                 .replace(/'/g, '&#039;');
         }
 
-        function toNumber(value) {
-            if (typeof value === 'number') return isFinite(value) ? value : 0;
-            if (typeof value === 'string') {
-                var s = value.trim();
-                if (!s) return 0;
-                // Remove moeda/espacos e normaliza formato pt-BR
-                s = s.replace(/R\$\s?/g, '').replace(/\s/g, '');
-                s = s.replace(/\./g, '').replace(/,/g, '.');
-                var n = Number(s);
-                return isFinite(n) ? n : 0;
-            }
-            return 0;
-        }
-
         function formatCurrency(value) {
-            var n = toNumber(value);
-            return 'R$ ' + n.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            return 'R$ ' + (value || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
 
         function formatDate(date) {
@@ -692,7 +801,6 @@
             return parts[2] + '/' + parts[1] + '/' + parts[0];
         }
 
-        // Cores das agências: AV = Roxo, CALIA = Laranja, EBM = Cinza
         function getAgencyClass(agencia) {
             if (!agencia) return '';
             var upper = agencia.toUpperCase();
@@ -700,6 +808,26 @@
             if (upper.indexOf('CALIA') !== -1) return 'agencia-calia';
             if (upper.indexOf('EBM') !== -1) return 'agencia-ebm';
             return '';
+        }
+
+        // ==========================================
+        // TOGGLE EXECUTOR CARD
+        // ==========================================
+        function toggleExecutorCard() {
+            executorExpanded = !executorExpanded;
+            var content = document.getElementById('executorContent');
+            var chevron = document.getElementById('executorChevron');
+            var card = document.getElementById('executorCard');
+            
+            if (executorExpanded) {
+                content.classList.add('show');
+                chevron.classList.add('expanded');
+                card.classList.add('expanded');
+            } else {
+                content.classList.remove('show');
+                chevron.classList.remove('expanded');
+                card.classList.remove('expanded');
+            }
         }
 
         // ==========================================
@@ -752,40 +880,18 @@
             var totalQtd = 0;
             var html = items.map(function(item) {
                 var key = item.agencia + '|' + item.campanha + '|' + item.controle;
-                totalValor += toNumber(item.valor);
-                totalQtd += toNumber(item.qtd);
+                totalValor += item.valor;
+                totalQtd += item.qtd;
                 var agencyClass = getAgencyClass(item.agencia);
-                // Formatar data atesto com dia da semana e dias atrás em linha menor
-                var dataAtestoHtml = '-';
-                if (item.dataAtesto) {
-                    var d = new Date(item.dataAtesto);
-                    if (!isNaN(d)) {
-                        var dia = String(d.getDate()).padStart(2, '0');
-                        var mes = String(d.getMonth() + 1).padStart(2, '0');
-                        var ano = d.getFullYear();
-                        var diaSemana = DIAS_SEMANA[d.getDay()];
-                        var hoje = new Date();
-                        hoje.setHours(0, 0, 0, 0);
-                        var dataComp = new Date(d);
-                        dataComp.setHours(0, 0, 0, 0);
-                        var diffMs = hoje - dataComp;
-                        var diffDias = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-                        var agoText = '';
-                        if (diffDias === 0) agoText = 'hoje';
-                        else if (diffDias === 1) agoText = 'há 1 dia';
-                        else if (diffDias > 1) agoText = 'há ' + diffDias + ' dias';
-                        dataAtestoHtml = '<div>' + dia + '/' + mes + '/' + ano + '</div><div style="font-size: 0.7rem; color: hsl(220, 10%, 55%);">' + diaSemana + (agoText ? ' · ' + agoText : '') + '</div>';
-                    }
-                }
                 return '<tr>' +
                     '<td class="agencia ' + agencyClass + '">' + (item.agencia || '-') + '</td>' +
                     '<td class="campanha">' + (item.campanha || '-') + '</td>' +
                     '<td><span class="controle">' + (item.controle || '-') + '</span></td>' +
                     '<td class="qtd">' + item.qtd + '</td>' +
-                    '<td class="valor" style="text-align:center; vertical-align:middle;">' + formatCurrency(item.valor) + '</td>' +
-                    '<td class="data" style="text-align:center; vertical-align:middle;">' + dataAtestoHtml + '</td>' +
+                    '<td class="valor">' + formatCurrency(item.valor) + '</td>' +
+                    '<td class="data">' + formatDate(item.dataAtesto) + '</td>' +
                     '<td>' + createStatusSelect(item.statusPag || 'montando', key) + '</td>' +
-                    '<td><input type="text" class="obs-input" style="min-width: 280px;" placeholder="Observação..." value="' + escapeHtml(item.obs || '') + '" onchange="saveObs(\'emProcesso\', \'' + escapeHtml(key) + '\', this.value)"></td>' +
+                    '<td><input type="text" class="obs-input" style="min-width: 200px;" placeholder="Observação..." value="' + escapeHtml(item.obs || '') + '" onchange="saveObs(\'emProcesso\', \'' + escapeHtml(key) + '\', this.value)"></td>' +
                     '</tr>';
             }).join('');
 
@@ -799,14 +905,13 @@
         }
 
         // ==========================================
-        // RENDER ATESTADAS - Com cores de agência, diligência e tooltip
+        // RENDER ATESTADAS
         // ==========================================
         function renderAtestadas() {
             var tbody = document.getElementById('tbody-atestadas');
             var countEl = document.getElementById('count-atestadas');
             var items = dados.atestadas || [];
 
-            // Ordenar por agência: AV > Calia > EBM
             var agenciaOrdem = { 'AV': 1, 'CALIA': 2, 'EBM': 3 };
             items.sort(function(a, b) {
                 var agA = (a.agencia || '').toUpperCase();
@@ -816,25 +921,17 @@
                 return ordemA - ordemB;
             });
 
-            var emProcessoItems = dados.emProcesso || [];
-            var emProcessoKeys = {};
-            emProcessoItems.forEach(function(item) {
-                var key = (item.agencia || '') + '|' + (item.campanha || '');
-                emProcessoKeys[key] = true;
-            });
-
             var totalEmAnalise = 0, totalAtestadas = 0, totalPendentes = 0, totalDiligencia = 0;
             items.forEach(function(item) {
-                var qtdDiligencia = item.qtdDiligencia || item.qtdDiligenciaInterna || item.qtdEmDiligenciaInterna || item.qtdDiligenciaInt || item.qtdDiligenciaInternaM || 0;
                 totalEmAnalise += item.qtdEmAnalise || 0;
                 totalAtestadas += item.qtdAtestada || 0;
                 totalPendentes += item.qtdPendente || 0;
-                totalDiligencia += qtdDiligencia || 0;
+                totalDiligencia += item.qtdDiligencia || 0;
             });
 
             var countHtml = '';
             if (totalEmAnalise > 0) countHtml += '<span class="count-badge gray">' + totalEmAnalise + ' em análise</span>';
-            countHtml += '<span class="count-badge blue">' + totalAtestadas + ' atestadas</span>';
+            if (totalAtestadas > 0) countHtml += '<span class="count-badge blue">' + totalAtestadas + ' atestadas</span>';
             if (totalPendentes > 0) countHtml += '<span class="count-badge red">' + totalPendentes + ' inconformidades</span>';
             if (totalDiligencia > 0) countHtml += '<span class="count-badge orange">' + totalDiligencia + ' em diligência</span>';
             countEl.innerHTML = countHtml;
@@ -849,100 +946,74 @@
 
             var html = items.map(function(item) {
                 var key = (item.agencia || '') + '|' + (item.campanha || '');
-
-                var qtdDiligencia = item.qtdDiligencia || item.qtdDiligenciaInterna || item.qtdEmDiligenciaInterna || item.qtdDiligenciaInt || item.qtdDiligenciaInternaM || 0;
-                var valorDiligencia = item.valorDiligencia || item.valorDiligenciaInterna || item.valorEmDiligenciaInterna || item.valorDiligenciaInt || item.valorDiligenciaInternaAB || 0;
-
-                totalValorEmAnalise += toNumber(item.valorEmAnalise || 0);
-                totalValorAtestado += toNumber(item.valorAtestado || 0);
-                totalValorPendente += toNumber(item.valorPendente || 0);
-                totalValorDiligencia += toNumber(valorDiligencia);
-
-                totalQtdEmAnalise += toNumber(item.qtdEmAnalise || 0);
-                totalQtdAtestada += toNumber(item.qtdAtestada || 0);
-                totalQtdPendente += toNumber(item.qtdPendente || 0);
-                totalQtdDiligencia += toNumber(qtdDiligencia);
-
-                // Inconformidades + Diligência interna (tooltip sempre tenta coluna P)
-                var pendentesList = item.pendentes || item.inconformidades || [];
-                var diligenciasList = item.diligencias || item.diligenciasInternas || item.diligenciaInterna || item.emDiligenciaInterna || [];
-                if (!Array.isArray(pendentesList)) pendentesList = [];
-                if (!Array.isArray(diligenciasList)) diligenciasList = [];
+                totalValorEmAnalise += item.valorEmAnalise || 0;
+                totalValorAtestado += item.valorAtestado || 0;
+                totalValorPendente += item.valorPendente || 0;
+                totalValorDiligencia += item.valorDiligencia || 0;
+                totalQtdEmAnalise += item.qtdEmAnalise || 0;
+                totalQtdAtestada += item.qtdAtestada || 0;
+                totalQtdPendente += item.qtdPendente || 0;
+                totalQtdDiligencia += item.qtdDiligencia || 0;
 
                 var pendentesHtml = '';
-                if (pendentesList.length > 0) {
-                    pendentesHtml = pendentesList.map(function(p) {
-                        var tooltipText = p.motivo || p.detalhe || p.descricao || p.tooltip || p.texto || p.colunaP || p.p || item.colunaP || item.motivo || 'Sem detalhes';
-                        var tooltip = ' title="' + escapeHtml(tooltipText) + '"';
+                if (item.pendentes && item.pendentes.length > 0) {
+                    pendentesHtml = item.pendentes.map(function(p) {
+                        var tooltip = p.motivo ? ' title="' + escapeHtml(p.motivo) + '"' : '';
                         var tipoMidia = p.tipoMidia ? ' | ' + p.tipoMidia : '';
                         var executor = p.executor ? ' | ' + p.executor : '';
-                        return '<div class="pendente-item"' + tooltip + '><span class="pendente-info">NF: ' + (p.nf || '-') + tipoMidia + ' | ' + (p.veiculo || '-') + executor + '</span></div>';
+                        var veiculo = p.veiculo ? ' | ' + p.veiculo : '';
+                        return '<div class="pendente-item"' + tooltip + '><span class="pendente-info">NF: ' + (p.nf || '-') + tipoMidia + veiculo + executor + '</span></div>';
                     }).join('');
                 }
 
-                if (diligenciasList.length > 0) {
-                    pendentesHtml += diligenciasList.map(function(d) {
-                        var tooltipText = d.motivo || d.detalhe || d.descricao || d.tooltip || d.texto || d.colunaP || d.p || item.colunaP || item.motivo || 'Sem detalhes';
-                        var tooltip = ' title="' + escapeHtml(tooltipText) + '"';
+                if (item.diligencias && item.diligencias.length > 0) {
+                    pendentesHtml += item.diligencias.map(function(d) {
+                        var tooltip = d.motivo ? ' title="' + escapeHtml(d.motivo) + '"' : '';
                         var tipoMidia = d.tipoMidia ? ' | ' + d.tipoMidia : '';
                         var executor = d.executor ? ' | ' + d.executor : '';
-                        return '<div class="diligencia-item"' + tooltip + '><span>NF: ' + (d.nf || '-') + tipoMidia + ' | ' + (d.veiculo || '-') + executor + '</span></div>';
+                        var veiculo = d.veiculo ? ' | ' + d.veiculo : '';
+                        return '<div class="diligencia-item"' + tooltip + '><span>NF: ' + (d.nf || '-') + tipoMidia + veiculo + ' (diligência)' + executor + '</span></div>';
                     }).join('');
                 }
 
                 if (!pendentesHtml) pendentesHtml = '-';
 
-                var qtdTotal = (item.qtdEmAnalise || 0) + (item.qtdAtestada || 0) + (item.qtdPendente || 0) + (qtdDiligencia || 0);
-                var qtdHtml = '<div style="color: hsl(220, 15%, 35%);">' + qtdTotal + '</div><div class="qtd-sub" style="color: hsl(220, 10%, 60%); font-size: 0.75rem;">';
-                if ((item.qtdAtestada || 0) > 0) qtdHtml += '<div>' + item.qtdAtestada + ' atestadas</div>';
+                // Qtd - mostrar apenas os que têm valor > 0
+                var qtdTotal = (item.qtdEmAnalise || 0) + (item.qtdAtestada || 0) + (item.qtdPendente || 0) + (item.qtdDiligencia || 0);
+                var qtdHtml = '<div>' + qtdTotal + '</div><div class="qtd-sub" style="color: hsl(220, 10%, 50%);">';
                 if ((item.qtdEmAnalise || 0) > 0) qtdHtml += '<div>' + item.qtdEmAnalise + ' em análise</div>';
-                if ((item.qtdPendente || 0) > 0) qtdHtml += '<div>' + item.qtdPendente + ' inconf.</div>';
-                if ((qtdDiligencia || 0) > 0) qtdHtml += '<div>' + qtdDiligencia + ' diligência</div>';
+                if ((item.qtdAtestada || 0) > 0) qtdHtml += '<div>' + item.qtdAtestada + ' atestadas</div>';
+                if ((item.qtdPendente || 0) > 0) qtdHtml += '<div>' + item.qtdPendente + ' inconform.</div>';
+                if ((item.qtdDiligencia || 0) > 0) qtdHtml += '<div>' + item.qtdDiligencia + ' diligência</div>';
                 qtdHtml += '</div>';
 
-                var valorTotal = toNumber(item.valorEmAnalise || 0) + toNumber(item.valorAtestado || 0) + toNumber(item.valorPendente || 0) + toNumber(valorDiligencia);
-                var valorHtml = '<div style="color: hsl(220, 15%, 35%);">' + formatCurrency(valorTotal) + '</div><div class="valor-sub" style="color: hsl(220, 10%, 60%); font-size: 0.75rem;">';
-                if (toNumber(item.valorAtestado || 0) > 0) valorHtml += '<div>' + formatCurrency(item.valorAtestado) + '</div>';
-                if (toNumber(item.valorEmAnalise || 0) > 0) valorHtml += '<div>' + formatCurrency(item.valorEmAnalise) + '</div>';
-                if (toNumber(item.valorPendente || 0) > 0) valorHtml += '<div>' + formatCurrency(item.valorPendente) + '</div>';
-                if (toNumber(valorDiligencia) > 0) valorHtml += '<div>' + formatCurrency(valorDiligencia) + '</div>';
+                // Valor - mostrar apenas valores, sem labels, e só se > 0
+                var valorTotal = (item.valorEmAnalise || 0) + (item.valorAtestado || 0) + (item.valorPendente || 0) + (item.valorDiligencia || 0);
+                var valorHtml = '<div>' + formatCurrency(valorTotal) + '</div><div class="valor-sub" style="color: hsl(220, 10%, 50%);">';
+                if ((item.valorEmAnalise || 0) > 0) valorHtml += '<div>' + formatCurrency(item.valorEmAnalise) + '</div>';
+                if ((item.valorAtestado || 0) > 0) valorHtml += '<div>' + formatCurrency(item.valorAtestado) + '</div>';
+                if ((item.valorPendente || 0) > 0) valorHtml += '<div>' + formatCurrency(item.valorPendente) + '</div>';
+                if ((item.valorDiligencia || 0) > 0) valorHtml += '<div>' + formatCurrency(item.valorDiligencia) + '</div>';
                 valorHtml += '</div>';
 
                 var agencyClass = getAgencyClass(item.agencia);
                 return '<tr>' +
-                    '<td class="agencia ' + agencyClass + '" style="text-align:center;">' + (item.agencia || '-') + '</td>' +
-                    '<td class="campanha" style="text-align:center;">' + (item.campanha || '-') + '</td>' +
-                    '<td class="qtd" style="text-align:center;">' + qtdHtml + '</td>' +
-                    '<td style="text-align:center;">' + valorHtml + '</td>' +
-                '<td class="pendentes-cell">' + pendentesHtml + '</td>' +
-                    '<td><input type="text" class="obs-input" style="min-width: 280px;" placeholder="Observação..." value="' + escapeHtml(item.obs || '') + '" onchange="saveObs(\'atestadas\', \'' + escapeHtml(key) + '\', this.value)"></td>' +
+                    '<td class="agencia ' + agencyClass + '">' + (item.agencia || '-') + '</td>' +
+                    '<td class="campanha">' + (item.campanha || '-') + '</td>' +
+                    '<td class="qtd">' + qtdHtml + '</td>' +
+                    '<td class="valor">' + valorHtml + '</td>' +
+                    '<td class="pendentes-cell">' + pendentesHtml + '</td>' +
+                    '<td><input type="text" class="obs-input" style="min-width: 200px;" placeholder="Observação..." value="' + escapeHtml(item.obs || '') + '" onchange="saveObs(\'atestadas\', \'' + escapeHtml(key) + '\', this.value)"></td>' +
                     '</tr>';
             }).join('');
 
             var summaryQtdTotal = totalQtdEmAnalise + totalQtdAtestada + totalQtdPendente + totalQtdDiligencia;
-            var summaryQtdHtml = '<div style="color: hsl(220, 15%, 35%); font-weight: 600;">' + summaryQtdTotal + '</div><div class="qtd-sub" style="color: hsl(220, 10%, 60%); font-size: 0.75rem;">';
-            if (totalQtdAtestada > 0) summaryQtdHtml += '<div>' + totalQtdAtestada + ' atestadas</div>';
-            if (totalQtdEmAnalise > 0) summaryQtdHtml += '<div>' + totalQtdEmAnalise + ' em análise</div>';
-            if (totalQtdPendente > 0) summaryQtdHtml += '<div>' + totalQtdPendente + ' inconf.</div>';
-            if (totalQtdDiligencia > 0) summaryQtdHtml += '<div>' + totalQtdDiligencia + ' diligência</div>';
-            summaryQtdHtml += '</div>';
+            var summaryQtdHtml = '<div>' + summaryQtdTotal + '</div>';
 
             var summaryValorTotal = totalValorEmAnalise + totalValorAtestado + totalValorPendente + totalValorDiligencia;
-            var summaryValorHtml = '<div style="color: hsl(220, 15%, 35%); font-weight: 600;">' + formatCurrency(summaryValorTotal) + '</div><div class="valor-sub" style="color: hsl(220, 10%, 60%); font-size: 0.75rem;">';
-            if (totalValorAtestado > 0) summaryValorHtml += '<div>' + formatCurrency(totalValorAtestado) + '</div>';
-            if (totalValorEmAnalise > 0) summaryValorHtml += '<div>' + formatCurrency(totalValorEmAnalise) + '</div>';
-            if (totalValorPendente > 0) summaryValorHtml += '<div>' + formatCurrency(totalValorPendente) + '</div>';
-            if (totalValorDiligencia > 0) summaryValorHtml += '<div>' + formatCurrency(totalValorDiligencia) + '</div>';
-            summaryValorHtml += '</div>';
+            var summaryValorHtml = '<div>' + formatCurrency(summaryValorTotal) + '</div>';
 
-            html += '<tr class="summary-row">' +
-                '<td style="text-align:left;"><strong>Total</strong></td>' +
-                '<td></td>' +
-                '<td class="qtd" style="text-align:center;">' + summaryQtdHtml + '</td>' +
-                '<td style="text-align:center;">' + summaryValorHtml + '</td>' +
-                '<td colspan="2"></td>' +
-                '</tr>';
-
+            html += '<tr class="summary-row"><td colspan="2"><strong>Total</strong></td><td class="qtd">' + summaryQtdHtml + '</td><td class="valor">' + summaryValorHtml + '</td><td colspan="2"></td></tr>';
             tbody.innerHTML = html;
         }
 
@@ -964,10 +1035,9 @@
             var totalQtd = 0;
             var html = items.map(function(item) {
                 var agencyClass = getAgencyClass(item.agencia);
-                totalValor += toNumber(item.valor);
-                totalQtd += toNumber(item.qtd);
-                
-                // Formatar data com dia da semana e dias atrás em linha menor
+                totalValor += item.valor || 0;
+                totalQtd += item.qtd || 0;
+
                 var dataHtml = '-';
                 if (item.dataPago) {
                     var d = new Date(item.dataPago);
@@ -989,65 +1059,73 @@
                         dataHtml = '<div>' + dia + '/' + mes + '/' + ano + '</div><div style="font-size: 0.7rem; color: hsl(220, 10%, 55%);">' + diaSemana + (agoText ? ' · ' + agoText : '') + '</div>';
                     }
                 }
-                
+
                 return '<tr>' +
                     '<td class="agencia ' + agencyClass + '">' + (item.agencia || '-') + '</td>' +
                     '<td class="campanha">' + (item.campanha || '-') + '</td>' +
                     '<td><span class="controle">' + (item.controle || '-') + '</span></td>' +
-                    '<td class="qtd" style="font-weight: 400;">' + item.qtd + '</td>' +
-                    '<td style="color: hsl(220, 15%, 35%);">' + formatCurrency(item.valor) + '</td>' +
+                    '<td class="qtd">' + item.qtd + '</td>' +
+                    '<td class="valor">' + formatCurrency(item.valor) + '</td>' +
                     '<td class="data">' + dataHtml + '</td>' +
                     '</tr>';
             }).join('');
 
             html += '<tr class="summary-row">' +
-                '<td style="text-align:left;"><strong>Total</strong></td><td></td><td></td>' +
-                '<td class="qtd" style="font-weight: 600;">' + totalQtd + '</td>' +
-                '<td style="color: hsl(220, 15%, 35%); font-weight: 600;">' + formatCurrency(totalValor) + '</td>' +
+                '<td colspan="3"><strong>Total</strong></td>' +
+                '<td class="qtd">' + totalQtd + '</td>' +
+                '<td class="valor">' + formatCurrency(totalValor) + '</td>' +
                 '<td></td></tr>';
 
             tbody.innerHTML = html;
         }
 
         // ==========================================
-        // EXECUTORES - Menu suspenso com data mais recente
+        // EXECUTORES
         // ==========================================
         function carregarExecutorDatasDisponiveis() {
             if (!window.google || !google.script || !google.script.run) {
                 document.getElementById('executorDateSelect').innerHTML = '<option value="">Não disponível</option>';
+                document.getElementById('executorDatePreview').textContent = 'Não disponível';
                 return;
             }
 
             google.script.run
                 .withSuccessHandler(function(result) {
                     var select = document.getElementById('executorDateSelect');
+                    var preview = document.getElementById('executorDatePreview');
                     var datasDisponiveis = result.datasDisponiveis || [];
 
                     if (datasDisponiveis.length === 0) {
                         select.innerHTML = '<option value="">Nenhuma data disponível</option>';
+                        preview.textContent = 'Sem dados';
                         return;
                     }
 
-                    // Primeira opção é a data mais recente (já vem ordenada)
                     var html = '';
                     datasDisponiveis.forEach(function(data, idx) {
                         var selected = idx === 0 ? 'selected' : '';
                         html += '<option value="' + data + '" ' + selected + '>' + formatDateSimple(data) + '</option>';
                     });
                     select.innerHTML = html;
+                    
+                    // Mostrar data mais recente no preview
+                    preview.textContent = formatDateSimple(datasDisponiveis[0]);
 
-                    // Carregar executores da data mais recente
                     renderExecutores(result);
                 })
                 .withFailureHandler(function(err) {
                     console.error('Erro ao carregar datas:', err);
                     document.getElementById('executorDateSelect').innerHTML = '<option value="">Erro ao carregar</option>';
+                    document.getElementById('executorDatePreview').textContent = 'Erro';
                 })
-                .getDadosExecutores(null); // null = pegar data mais recente
+                .getDadosExecutores(null);
         }
 
         function carregarExecutores(dataSelecionada) {
             if (!window.google || !google.script || !google.script.run) return;
+
+            // Atualizar preview
+            document.getElementById('executorDatePreview').textContent = formatDateSimple(dataSelecionada);
 
             document.getElementById('executorTableContainer').innerHTML = '<div class="empty-state"><div class="spinner" style="width:24px;height:24px;margin:0 auto 12px;"></div><p>Carregando...</p></div>';
 
@@ -1068,7 +1146,7 @@
                 return;
             }
 
-            var totalAv = 0, totalCalia = 0, totalEbm = 0, totalGeral = 0, totalValor = 0, totalEmAnalise = 0;
+            var totalAv = 0, totalCalia = 0, totalEbm = 0, totalGeral = 0, totalValor = 0, totalAnalisadas = 0;
 
             var html = '<table class="executor-table"><thead><tr>' +
                 '<th>Executor</th>' +
@@ -1081,42 +1159,32 @@
                 '</tr></thead><tbody>';
 
             executores.forEach(function(exec) {
-                totalAv += toNumber(exec.av || 0);
-                totalCalia += toNumber(exec.calia || 0);
-                totalEbm += toNumber(exec.ebm || 0);
-                totalGeral += toNumber(exec.total || 0);
-
-                var execValor = toNumber(
-                    exec.valorAB != null ? exec.valorAB :
-                    (exec.ab != null ? exec.ab :
-                    (exec.AB != null ? exec.AB :
-                    (exec.valor != null ? exec.valor :
-                    (exec.valorTotal != null ? exec.valorTotal : exec.totalValor))))
-                );
-                totalValor += execValor;
-
-                // Analisadas = total - emAnalise (valores do consolidado coluna M)
-                var analisadas = toNumber(exec.total || 0) - toNumber(exec.emAnalise || 0);
-                totalEmAnalise += analisadas;
+                totalAv += exec.av || 0;
+                totalCalia += exec.calia || 0;
+                totalEbm += exec.ebm || 0;
+                totalGeral += exec.total || 0;
+                totalValor += exec.valor || 0;
+                var analisadas = (exec.total || 0) - (exec.emAnalise || 0);
+                totalAnalisadas += analisadas;
 
                 html += '<tr>' +
                     '<td class="executor-name">' + escapeHtml(exec.nome) + '</td>' +
-                    '<td class="count"><span class="agencia-av">' + (exec.av || 0) + '</span></td>' +
-                    '<td class="count"><span class="agencia-calia">' + (exec.calia || 0) + '</span></td>' +
-                    '<td class="count"><span class="agencia-ebm">' + (exec.ebm || 0) + '</span></td>' +
+                    '<td class="count av">' + (exec.av || 0) + '</td>' +
+                    '<td class="count calia">' + (exec.calia || 0) + '</td>' +
+                    '<td class="count ebm">' + (exec.ebm || 0) + '</td>' +
                     '<td class="count">' + (exec.total || 0) + '</td>' +
                     '<td class="count">' + analisadas + '</td>' +
-                    '<td class="count">' + formatCurrency(execValor) + '</td>' +
+                    '<td class="count">' + formatCurrency(exec.valor || 0) + '</td>' +
                     '</tr>';
             });
 
             html += '<tr class="summary-row">' +
-                '<td style="text-align:left;">Total</td>' +
-                '<td class="count">' + totalAv + '</td>' +
-                '<td class="count">' + totalCalia + '</td>' +
-                '<td class="count">' + totalEbm + '</td>' +
+                '<td>TOTAL</td>' +
+                '<td class="count av">' + totalAv + '</td>' +
+                '<td class="count calia">' + totalCalia + '</td>' +
+                '<td class="count ebm">' + totalEbm + '</td>' +
                 '<td class="count">' + totalGeral + '</td>' +
-                '<td class="count">' + totalEmAnalise + '</td>' +
+                '<td class="count">' + totalAnalisadas + '</td>' +
                 '<td class="count">' + formatCurrency(totalValor) + '</td>' +
                 '</tr></tbody></table>';
 
@@ -1124,13 +1192,12 @@
         }
 
         // ==========================================
-        // GERADOR - Expande automaticamente ao digitar
+        // GERADOR DE TABELA - FUNÇÕES COMPLETAS (BETA)
         // ==========================================
         function debounceSearchGerador() {
             clearTimeout(searchTimeoutGerador);
             var valor = document.getElementById('valorBuscaGerador').value.trim();
 
-            // Expandir automaticamente ao digitar
             var content = document.getElementById('geradorContent');
             var card = document.getElementById('geradorCard');
 
@@ -1140,9 +1207,7 @@
             } else {
                 content.classList.remove('show');
                 card.classList.remove('expanded');
-                document.getElementById('statusSaldoGerador').innerHTML = '';
-                document.getElementById('atestoInfoGerador').innerHTML = '';
-                document.getElementById('tableContainerGerador').innerHTML = '';
+                limparGerador();
                 return;
             }
 
@@ -1151,9 +1216,26 @@
             }, 400);
         }
 
+        function limparGerador() {
+            document.getElementById('geradorDateTime').innerHTML = '';
+            document.getElementById('statusSaldoGerador').innerHTML = '';
+            document.getElementById('certidoesAreaGerador').innerHTML = '';
+            document.getElementById('atestoInfoGerador').innerHTML = '';
+            document.getElementById('tableContainerGerador').innerHTML = '';
+            window.saldoAtualGerador = 0;
+        }
+
         function buscarDadosGerador(valor) {
             document.getElementById('loadingGerador').style.display = 'block';
             document.getElementById('tableContainerGerador').innerHTML = '';
+
+            var agora = new Date();
+            var dataHora = String(agora.getDate()).padStart(2,'0') + '/' + 
+                String(agora.getMonth()+1).padStart(2,'0') + '/' + 
+                agora.getFullYear() + ', ' + 
+                String(agora.getHours()).padStart(2,'0') + ':' + 
+                String(agora.getMinutes()).padStart(2,'0');
+            document.getElementById('geradorDateTime').innerHTML = dataHora;
 
             if (window.google && google.script && google.script.run) {
                 google.script.run
@@ -1167,15 +1249,37 @@
                 google.script.run
                     .withSuccessHandler(updateSaldoGerador)
                     .getSaldoByPI(valor);
+
+                google.script.run
+                    .withSuccessHandler(updateCertidoesGerador)
+                    .getCertidoesByAgencia(valor);
             }
         }
 
         function updateSaldoGerador(result) {
             var div = document.getElementById('statusSaldoGerador');
             if (result && result.agencia && result.campanha) {
-                div.innerHTML = 'Agência: <strong style="color:hsl(217,90%,45%);">' + result.agencia + '</strong>, Campanha: <strong style="color:hsl(217,90%,45%);">' + result.campanha + '</strong>, Saldo Atual: <strong style="color:hsl(217,90%,45%);">' + formatCurrency(result.saldo) + '</strong>';
+                window.saldoAtualGerador = result.saldo || 0;
+                div.innerHTML = 'Agência: <strong style="color:hsl(217,90%,45%);">' + escapeHtml(result.agencia) + '</strong>, ' +
+                    'Campanha: <strong style="color:hsl(217,90%,45%);">' + escapeHtml(result.campanha) + '</strong>, ' +
+                    'Saldo Atual: <strong style="color:hsl(217,90%,45%);">' + formatCurrency(result.saldo) + '</strong>';
             } else {
+                window.saldoAtualGerador = 0;
                 div.innerHTML = '<span style="color:hsl(0,75%,45%);font-weight:bold;">Agência/Campanha não encontradas.</span>';
+            }
+        }
+
+        function updateCertidoesGerador(result) {
+            var div = document.getElementById('certidoesAreaGerador');
+            if (result && result.agencia_cert) {
+                var linkHtml = result.link ? '<a href="' + escapeHtml(result.link) + '" target="_blank">🔗</a>' : '';
+                div.innerHTML = '<div class="gerador-certidoes"><strong>Certidões:</strong> ' +
+                    'RFB ' + (result.rfb || 'N/A') + ', ' +
+                    'SEFAZ DF ' + (result.sefaz_df || 'N/A') + ', ' +
+                    'FGTS ' + (result.fgts || 'N/A') + ', ' +
+                    'TST ' + (result.tst || 'N/A') + ' ' + linkHtml + '</div>';
+            } else {
+                div.innerHTML = '';
             }
         }
 
@@ -1188,23 +1292,101 @@
                 return;
             }
 
-            var totalLiquido = 0;
+            var temGlosa = data.some(function(r) {
+                return r.glosa && r.glosa !== 0 && r.glosa !== '-';
+            });
+
+            var totalValorNF = 0;
+            var totalGlosa = 0;
+            var totalAposGlosa = 0;
             var nfList = [];
+
             data.forEach(function(r) {
-                totalLiquido += Number(r.valor_nf) || 0;
+                var valorNF = Number(r.valor_nf) || 0;
+                var glosa = Number(r.glosa) || 0;
+                var valorAposGlosa = valorNF - glosa;
+                totalValorNF += valorNF;
+                totalGlosa += glosa;
+                totalAposGlosa += valorAposGlosa;
                 if (r.nf && r.nf !== '-') nfList.push(r.nf);
             });
 
             nfList = [...new Set(nfList)].sort(function(a, b) { return Number(a) - Number(b); });
-            var nfTexto = nfList.length > 1 ? nfList.slice(0, -1).join(', ') + ' e ' + nfList[nfList.length - 1] : nfList[0];
+            var nfTexto = nfList.length > 1 ? nfList.slice(0, -1).join(', ') + ' e ' + nfList[nfList.length - 1] : (nfList[0] || '-');
 
-            document.getElementById('atestoInfoGerador').innerHTML = '<div style="background:hsl(217,90%,97%);padding:12px 16px;border-radius:8px;border:1px solid hsl(217,90%,90%);"><strong style="color:hsl(217,90%,45%);">Texto para atesto:</strong> ' + nfTexto + ', no montante total de <strong>' + formatCurrency(totalLiquido) + '</strong></div>';
+            var valorAtesto = temGlosa ? totalAposGlosa : totalValorNF;
+            document.getElementById('atestoInfoGerador').innerHTML = '<div class="gerador-info-box"><strong style="color:hsl(217,90%,45%);">Texto para atesto:</strong> ' + nfTexto + ', no montante total de <strong>' + formatCurrency(valorAtesto) + '</strong></div>';
 
-            var html = '<table class="executor-table" style="margin-top:20px;"><thead><tr><th>Ord.</th><th>NF</th><th>Veículo/Fornecedor</th><th>CNPJ</th><th>Tipo de Mídia</th><th>Valor da NF</th></tr></thead><tbody>';
-            data.forEach(function(r, i) {
-                html += '<tr><td>' + (i + 1) + '</td><td>' + (r.nf || '-') + '</td><td>' + (r.veiculo_forn || '-') + '</td><td>' + (r.cnpj || '-') + '</td><td>' + (r.tipo_midia || '-') + '</td><td class="valor">' + formatCurrency(r.valor_nf) + '</td></tr>';
-            });
-            html += '<tr class="summary-row"><td colspan="5"><strong>TOTAL</strong></td><td class="valor"><strong>' + formatCurrency(totalLiquido) + '</strong></td></tr></tbody></table>';
+            var saldoRestante = window.saldoAtualGerador - valorAtesto;
+            var numCols = temGlosa ? 9 : 7;
+
+            var html = '<table class="gerador-table">';
+            // Título na primeira linha da tabela
+            html += '<thead><tr class="title-row"><th colspan="' + numCols + '">4. CONTROLE DE SALDO ORÇAMENTÁRIO</th></tr>';
+            
+            if (temGlosa) {
+                html += '<tr>' +
+                    '<th>Ord.</th>' +
+                    '<th>NF</th>' +
+                    '<th>Veículo/Fornecedor</th>' +
+                    '<th>CNPJ</th>' +
+                    '<th>Tipo de Mídia</th>' +
+                    '<th class="valor">Valor da NF</th>' +
+                    '<th class="valor">Glosa</th>' +
+                    '<th class="valor">Valor após Glosa</th>' +
+                    '<th class="valor">Saldo do Empenho</th>' +
+                    '</tr></thead><tbody>';
+                data.forEach(function(r, i) {
+                    var valorNF = Number(r.valor_nf) || 0;
+                    var glosa = Number(r.glosa) || 0;
+                    var valorAposGlosa = valorNF - glosa;
+                    var glosaDisplay = glosa > 0 ? formatCurrency(glosa) : '-';
+                    html += '<tr>' +
+                        '<td class="center">' + (i + 1) + '</td>' +
+                        '<td class="center">' + escapeHtml(r.nf || '-') + '</td>' +
+                        '<td class="center">' + escapeHtml(r.veiculo_forn || '-') + '</td>' +
+                        '<td class="center">' + escapeHtml(r.cnpj || '-') + '</td>' +
+                        '<td class="center">' + escapeHtml(r.tipo_midia || '-') + '</td>' +
+                        '<td class="valor">' + formatCurrency(valorNF) + '</td>' +
+                        '<td class="valor">' + glosaDisplay + '</td>' +
+                        '<td class="valor">' + formatCurrency(valorAposGlosa) + '</td>' +
+                        '<td class="valor">-</td>' +
+                        '</tr>';
+                });
+                html += '<tr class="summary-row">' +
+                    '<td colspan="5" style="text-align:right;"><strong>TOTAL</strong></td>' +
+                    '<td class="valor">' + formatCurrency(totalValorNF) + '</td>' +
+                    '<td class="valor">' + formatCurrency(totalGlosa) + '</td>' +
+                    '<td class="valor">' + formatCurrency(totalAposGlosa) + '</td>' +
+                    '<td class="valor"><strong>' + formatCurrency(saldoRestante) + '</strong></td>' +
+                    '</tr></tbody></table>';
+            } else {
+                html += '<tr>' +
+                    '<th>Ord.</th>' +
+                    '<th>NF</th>' +
+                    '<th>Veículo/Fornecedor</th>' +
+                    '<th>CNPJ</th>' +
+                    '<th>Tipo de Mídia</th>' +
+                    '<th class="valor">Valor da NF</th>' +
+                    '<th class="valor">Saldo do Empenho</th>' +
+                    '</tr></thead><tbody>';
+                data.forEach(function(r, i) {
+                    html += '<tr>' +
+                        '<td class="center">' + (i + 1) + '</td>' +
+                        '<td class="center">' + escapeHtml(r.nf || '-') + '</td>' +
+                        '<td class="center">' + escapeHtml(r.veiculo_forn || '-') + '</td>' +
+                        '<td class="center">' + escapeHtml(r.cnpj || '-') + '</td>' +
+                        '<td class="center">' + escapeHtml(r.tipo_midia || '-') + '</td>' +
+                        '<td class="valor">' + formatCurrency(r.valor_nf) + '</td>' +
+                        '<td class="valor">-</td>' +
+                        '</tr>';
+                });
+                html += '<tr class="summary-row">' +
+                    '<td colspan="5" style="text-align:right;"><strong>TOTAL</strong></td>' +
+                    '<td class="valor">' + formatCurrency(totalValorNF) + '</td>' +
+                    '<td class="valor"><strong>' + formatCurrency(saldoRestante) + '</strong></td>' +
+                    '</tr></tbody></table>';
+            }
 
             container.innerHTML = html;
         }
@@ -1244,32 +1426,9 @@
         }
 
         // ==========================================
-        // TOGGLE EXECUTORES
-        // ==========================================
-        var executoresExpanded = false;
-        function toggleExecutores() {
-            executoresExpanded = !executoresExpanded;
-            var container = document.getElementById('executorTableContainer');
-            var chevron = document.getElementById('executorChevron');
-            var card = document.getElementById('executorCard');
-            if (executoresExpanded) {
-                container.classList.add('show');
-                card.classList.add('expanded');
-                chevron.style.transform = 'rotate(180deg)';
-            } else {
-                container.classList.remove('show');
-                card.classList.remove('expanded');
-                chevron.style.transform = 'rotate(0deg)';
-            }
-        }
-
-        // ==========================================
         // INIT
         // ==========================================
         document.addEventListener('DOMContentLoaded', function() {
-            renderEmProcesso();
-            renderAtestadas();
-            renderPagas();
             loadData();
             carregarExecutorDatasDisponiveis();
         });
